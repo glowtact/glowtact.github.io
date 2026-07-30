@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Contact Atlas: an evidence-first interactive website concept for GlowTact.">
+    <title>GlowTact — Contact Atlas</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the atlas</a>
+
+    <header class="atlas-header">
+      <a class="atlas-brand" href="../" aria-label="Back to GlowTact concept review">
+        <span>GT</span>
+        <strong>Contact Atlas</strong>
+      </a>
+      <nav aria-label="Atlas chapters">
+        <a href="#plate-mechanism">Mechanism</a>
+        <a href="#plates">Specimens</a>
+        <a href="#ledger">Ledger</a>
+      </nav>
+      <a class="concept-mark" href="../">
+        <span>Concept</span>
+        <strong>02 / 03</strong>
+      </a>
+    </header>
+
+    <main id="main">
+      <section class="atlas-hero" aria-labelledby="atlas-title">
+        <div class="hero-index" aria-hidden="true">
+          <span>ATLAS</span>
+          <strong>01—06</strong>
+        </div>
+        <div class="hero-title" data-reveal>
+          <p class="chapter-label">GlowTact field notes · contact &amp; geometry</p>
+          <h1 id="atlas-title">Every contact leaves a legible trace.</h1>
+        </div>
+        <div class="hero-copy" data-reveal>
+          <p>
+            A specimen-led reading of GlowTact: from pressure-induced optical
+            coupling to fine contact geometry in compact fingertips.
+          </p>
+          <dl>
+            <div><dt>Illumination</dt><dd>Single-color</dd></div>
+            <div><dt>Interface</dt><dd>Unbonded membrane</dd></div>
+            <div><dt>Output</dt><dd>Local darkening</dd></div>
+          </dl>
+        </div>
+        <div class="hero-field" aria-hidden="true" data-reveal>
+          <span class="field-axis field-axis--x"></span>
+          <span class="field-axis field-axis--y"></span>
+          <div class="field-contact field-contact--one"><i></i></div>
+          <div class="field-contact field-contact--two"><i></i></div>
+          <div class="field-contact field-contact--three"><i></i></div>
+          <p>Pressure-responsive contact field</p>
+        </div>
+        <p class="hero-footnote" data-reveal>
+          PLATE 01 · CONCEPTUAL CONTACT FIELD · NOT TO SCALE
+        </p>
+      </section>
+
+      <section class="plate plate--mechanism" id="plate-mechanism" aria-labelledby="mechanism-title">
+        <header class="plate-heading" data-reveal>
+          <div class="plate-number"><span>PLATE</span><strong>02</strong></div>
+          <div>
+            <p class="chapter-label">Interface anatomy</p>
+            <h2 id="mechanism-title">Inspect the coupling layer</h2>
+          </div>
+          <p>
+            Move the lens, then switch layers to read the same conceptual
+            contact as membrane geometry, optical coupling, or tactile output.
+          </p>
+        </header>
+
+        <div class="specimen-workbench" data-layer="coupling" data-reveal>
+          <div class="specimen-stage" id="comparison-stage">
+            <div class="stage-label stage-label--top">
+              <span>Specimen GT–C01</span>
+              <span>Conceptual section</span>
+            </div>
+            <div class="stage-grid" aria-hidden="true"></div>
+            <div class="stage-base" aria-hidden="true">
+              <span class="section-probe"></span>
+              <span class="section-membrane"></span>
+              <span class="section-gap"></span>
+              <span class="section-gel"></span>
+            </div>
+            <div class="stage-overlay" aria-hidden="true">
+              <span class="overlay-membrane"></span>
+              <span class="overlay-coupling"></span>
+              <span class="overlay-output"></span>
+            </div>
+            <div class="comparison-rule" aria-hidden="true"><span></span></div>
+            <div class="lens-label" aria-hidden="true">LENS</div>
+            <div class="stage-scale" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <aside class="workbench-controls" aria-label="Specimen layer controls">
+            <div class="control-heading">
+              <span>Layer view</span>
+              <strong id="layer-title">Optical coupling</strong>
+            </div>
+            <div class="layer-tabs" role="group" aria-label="Conceptual layer">
+              <button type="button" data-layer="membrane" aria-pressed="false">
+                <span>01</span>Membrane
+              </button>
+              <button type="button" data-layer="coupling" aria-pressed="true">
+                <span>02</span>Coupling
+              </button>
+              <button type="button" data-layer="tactile" aria-pressed="false">
+                <span>03</span>Tactile
+              </button>
+            </div>
+            <label for="lens-position">
+              <span>Comparison lens</span>
+              <output id="lens-output" for="lens-position">52%</output>
+            </label>
+            <input id="lens-position" type="range" min="0" max="100" value="52" aria-label="Comparison lens position">
+            <p id="layer-description">
+              The amber region marks where pressure increases local membrane–gel
+              optical coupling.
+            </p>
+            <p class="disclosure">Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="plate plate--catalog" aria-labelledby="catalog-title">
+        <header class="plate-heading" data-reveal>
+          <div class="plate-number"><span>PLATE</span><strong>03</strong></div>
+          <div>
+            <p class="chapter-label">Embodiment catalog</p>
+            <h2 id="catalog-title">The stack changes shape</h2>
+          </div>
+          <p>
+            Flat, omnidirectional, and humanoid fingertip implementations share
+            the pressure-responsive interface.
+          </p>
+        </header>
+
+        <div class="catalog-grid">
+          <article class="catalog-entry catalog-entry--feature" data-reveal>
+            <div class="catalog-image">
+              <img src="../assets/images/hero-teaser.jpg" alt="Robotic hand using black GlowTact fingertips to grasp a small screw">
+              <span>Experimental media</span>
+            </div>
+            <p class="catalog-code">GT / H–17</p>
+            <h3>Humanoid fingertip</h3>
+            <p>Approximately 17 mm wide with front-facing tactile coverage.</p>
+          </article>
+          <article class="catalog-entry" data-reveal>
+            <div class="catalog-schematic catalog-schematic--flat" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <p class="catalog-code">GT / F–01</p>
+            <h3>Flat sensor</h3>
+            <p>Textured silicone, acrylic light guide, perimeter LEDs, and a fisheye camera.</p>
+          </article>
+          <article class="catalog-entry" data-reveal>
+            <div class="catalog-schematic catalog-schematic--omni" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <p class="catalog-code">GT / O–01</p>
+            <h3>Omnidirectional tip</h3>
+            <p>A clear skeleton and black membrane extend contact around a curved surface.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="plate plate--pressure" aria-labelledby="pressure-title">
+        <header class="plate-heading" data-reveal>
+          <div class="plate-number"><span>PLATE</span><strong>04</strong></div>
+          <div>
+            <p class="chapter-label">Controlled contact</p>
+            <h2 id="pressure-title">Darkening preserves texture</h2>
+          </div>
+          <p>
+            Under increasing controlled load, the visible contact grows darker
+            while fingerprint structure remains spatially legible.
+          </p>
+        </header>
+        <figure class="pressure-plate" data-reveal>
+          <img src="../assets/images/fingerprint-pressure.jpg" alt="Fingerprint tactile contacts at 0.3, 1.0, and 2.0 newtons, with increasing local darkening">
+          <figcaption>
+            <div><span>0.3 N</span><span>1.0 N</span><span>2.0 N</span></div>
+            <p>Experimental media · controlled contact sequence</p>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="plate plate--specimens" id="plates" aria-labelledby="specimens-title">
+        <header class="plate-heading" data-reveal>
+          <div class="plate-number"><span>PLATE</span><strong>05</strong></div>
+          <div>
+            <p class="chapter-label">Geometry specimens</p>
+            <h2 id="specimens-title">Read the contact, not just the event</h2>
+          </div>
+          <p>
+            Select a supplied qualitative reconstruction. Each specimen keeps
+            the contact shape tied to its source image.
+          </p>
+        </header>
+
+        <div class="geometry-browser" data-reveal>
+          <div class="specimen-sidebar">
+            <p>Collection / 03 specimens</p>
+            <div class="specimen-tabs" role="group" aria-label="Geometry specimen">
+              <button type="button" data-specimen="thread" aria-pressed="true">
+                <span>01</span><strong>M1 threads</strong><i>Repeated profile</i>
+              </button>
+              <button type="button" data-specimen="phillips" aria-pressed="false">
+                <span>02</span><strong>Phillips head</strong><i>Recessed profile</i>
+              </button>
+              <button type="button" data-specimen="balls" aria-pressed="false">
+                <span>03</span><strong>Ball array</strong><i>Separated contacts</i>
+              </button>
+            </div>
+          </div>
+          <figure class="geometry-figure">
+            <div class="geometry-image">
+              <img id="specimen-image" src="../assets/images/thread-mesh.png" alt="Qualitative reconstruction of M1 screw threads">
+              <span class="image-corner image-corner--tl"></span>
+              <span class="image-corner image-corner--br"></span>
+            </div>
+            <figcaption>
+              <div>
+                <span>Selected specimen</span>
+                <h3 id="specimen-title">M1 screw threads</h3>
+              </div>
+              <p id="specimen-note">Fine repeated geometry remains spatially legible.</p>
+              <span>Qualitative reconstruction</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="plate plate--overview" aria-labelledby="overview-title">
+        <header class="plate-heading" data-reveal>
+          <div class="plate-number"><span>PLATE</span><strong>06</strong></div>
+          <div>
+            <p class="chapter-label">Collection overview</p>
+            <h2 id="overview-title">Objects, signals, reconstructions</h2>
+          </div>
+          <p>
+            The overview groups physical contacts, tactile images, and
+            qualitative geometry reconstructions.
+          </p>
+        </header>
+        <figure class="overview-figure" data-reveal>
+          <img src="../assets/images/reconstruction-overview.jpg" alt="Collection of contact objects, tactile images, and qualitative reconstructions">
+          <figcaption>Source overview · supplied project figure</figcaption>
+        </figure>
+      </section>
+
+      <section class="ledger" id="ledger" aria-labelledby="ledger-title">
+        <div class="ledger-heading">
+          <p class="chapter-label">Methods ledger</p>
+          <h2 id="ledger-title">What the atlas claims</h2>
+        </div>
+        <dl class="ledger-list">
+          <div data-reveal>
+            <dt>Mechanism</dt>
+            <dd>Pressure-induced optical coupling at an unbonded membrane–gel interface.</dd>
+          </div>
+          <div data-reveal>
+            <dt>Illumination</dt>
+            <dd>Single-color and nondirectional.</dd>
+          </div>
+          <div data-reveal>
+            <dt>Geometry</dt>
+            <dd>Useful spatial contact information with qualitative reconstruction down to M1 threads.</dd>
+          </div>
+          <div data-reveal>
+            <dt>Force</dt>
+            <dd>Pressure-responsive images support learned normal-force estimation.</dd>
+          </div>
+        </dl>
+        <div class="citation-block">
+          <p>Temporary anonymous citation</p>
+          <pre><code>@article{anonymous2026glowtact,
+  title  = {GlowTact: Simple and Compact Vision-Based Tactile Sensing
+            with High Sensitivity and Spatial Resolution},
+  author = {Anonymous},
+  year   = {2026}
+}</code></pre>
+          <div class="availability">
+            <span aria-disabled="true">Paper / not yet available</span>
+            <span aria-disabled="true">Code / not yet available</span>
+            <span aria-disabled="true">Data / not yet available</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="atlas-footer">
+      <a href="../concept-01/"><span aria-hidden="true">←</span> Optical Coupling</a>
+      <p>GlowTact · Contact Atlas · Concept 02</p>
+      <a href="../concept-03/">Signal Chamber <span aria-hidden="true">→</span></a>
+    </footer>
+  </body>
+</html>

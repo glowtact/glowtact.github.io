@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Optical Coupling: a mechanism-first interactive website concept for GlowTact.">
+    <title>GlowTact — Optical Coupling</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="../" aria-label="Back to GlowTact concept review">
+        <svg viewBox="0 0 28 28" aria-hidden="true">
+          <circle cx="14" cy="14" r="12"></circle>
+          <circle cx="14" cy="14" r="4" class="brand-core"></circle>
+        </svg>
+        <span>GlowTact</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#mechanism">Mechanism</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#paper">Paper</a>
+      </nav>
+      <a class="concept-switcher" href="../">
+        <span>Concept 01</span>
+        <span aria-hidden="true">⌁</span>
+      </a>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="hero-copy" data-reveal>
+          <p class="eyebrow">Vision-based tactile sensing · 2026</p>
+          <h1>Pressure becomes visible.</h1>
+          <p class="hero-summary">
+            GlowTact turns optical coupling between a black elastomer membrane
+            and a microtextured transparent gel into a direct, high-contrast
+            tactile image.
+          </p>
+          <a class="text-link" href="#mechanism">
+            Explore the coupling mechanism <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+
+        <div class="hero-aperture" aria-hidden="true" data-reveal>
+          <div class="aperture-ring aperture-ring--outer"></div>
+          <div class="aperture-ring aperture-ring--mid"></div>
+          <div class="aperture-contact">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p>Local darkening</p>
+        </div>
+
+        <div class="hero-meta" data-reveal>
+          <div>
+            <span>Illumination</span>
+            <strong>Single-color</strong>
+          </div>
+          <div>
+            <span>Response</span>
+            <strong>Pressure-responsive</strong>
+          </div>
+          <div>
+            <span>Form</span>
+            <strong>Compact fingertip</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="mechanism" id="mechanism" aria-labelledby="mechanism-title">
+        <div class="section-heading" data-reveal>
+          <p class="eyebrow">01 · Optical mechanism</p>
+          <h2 id="mechanism-title">From air gap to dark tactile signal</h2>
+          <p>
+            Move the control to see how contact changes the interface. The
+            visualization is qualitative and deliberately uses no force units.
+          </p>
+        </div>
+
+        <div class="mechanism-lab" data-probe="sphere" data-reveal>
+          <div class="diagram-panel">
+            <div class="diagram-label diagram-label--left">
+              <span>Cross-section</span>
+              <strong>Interface state</strong>
+            </div>
+            <svg class="coupling-diagram" viewBox="0 0 900 600" role="img" aria-labelledby="diagram-title diagram-desc">
+              <title id="diagram-title">Conceptual GlowTact membrane and gel cross-section</title>
+              <desc id="diagram-desc">A probe presses a black membrane toward a microtextured transparent gel. The air gap closes and the amber coupling region expands.</desc>
+              <defs>
+                <pattern id="microtexture" width="18" height="18" patternUnits="userSpaceOnUse">
+                  <circle cx="4" cy="4" r="1.6" fill="currentColor"></circle>
+                </pattern>
+                <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="12"></feGaussianBlur>
+                </filter>
+              </defs>
+
+              <g id="reflected-rays" class="reflected-rays">
+                <path d="M210 438 L154 356 L104 438"></path>
+                <path d="M690 438 L746 356 L796 438"></path>
+                <path d="M315 448 L276 380 L244 448"></path>
+                <path d="M585 448 L624 380 L656 448"></path>
+              </g>
+
+              <g id="probe-shape" class="probe-shape">
+                <path class="probe probe--sphere" d="M390 74 H510 V166 Q510 220 450 220 Q390 220 390 166 Z"></path>
+                <path class="probe probe--flat" d="M362 74 H538 V214 H362 Z"></path>
+                <path class="probe probe--edge" d="M390 74 H510 V180 L450 222 L390 180 Z"></path>
+              </g>
+
+              <g class="probe-guides">
+                <line x1="450" y1="28" x2="450" y2="66"></line>
+                <path d="M438 54 L450 66 L462 54"></path>
+              </g>
+
+              <ellipse id="coupling-patch" class="coupling-glow" cx="450" cy="347" rx="118" ry="30" filter="url(#softGlow)"></ellipse>
+              <ellipse class="coupling-core" cx="450" cy="360" rx="96" ry="15"></ellipse>
+
+              <path id="membrane-path" class="membrane" d="M110 318 C260 318 334 324 382 344 C412 357 427 369 450 369 C473 369 488 357 518 344 C566 324 640 318 790 318"></path>
+              <path class="membrane-fill" d="M110 318 C260 318 334 324 382 344 C412 357 427 369 450 369 C473 369 488 357 518 344 C566 324 640 318 790 318 L790 292 C620 292 560 297 510 310 C478 318 468 324 450 324 C432 324 422 318 390 310 C340 297 280 292 110 292 Z"></path>
+
+              <g id="air-gap" class="air-gap">
+                <line x1="206" y1="337" x2="206" y2="376"></line>
+                <line x1="694" y1="337" x2="694" y2="376"></line>
+                <text x="450" y="411" text-anchor="middle">MICROSCOPIC AIR GAP</text>
+              </g>
+
+              <rect class="gel" x="80" y="380" width="740" height="148" rx="4"></rect>
+              <rect class="texture" x="80" y="380" width="740" height="50" fill="url(#microtexture)"></rect>
+              <line class="acrylic-line" x1="80" y1="528" x2="820" y2="528"></line>
+
+              <g id="tactile-patch" class="tactile-inset">
+                <rect x="670" y="66" width="156" height="118" rx="2"></rect>
+                <ellipse cx="748" cy="125" rx="43" ry="30"></ellipse>
+                <text x="748" y="208" text-anchor="middle">SIMULATED OUTPUT</text>
+              </g>
+
+              <g class="diagram-legend">
+                <circle cx="106" cy="560" r="5" class="legend-amber"></circle>
+                <text x="122" y="565">Optical coupling</text>
+                <circle cx="294" cy="560" r="5" class="legend-black"></circle>
+                <text x="310" y="565">Black membrane</text>
+                <circle cx="480" cy="560" r="5" class="legend-gel"></circle>
+                <text x="496" y="565">Microtextured gel</text>
+              </g>
+            </svg>
+          </div>
+
+          <aside class="mechanism-controls" aria-label="Mechanism controls">
+            <div class="state-readout">
+              <span>Interface state</span>
+              <output id="pressure-state" for="pressure">Partial coupling</output>
+              <div class="state-rule" aria-hidden="true"><span></span></div>
+            </div>
+
+            <label class="range-label" for="pressure">
+              <span>Applied pressure</span>
+              <span>Conceptual</span>
+            </label>
+            <input id="pressure" type="range" min="0" max="100" value="22" aria-describedby="pressure-state mechanism-note">
+
+            <fieldset>
+              <legend>Probe profile</legend>
+              <div class="probe-switch" role="group" aria-label="Probe profile">
+                <button type="button" data-probe="flat" aria-pressed="false">
+                  <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M6 3h16v14H6z"></path></svg>
+                  Flat
+                </button>
+                <button type="button" data-probe="sphere" aria-pressed="true">
+                  <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M6 3h16v7a8 8 0 0 1-16 0z"></path></svg>
+                  Sphere
+                </button>
+                <button type="button" data-probe="edge" aria-pressed="false">
+                  <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M6 3h16v8l-8 6-8-6z"></path></svg>
+                  Edge
+                </button>
+              </div>
+            </fieldset>
+
+            <button class="reset-button" id="reset-mechanism" type="button">
+              Reset mechanism <span aria-hidden="true">↺</span>
+            </button>
+
+            <p class="mechanism-note" id="mechanism-note">Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="principle" aria-labelledby="principle-title">
+        <div class="section-heading" data-reveal>
+          <p class="eyebrow">02 · Three interface states</p>
+          <h2 id="principle-title">A simpler optical response</h2>
+        </div>
+        <ol class="principle-steps">
+          <li data-reveal>
+            <span class="step-number">01</span>
+            <div class="step-visual step-visual--gap" aria-hidden="true"><i></i></div>
+            <h3>No contact</h3>
+            <p>Microscopic air gaps diffusely reflect light, producing a light-gray tactile image.</p>
+          </li>
+          <li data-reveal>
+            <span class="step-number">02</span>
+            <div class="step-visual step-visual--coupled" aria-hidden="true"><i></i></div>
+            <h3>Local contact</h3>
+            <p>Pressure increases membrane–gel optical coupling and reduces reflection locally.</p>
+          </li>
+          <li data-reveal>
+            <span class="step-number">03</span>
+            <div class="step-visual step-visual--dark" aria-hidden="true"><i></i></div>
+            <h3>Increasing pressure</h3>
+            <p>A larger fraction of the interface couples, so the response becomes larger and darker.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="embodiments" aria-labelledby="embodiments-title">
+        <div class="section-heading section-heading--split" data-reveal>
+          <div>
+            <p class="eyebrow">03 · Form factors</p>
+            <h2 id="embodiments-title">One principle, compact embodiments</h2>
+          </div>
+          <p>
+            The sensing stack supports flat, omnidirectional, and humanoid
+            fingertip geometries using single-color, nondirectional illumination.
+          </p>
+        </div>
+        <figure class="wide-figure" data-reveal>
+          <img src="../assets/images/hero-teaser.jpg" alt="Robotic hand with black tactile fingertips grasping a small screw, with tactile-image insets">
+          <figcaption>
+            <span>Humanoid fingertip demonstration</span>
+            <span>Experimental media</span>
+          </figcaption>
+        </figure>
+        <div class="form-factor-list">
+          <article data-reveal>
+            <p>01 / Flat</p>
+            <h3>Bench-scale clarity</h3>
+            <span>Textured silicone · perimeter LEDs · fisheye camera</span>
+          </article>
+          <article data-reveal>
+            <p>02 / Omnidirectional</p>
+            <h3>Curved tactile coverage</h3>
+            <span>Clear epoxy skeleton · black membrane · LED ring</span>
+          </article>
+          <article data-reveal>
+            <p>03 / Humanoid</p>
+            <h3>Approximately 17 mm wide</h3>
+            <span>Curved gel body · wide-angle camera · U-shaped light strip</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="evidence" id="evidence" aria-labelledby="evidence-title">
+        <div class="section-heading section-heading--split" data-reveal>
+          <div>
+            <p class="eyebrow">04 · Spatial evidence</p>
+            <h2 id="evidence-title">Sensitivity without losing structure</h2>
+          </div>
+          <p>
+            Pressure-responsive images remain spatially informative as the
+            contact grows darker.
+          </p>
+        </div>
+        <div class="evidence-grid">
+          <figure class="evidence-card evidence-card--wide" data-reveal>
+            <img src="../assets/images/fingerprint-pressure.jpg" alt="Three tactile fingerprint images at 0.3, 1.0, and 2.0 newtons, becoming darker with force">
+            <figcaption>
+              <div>
+                <span>Controlled contact</span>
+                <strong>Monotonic local darkening</strong>
+              </div>
+              <span>Experimental media</span>
+            </figcaption>
+          </figure>
+          <figure class="evidence-card" data-reveal>
+            <img src="../assets/images/reconstruction-overview.jpg" alt="Contact objects, tactile images, and qualitative reconstructions including small screw threads and ball arrays">
+            <figcaption>
+              <div>
+                <span>Geometry</span>
+                <strong>Fine contact structure down to M1 threads</strong>
+              </div>
+              <span>Qualitative reconstruction</span>
+            </figcaption>
+          </figure>
+          <div class="evidence-statement" data-reveal>
+            <p>Remember this</p>
+            <strong>Simple light.<br>Fine signal.</strong>
+            <span>
+              Single-color illumination and a direct pressure-responsive
+              optical mechanism.
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="paper" id="paper" aria-labelledby="paper-title">
+        <p class="eyebrow">05 · Research artifact</p>
+        <div>
+          <h2 id="paper-title">GlowTact</h2>
+          <p>Simple and Compact Vision-Based Tactile Sensing with High Sensitivity and Spatial Resolution</p>
+        </div>
+        <div class="paper-actions" aria-label="Research links">
+          <span aria-disabled="true">Paper · not yet available</span>
+          <span aria-disabled="true">Code · not yet available</span>
+          <span aria-disabled="true">Data · not yet available</span>
+        </div>
+        <pre><code>@article{anonymous2026glowtact,
+  title  = {GlowTact: Simple and Compact Vision-Based
+            Tactile Sensing with High Sensitivity and Spatial Resolution},
+  author = {Anonymous},
+  year   = {2026}
+}</code></pre>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand" href="../"><span>GlowTact</span></a>
+      <p>Concept 01 · Optical Coupling</p>
+      <a href="../concept-02/">Next: Contact Atlas <span aria-hidden="true">→</span></a>
+    </footer>
+  </body>
+</html>

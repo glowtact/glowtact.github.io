@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Signal Chamber: an instrument-first interactive website concept for GlowTact.">
+    <title>GlowTact — Signal Chamber</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to signal</a>
+
+    <header class="instrument-header">
+      <a class="instrument-brand" href="../" aria-label="Back to GlowTact concept review">
+        <span class="status-lamp" aria-hidden="true"></span>
+        <strong>GLOWTACT</strong>
+        <span>OPTICAL INSTRUMENT</span>
+      </a>
+      <nav aria-label="Signal Chamber sections">
+        <a href="#instrument">Instrument</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#research">Research</a>
+      </nav>
+      <a class="concept-channel" href="../">
+        <span>CHANNEL</span>
+        <strong>03</strong>
+      </a>
+    </header>
+
+    <main id="main">
+      <section class="signal-hero" aria-labelledby="signal-title">
+        <div class="hero-copy" data-reveal>
+          <p class="signal-label"><span>LIVE</span> Pressure-responsive optical signal</p>
+          <h1 id="signal-title">Contact,<br>made visible.</h1>
+          <p>
+            GlowTact converts pressure-induced optical coupling into a direct,
+            high-contrast tactile image with single-color, nondirectional
+            illumination.
+          </p>
+        </div>
+
+        <div class="hero-signal" aria-hidden="true" data-reveal>
+          <span class="signal-grid"></span>
+          <span class="signal-orbit signal-orbit--outer"></span>
+          <span class="signal-orbit signal-orbit--inner"></span>
+          <span class="signal-crosshair signal-crosshair--x"></span>
+          <span class="signal-crosshair signal-crosshair--y"></span>
+          <span class="signal-imprint">
+            <i></i><i></i><i></i><i></i><i></i>
+          </span>
+          <span class="signal-sweep"></span>
+          <span class="signal-coordinate">X 018.4 / Y 026.7</span>
+          <span class="signal-state">CONTACT FIELD / ACTIVE</span>
+        </div>
+
+        <div class="hero-readouts" data-reveal>
+          <div><span>MECHANISM</span><strong>Optical coupling</strong></div>
+          <div><span>LIGHT</span><strong>Single-color</strong></div>
+          <div><span>GEOMETRY</span><strong>M1 threads</strong></div>
+          <div><span>FORM</span><strong>Compact fingertip</strong></div>
+        </div>
+      </section>
+
+      <section class="instrument" id="instrument" aria-labelledby="instrument-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>SYS–01</span> Coupling sequence</p>
+            <h2 id="instrument-title">One input. Three linked views.</h2>
+          </div>
+          <p>
+            Run a single finite pressure cycle or take control directly. Every
+            readout stays qualitative.
+          </p>
+        </header>
+
+        <div class="instrument-shell" data-reveal>
+          <div class="instrument-toolbar">
+            <div class="toolbar-identity">
+              <span class="status-lamp" aria-hidden="true"></span>
+              <div><strong>GT / SIGNAL CHAMBER</strong><span>Conceptual response monitor</span></div>
+            </div>
+            <div class="toolbar-status">
+              <span>STATE</span>
+              <output id="toolbar-state">Partial coupling</output>
+            </div>
+          </div>
+
+          <div class="instrument-views">
+            <article class="view-panel view-panel--section" aria-labelledby="section-view-title">
+              <header>
+                <div><span>VIEW A</span><h3 id="section-view-title">Interface section</h3></div>
+                <span class="view-unit">QUALITATIVE</span>
+              </header>
+              <div class="section-view" aria-hidden="true">
+                <span class="section-grid"></span>
+                <span class="section-indenter"></span>
+                <span class="section-membrane"></span>
+                <span class="section-coupling"></span>
+                <span class="section-gel"></span>
+                <span class="section-air">AIR GAP</span>
+              </div>
+            </article>
+
+            <article class="view-panel view-panel--aperture" aria-labelledby="aperture-view-title">
+              <header>
+                <div><span>VIEW B</span><h3 id="aperture-view-title">Coupling aperture</h3></div>
+                <span class="view-unit">SIMULATED</span>
+              </header>
+              <div class="aperture-view" aria-hidden="true">
+                <span class="aperture-grid"></span>
+                <span class="aperture-ring aperture-ring--1"></span>
+                <span class="aperture-ring aperture-ring--2"></span>
+                <span class="aperture-coupling"></span>
+                <span class="aperture-axis aperture-axis--x"></span>
+                <span class="aperture-axis aperture-axis--y"></span>
+              </div>
+            </article>
+
+            <article class="view-panel view-panel--tactile" aria-labelledby="tactile-view-title">
+              <header>
+                <div><span>VIEW C</span><h3 id="tactile-view-title">Tactile output</h3></div>
+                <span class="view-unit">SIMULATED</span>
+              </header>
+              <div class="tactile-view" aria-hidden="true">
+                <span class="tactile-noise"></span>
+                <span class="tactile-patch">
+                  <i></i><i></i><i></i><i></i><i></i>
+                </span>
+                <span class="tactile-cursor"></span>
+              </div>
+            </article>
+          </div>
+
+          <div class="instrument-console">
+            <div class="console-control console-control--play">
+              <span>SEQUENCE</span>
+              <button id="play-sequence" type="button" aria-pressed="false">
+                <span class="play-icon" aria-hidden="true"></span>
+                <span id="play-label">Run once</span>
+              </button>
+            </div>
+            <div class="console-control console-control--range">
+              <label for="signal-pressure">
+                <span>APPLIED PRESSURE / CONCEPTUAL</span>
+                <output id="pressure-percent" for="signal-pressure">32%</output>
+              </label>
+              <input id="signal-pressure" type="range" min="0" max="100" value="32" aria-describedby="instrument-disclosure">
+            </div>
+            <dl class="console-readouts">
+              <div><dt>INTERFACE</dt><dd id="readout-interface">Partial coupling</dd></div>
+              <div><dt>REFLECTION</dt><dd id="readout-reflection">Reduced locally</dd></div>
+              <div><dt>OUTPUT</dt><dd id="readout-output">Darkening region</dd></div>
+            </dl>
+          </div>
+          <p class="instrument-disclosure" id="instrument-disclosure">Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.</p>
+        </div>
+      </section>
+
+      <section class="sequence" aria-labelledby="sequence-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>SYS–02</span> Mechanism states</p>
+            <h2 id="sequence-title">The signal is the interface changing.</h2>
+          </div>
+        </header>
+        <ol class="sequence-rail">
+          <li data-reveal>
+            <span class="sequence-index">00</span>
+            <div class="sequence-signal sequence-signal--gap" aria-hidden="true"><i></i></div>
+            <h3>Air gap</h3>
+            <p>Microscopic gaps diffusely reflect light at the unloaded interface.</p>
+          </li>
+          <li data-reveal>
+            <span class="sequence-index">01</span>
+            <div class="sequence-signal sequence-signal--partial" aria-hidden="true"><i></i></div>
+            <h3>Partial coupling</h3>
+            <p>Pressure brings the black membrane into local optical contact.</p>
+          </li>
+          <li data-reveal>
+            <span class="sequence-index">02</span>
+            <div class="sequence-signal sequence-signal--expanded" aria-hidden="true"><i></i></div>
+            <h3>Expanded coupling</h3>
+            <p>A larger interface fraction couples and the tactile region darkens.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="media-chamber" aria-labelledby="media-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>REC–01</span> Manipulation record</p>
+            <h2 id="media-title">A compact signal at the fingertip.</h2>
+          </div>
+          <p>
+            Supplied project media shows the sensor in a robotic manipulation
+            context. Playback is user controlled.
+          </p>
+        </header>
+        <div class="media-grid">
+          <figure class="video-module" data-reveal>
+            <video controls muted playsinline preload="none" aria-label="GlowTact contact demonstration video">
+              <source src="../assets/video/mms-contact.mp4" type="video/mp4">
+              Your browser does not support embedded video.
+            </video>
+            <figcaption>
+              <span>REC / MMS CONTACT</span>
+              <span>Supplied experimental video</span>
+            </figcaption>
+          </figure>
+          <figure class="media-fallback" data-reveal>
+            <img src="../assets/images/hero-teaser.jpg" alt="Robotic hand with black tactile fingertips grasping a screw">
+            <figcaption>
+              <span>STATIC / ROBOTIC HAND</span>
+              <span>Fallback and context frame</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="form-rail" aria-labelledby="form-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>CFG–01</span> Sensor forms</p>
+            <h2 id="form-title">Three bodies, one optical principle.</h2>
+          </div>
+        </header>
+        <div class="configuration-rail">
+          <article data-reveal>
+            <span class="config-index">A / 01</span>
+            <div class="config-glyph config-glyph--flat" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div><h3>Flat</h3><p>Bench-scale sensing with textured silicone and perimeter LEDs.</p></div>
+          </article>
+          <article data-reveal>
+            <span class="config-index">A / 02</span>
+            <div class="config-glyph config-glyph--omni" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div><h3>Omnidirectional</h3><p>Curved tactile coverage over a clear epoxy skeleton.</p></div>
+          </article>
+          <article data-reveal>
+            <span class="config-index">A / 03</span>
+            <div class="config-glyph config-glyph--finger" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div><h3>Humanoid</h3><p>Approximately 17 mm wide with a wide-angle camera.</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="evidence-chamber" id="evidence" aria-labelledby="evidence-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>DAT–01</span> Spatial records</p>
+            <h2 id="evidence-title">The dark signal keeps its shape.</h2>
+          </div>
+          <p>
+            Controlled contact and reconstruction examples show spatial contact
+            information alongside the pressure-responsive signal.
+          </p>
+        </header>
+        <div class="evidence-console">
+          <figure class="evidence-view evidence-view--pressure" data-reveal>
+            <header><span>INPUT / FINGERPRINT</span><span>0.3 → 2.0 N</span></header>
+            <img src="../assets/images/fingerprint-pressure.jpg" alt="Fingerprint tactile contacts that darken from 0.3 to 2.0 newtons">
+            <figcaption>Experimental controlled-contact sequence</figcaption>
+          </figure>
+          <figure class="evidence-view evidence-view--geometry" data-reveal>
+            <header><span>OUTPUT / GEOMETRY</span><span>M1 THREADS</span></header>
+            <img src="../assets/images/thread-mesh.png" alt="Qualitative reconstruction of M1 screw threads">
+            <figcaption>Qualitative reconstruction</figcaption>
+          </figure>
+          <figure class="evidence-view evidence-view--collection" data-reveal>
+            <header><span>ARCHIVE / OVERVIEW</span><span>MULTI-OBJECT</span></header>
+            <img src="../assets/images/reconstruction-overview.jpg" alt="Contact objects, tactile images, and qualitative geometry reconstructions">
+            <figcaption>Supplied source overview</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="research-console" id="research" aria-labelledby="research-title">
+        <div class="research-heading">
+          <p class="signal-label"><span>DOC–01</span> Research record</p>
+          <h2 id="research-title">GlowTact</h2>
+          <p>Simple and Compact Vision-Based Tactile Sensing with High Sensitivity and Spatial Resolution</p>
+        </div>
+        <div class="research-status">
+          <div><span>PAPER</span><strong>Not yet available</strong></div>
+          <div><span>CODE</span><strong>Not yet available</strong></div>
+          <div><span>DATA</span><strong>Not yet available</strong></div>
+        </div>
+        <pre><code>@article{anonymous2026glowtact,
+  title  = {GlowTact: Simple and Compact Vision-Based
+            Tactile Sensing with High Sensitivity and Spatial Resolution},
+  author = {Anonymous},
+  year   = {2026}
+}</code></pre>
+      </section>
+    </main>
+
+    <footer class="instrument-footer">
+      <a href="../concept-02/"><span aria-hidden="true">←</span> Contact Atlas</a>
+      <p><span class="status-lamp" aria-hidden="true"></span> GLOWTACT / SIGNAL CHAMBER</p>
+      <a href="../">All concepts <span aria-hidden="true">↗</span></a>
+    </footer>
+  </body>
+</html>
