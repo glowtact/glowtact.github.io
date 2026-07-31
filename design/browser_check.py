@@ -1,6 +1,7 @@
 from pathlib import Path
 import base64
 import os
+import re
 import sys
 
 from playwright.sync_api import (
@@ -218,20 +219,142 @@ def check_atlas_interactions(browser) -> None:
     page.close()
 
 
+def element_center(page: Page, selector: str) -> tuple[float, float]:
+    box = page.locator(selector).bounding_box()
+    if box is None:
+        raise AssertionError(f"signal: {selector} has no rendered bounding box")
+    return box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+
+
+def assert_centered(
+    page: Page, subject: str, container: str, tolerance: float = 1.0
+) -> None:
+    subject_x, subject_y = element_center(page, subject)
+    container_x, container_y = element_center(page, container)
+    delta_x = abs(subject_x - container_x)
+    delta_y = abs(subject_y - container_y)
+    if delta_x > tolerance or delta_y > tolerance:
+        raise AssertionError(
+            f"signal: {subject} is not centered in {container}; "
+            f"subject=({subject_x:.2f}, {subject_y:.2f}), "
+            f"container=({container_x:.2f}, {container_y:.2f}), "
+            f"delta=({delta_x:.2f}, {delta_y:.2f}), tolerance={tolerance:.2f}"
+        )
+
+
+def assert_horizontally_centered(
+    page: Page, subject: str, container: str, tolerance: float = 1.0
+) -> None:
+    subject_x, _ = element_center(page, subject)
+    container_x, _ = element_center(page, container)
+    delta_x = abs(subject_x - container_x)
+    if delta_x > tolerance:
+        raise AssertionError(
+            f"signal: {subject} is not horizontally centered in {container}; "
+            f"subject_x={subject_x:.2f}, container_x={container_x:.2f}, "
+            f"delta_x={delta_x:.2f}, tolerance={tolerance:.2f}"
+        )
+
+
+def assert_scale_label(page: Page, selector: str, value: int) -> None:
+    locator = page.locator(selector)
+    count = locator.count()
+    if count != 1:
+        raise AssertionError(f"signal: expected one {selector}, found {count}")
+    if not locator.is_visible():
+        raise AssertionError(f"signal: {selector} is not visible")
+    label = " ".join(locator.inner_text().split())
+    pattern = rf"(?<!\d){value}\s*(?:u|µ|μ)\s*m(?![a-z0-9])"
+    if re.search(pattern, label, flags=re.IGNORECASE) is None:
+        raise AssertionError(
+            f"signal: {selector} does not include {value} um; found {label!r}"
+        )
+
+
+def contact_thirds(page: Page) -> set[int]:
+    panel_box = page.locator("#micro-svg").bounding_box()
+    if panel_box is None:
+        raise AssertionError("signal: #micro-svg has no rendered bounding box")
+    panel_width = panel_box["width"]
+    if panel_width <= 0:
+        raise AssertionError(
+            f"signal: #micro-svg has non-positive rendered width {panel_width}"
+        )
+    panel_left = panel_box["x"]
+    panel_right = panel_left + panel_width
+    thirds: set[int] = set()
+    segments = page.locator(".micro-contact-segment")
+    for index in range(segments.count()):
+        segment_box = segments.nth(index).bounding_box()
+        if segment_box is None:
+            raise AssertionError(
+                f"signal: .micro-contact-segment[{index}] has no rendered bounding box"
+            )
+        center = segment_box["x"] + segment_box["width"] / 2
+        if center < panel_left or center > panel_right:
+            raise AssertionError(
+                f"signal: .micro-contact-segment[{index}] center {center:.2f} is "
+                f"outside #micro-svg bounds [{panel_left:.2f}, {panel_right:.2f}]"
+            )
+        offset = center - panel_left
+        if offset < panel_width / 3:
+            thirds.add(0)
+        elif offset < panel_width * 2 / 3:
+            thirds.add(1)
+        else:
+            thirds.add(2)
+    return thirds
+
+
 def check_signal_interactions(browser) -> None:
     page = browser.new_page(viewport=VIEWPORTS["desktop"])
     block_media(page)
     issues = collect_runtime_issues(page)
     navigate(page, "/concept-03/")
 
+    for selector in (
+        ".macro-camera-lens",
+        "#macro-field-of-view",
+        ".macro-scale-marker",
+        ".macro-interface-note",
+    ):
+        count = page.locator(selector).count()
+        if count != 1:
+            raise AssertionError(f"signal: expected one {selector}, found {count}")
+        box = page.locator(selector).bounding_box()
+        if box is None or box["width"] <= 0 or box["height"] <= 0:
+            raise AssertionError(
+                f"signal: {selector} has no non-empty rendered bounding box"
+            )
+    assert_scale_label(page, ".macro-interface-note", 9)
+    assert_scale_label(page, ".micro-window-label", 100)
+
+    assert_horizontally_centered(
+        page, "#macro-indenter", ".macro-stage svg"
+    )
+    assert_horizontally_centered(
+        page, ".macro-camera-lens", ".macro-stage svg"
+    )
+
     micro_2d = page.locator("#micro-tab-2d")
     micro_3d = page.locator("#micro-tab-3d")
     panel_2d = page.locator("#micro-panel-2d")
     panel_3d = page.locator("#micro-panel-3d")
+    pressure = page.locator("#signal-pressure")
     if micro_2d.get_attribute("aria-selected") != "true":
         raise AssertionError("signal: 2D microscope is not selected by default")
     if panel_2d.is_hidden() or not panel_3d.is_hidden():
         raise AssertionError("signal: default microscope panel visibility is incorrect")
+
+    for pressure_value in (0, 55, 100):
+        pressure.fill(str(pressure_value))
+        assert_centered(page, ".camera-contact", ".camera-stage")
+    pressure.fill("55")
+    thirds = contact_thirds(page)
+    if thirds != {0, 1, 2}:
+        raise AssertionError(
+            f"signal: contact segments do not span all thirds; found {sorted(thirds)}"
+        )
 
     micro_3d.click()
     if micro_3d.get_attribute("aria-selected") != "true":
@@ -239,7 +362,6 @@ def check_signal_interactions(browser) -> None:
     if panel_3d.is_hidden() or not panel_2d.is_hidden():
         raise AssertionError("signal: microscope panel did not switch to 3D")
 
-    pressure = page.locator("#signal-pressure")
     pressure.fill("80")
     if page.locator("#toolbar-state").inner_text() != "Expanded coupling":
         raise AssertionError("signal: pressure output did not update")
