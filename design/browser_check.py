@@ -223,10 +223,29 @@ def check_signal_interactions(browser) -> None:
     block_media(page)
     issues = collect_runtime_issues(page)
     navigate(page, "/concept-03/")
+
+    micro_2d = page.locator("#micro-tab-2d")
+    micro_3d = page.locator("#micro-tab-3d")
+    panel_2d = page.locator("#micro-panel-2d")
+    panel_3d = page.locator("#micro-panel-3d")
+    if micro_2d.get_attribute("aria-selected") != "true":
+        raise AssertionError("signal: 2D microscope is not selected by default")
+    if panel_2d.is_hidden() or not panel_3d.is_hidden():
+        raise AssertionError("signal: default microscope panel visibility is incorrect")
+
+    micro_3d.click()
+    if micro_3d.get_attribute("aria-selected") != "true":
+        raise AssertionError("signal: 3D microscope tab did not activate")
+    if panel_3d.is_hidden() or not panel_2d.is_hidden():
+        raise AssertionError("signal: microscope panel did not switch to 3D")
+
     pressure = page.locator("#signal-pressure")
     pressure.fill("80")
     if page.locator("#toolbar-state").inner_text() != "Expanded coupling":
         raise AssertionError("signal: pressure output did not update")
+    canvas_summary = page.locator("#micro-canvas").get_attribute("aria-label") or ""
+    if "Expanded coupling" not in canvas_summary:
+        raise AssertionError("signal: 3D microscope did not receive pressure state")
 
     play = page.locator("#play-sequence")
     play.click()

@@ -183,7 +183,12 @@ files remain unchanged.
 | `assets/images/thread-mesh.png` | `../glowtact_materials/single_meshes_gt/single_meshes/glowtact_1_steep_01_screw_threads_mesh.png` |
 | `assets/images/phillips-mesh.png` | `../glowtact_materials/single_meshes_gt/single_meshes/glowtact_1_steep_04_philips_head_mesh.png` |
 | `assets/images/ball-array-mesh.png` | `../glowtact_materials/single_meshes_gt/single_meshes/glowtact_1_steep_03_cali_balls_mesh.png` |
+| `assets/images/mms-contact-poster.jpg` | Midpoint frame extracted from `assets/video/mms-contact.mp4` |
 | `assets/video/mms-contact.mp4` | `../mms_gt.mp4` |
 
 The JPEG derivatives use quality 88 and a maximum dimension of 2200 pixels.
 The video and mesh PNGs are byte-for-byte copies of the supplied source files.
+
+Concept 03 uses `assets/images/hero-teaser.jpg` as its first-screen paper teaser.
+The figure is displayed without cropping, and its original scientific
+annotations are preserved.
