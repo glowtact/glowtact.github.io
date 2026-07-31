@@ -367,7 +367,10 @@ def contact_thirds(page: Page) -> set[int]:
 
 
 def check_signal_interactions(browser) -> None:
-    page = browser.new_page(viewport=VIEWPORTS["desktop"])
+    context = browser.new_context(
+        viewport=VIEWPORTS["desktop"], device_scale_factor=2
+    )
+    page = context.new_page()
     block_media(page)
     issues = collect_runtime_issues(page)
     navigate(page, "/concept-03/")
@@ -406,14 +409,59 @@ def check_signal_interactions(browser) -> None:
     if panel_2d.is_hidden() or not panel_3d.is_hidden():
         raise AssertionError("signal: default microscope panel visibility is incorrect")
 
-    for pressure_value in (0, 55, 100):
+    representative_pressures = (0, 25, 55, 75, 100)
+    dense_pressures = sorted(set(range(0, 101, 5)) | {2, 15, 16})
+    contact_samples = []
+    profile_signature = None
+    for pressure_value in dense_pressures:
         pressure.fill(str(pressure_value))
         assert_centered(page, ".camera-contact", ".camera-stage")
+        minimum_clearance = page.locator("#micro-svg").get_attribute(
+            "data-minimum-clearance"
+        )
+        if minimum_clearance is None:
+            raise AssertionError("signal: 2D minimum-clearance metric is missing")
+        if float(minimum_clearance) < 2.5 - 1e-6:
+            raise AssertionError(
+                f"signal: 2D clearance {minimum_clearance} is below 2.5 "
+                f"at {pressure_value}% pressure"
+            )
+        signature = page.locator("#micro-svg").get_attribute(
+            "data-profile-signature"
+        )
+        if not signature:
+            raise AssertionError("signal: 2D profile signature is missing")
+        if profile_signature is None:
+            profile_signature = signature
+        elif signature != profile_signature:
+            raise AssertionError("signal: 2D profile changed across pressure renders")
+        if pressure_value in representative_pressures:
+            sample_count = page.locator("#micro-svg").get_attribute(
+                "data-contact-samples"
+            )
+            if sample_count is None:
+                raise AssertionError("signal: 2D contact-sample metric is missing")
+            contact_samples.append(int(sample_count))
+    if contact_samples != sorted(contact_samples):
+        raise AssertionError(
+            f"signal: 2D contact samples are not monotonic: {contact_samples}"
+        )
+
     pressure.fill("55")
     thirds = contact_thirds(page)
     if thirds != {0, 1, 2}:
         raise AssertionError(
             f"signal: contact segments do not span all thirds; found {sorted(thirds)}"
+        )
+    third_counts_value = page.locator("#micro-svg").get_attribute(
+        "data-contact-thirds"
+    )
+    if third_counts_value is None:
+        raise AssertionError("signal: 2D contact-thirds metric is missing")
+    third_counts = [int(value) for value in third_counts_value.split(",")]
+    if len(third_counts) != 3 or any(value <= 0 for value in third_counts):
+        raise AssertionError(
+            f"signal: 2D contact-third counts are incomplete: {third_counts}"
         )
 
     micro_3d.click()
@@ -421,6 +469,97 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError("signal: 3D microscope tab did not activate")
     if panel_3d.is_hidden() or not panel_2d.is_hidden():
         raise AssertionError("signal: microscope panel did not switch to 3D")
+
+    canvas_box = page.locator("#micro-canvas").bounding_box()
+    if canvas_box is None:
+        raise AssertionError("signal: #micro-canvas has no rendered bounding box")
+    backing_size = page.locator("#micro-canvas").evaluate(
+        "canvas => ({ width: canvas.width, height: canvas.height })"
+    )
+    expected_width = round(canvas_box["width"] * 2)
+    expected_height = round(canvas_box["height"] * 2)
+    if backing_size != {"width": expected_width, "height": expected_height}:
+        raise AssertionError(
+            "signal: canvas backing store does not match CSS size at DPR 2; "
+            f"expected {expected_width}x{expected_height}, found "
+            f"{backing_size['width']}x{backing_size['height']}"
+        )
+
+    contact_cells = []
+    field_signature = None
+    for pressure_value in representative_pressures:
+        pressure.fill(str(pressure_value))
+        cell_count = page.locator("#micro-canvas").get_attribute(
+            "data-contact-cells"
+        )
+        if cell_count is None:
+            raise AssertionError("signal: 3D contact-cell metric is missing")
+        contact_cells.append(int(cell_count))
+        signature = page.locator("#micro-canvas").get_attribute(
+            "data-field-signature"
+        )
+        if not signature:
+            raise AssertionError("signal: 3D field signature is missing")
+        if field_signature is None:
+            field_signature = signature
+        elif signature != field_signature:
+            raise AssertionError("signal: 3D field changed across pressure renders")
+    if contact_cells != sorted(contact_cells):
+        raise AssertionError(
+            f"signal: 3D contact cells are not monotonic: {contact_cells}"
+        )
+
+    pressure.fill("55")
+    quadrant_counts_value = page.locator("#micro-canvas").get_attribute(
+        "data-contact-quadrants"
+    )
+    if quadrant_counts_value is None:
+        raise AssertionError("signal: 3D contact-quadrants metric is missing")
+    quadrant_counts = [
+        int(value) for value in quadrant_counts_value.split(",")
+    ]
+    if len(quadrant_counts) != 4 or any(
+        value <= 0 for value in quadrant_counts
+    ):
+        raise AssertionError(
+            f"signal: 3D contact quadrants are incomplete: {quadrant_counts}"
+        )
+
+    micro_3d.focus()
+    page.keyboard.press("ArrowRight")
+    if micro_2d.get_attribute("aria-selected") != "true":
+        raise AssertionError("signal: ArrowRight from 3D did not wrap to 2D")
+    page.keyboard.press("ArrowLeft")
+    if micro_3d.get_attribute("aria-selected") != "true":
+        raise AssertionError("signal: ArrowLeft from 2D did not wrap to 3D")
+    page.keyboard.press("Home")
+    if micro_2d.get_attribute("aria-selected") != "true":
+        raise AssertionError("signal: Home did not select the 2D tab")
+    page.keyboard.press("End")
+    if micro_3d.get_attribute("aria-selected") != "true":
+        raise AssertionError("signal: End did not select the 3D tab")
+
+    page.reload(wait_until="domcontentloaded")
+    if page.locator("#micro-svg").get_attribute(
+        "data-profile-signature"
+    ) != profile_signature:
+        raise AssertionError("signal: 2D profile changed after reload")
+    page.locator("#micro-tab-3d").click()
+    try:
+        page.wait_for_function(
+            "() => document.querySelector('#micro-canvas')"
+            "?.dataset.fieldSignature !== undefined",
+            timeout=4000,
+        )
+    except PlaywrightTimeoutError as error:
+        raise AssertionError(
+            "signal: 3D field signature never appeared after reload"
+        ) from error
+    if page.locator("#micro-canvas").get_attribute(
+        "data-field-signature"
+    ) != field_signature:
+        raise AssertionError("signal: 3D field changed after reload")
+    pressure = page.locator("#signal-pressure")
 
     pressure.fill("80")
     if page.locator("#toolbar-state").inner_text() != "Expanded coupling":
@@ -445,6 +584,7 @@ def check_signal_interactions(browser) -> None:
     if issues:
         raise AssertionError(f"signal interactions: {'; '.join(issues)}")
     page.close()
+    context.close()
 
 
 def check_keyboard_focus(browser) -> None:

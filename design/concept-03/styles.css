@@ -927,10 +927,12 @@ main {
   stroke-width: 12;
 }
 
-.micro-contact-points circle {
-  fill: var(--signal-amber-bright);
-  stroke: rgba(255, 255, 255, 0.35);
-  stroke-width: 1;
+.micro-contact-segment {
+  fill: none;
+  stroke: var(--signal-amber-bright);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4.5;
 }
 
 .micro-annotation path {

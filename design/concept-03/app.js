@@ -29,14 +29,17 @@ const macroFieldOfView = document.querySelector("#macro-field-of-view");
 const macroCameraAperture = document.querySelector(".macro-camera-aperture");
 
 const microSurfaceFill = document.querySelector("#micro-surface-fill");
+const microSvg = document.querySelector("#micro-svg");
 const microSurfaceLine = document.querySelector("#micro-surface-line");
 const microMembrane = document.querySelector("#micro-membrane");
 const microMembraneShadow = document.querySelector("#micro-membrane-shadow");
 const microGapArea = document.querySelector("#micro-gap-area");
 const microContactPoints = document.querySelector("#micro-contact-points");
 
-const FIELD_SIZE = 29;
+const FIELD_SIZE = 41;
+const PROFILE_SIZE = 65;
 const FIELD_SEED = 2500;
+const MICRO_CLEARANCE = 2.5;
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 let activeMicroView = "2d";
@@ -58,24 +61,31 @@ function seededRandom(seed) {
 
 function generateSurfaceField(size, seed) {
   const random = seededRandom(seed);
-  const components = Array.from({ length: 11 }, (_, index) => {
-    const band = index < 3 ? 1 : index < 7 ? 2 : 3;
-    const angle = random() * Math.PI * 2;
-    const frequency = band * (0.72 + random() * 0.78);
-    return {
-      x: Math.cos(angle) * frequency,
-      y: Math.sin(angle) * frequency,
-      phase: random() * Math.PI * 2,
-      amplitude: 1 / Math.pow(frequency, 1.36)
-    };
-  });
+  const gridSize = 8;
+  const asperities = [];
 
-  const grains = Array.from({ length: 18 }, () => ({
-    x: random(),
-    y: random(),
-    radius: 0.035 + random() * 0.075,
-    height: (random() - 0.32) * 0.65
-  }));
+  for (let row = 0; row < gridSize; row += 1) {
+    for (let column = 0; column < gridSize; column += 1) {
+      const radiusMajor = 0.024 + random() * 0.04;
+      const radiusMinor = 0.016 + random() * 0.03;
+      const angle = random() * Math.PI;
+      const shoulderAngle = random() * Math.PI * 2;
+      const shoulderDistance = radiusMajor * (0.35 + random() * 0.65);
+      asperities.push({
+        x: (column + 0.06 + random() * 0.88) / gridSize,
+        y: (row + 0.06 + random() * 0.88) / gridSize,
+        radiusMajor,
+        radiusMinor,
+        angle,
+        cuspPower: 0.72 + random() * 0.66,
+        height: 0.5 + random() * 0.62,
+        shoulderX: Math.cos(shoulderAngle) * shoulderDistance,
+        shoulderY: Math.sin(shoulderAngle) * shoulderDistance,
+        shoulderScale: 0.72 + random() * 0.68,
+        shoulderHeight: random() < 0.72 ? 0.1 + random() * 0.2 : 0
+      });
+    }
+  }
 
   const values = [];
   let minimum = Infinity;
@@ -86,21 +96,52 @@ function generateSurfaceField(size, seed) {
     for (let column = 0; column < size; column += 1) {
       const x = column / (size - 1);
       const y = row / (size - 1);
-      let height = 0;
+      const base =
+        0.075 +
+        Math.sin(x * Math.PI * 3.1 + 0.7) * 0.025 +
+        Math.cos(y * Math.PI * 2.6 + 1.2) * 0.022 +
+        Math.sin((x - y) * Math.PI * 2.2) * 0.014;
+      let asperityHeight = 0;
 
-      components.forEach((component) => {
-        const wave =
-          (x * component.x + y * component.y) * Math.PI * 2 + component.phase;
-        height += Math.sin(wave) * component.amplitude;
-        height += Math.cos(wave * 0.51 + component.phase * 0.38) * component.amplitude * 0.26;
+      asperities.forEach((asperity) => {
+        const cosine = Math.cos(asperity.angle);
+        const sine = Math.sin(asperity.angle);
+        const dx = x - asperity.x;
+        const dy = y - asperity.y;
+        const rotatedX = dx * cosine + dy * sine;
+        const rotatedY = -dx * sine + dy * cosine;
+        const distance = Math.sqrt(
+          Math.pow(rotatedX / asperity.radiusMajor, 2) +
+            Math.pow(rotatedY / asperity.radiusMinor, 2)
+        );
+        const mainHeight =
+          asperity.height *
+          Math.exp(-Math.pow(distance, asperity.cuspPower) * 2.7);
+        const shoulderDx = dx - asperity.shoulderX;
+        const shoulderDy = dy - asperity.shoulderY;
+        const shoulderX = shoulderDx * cosine + shoulderDy * sine;
+        const shoulderY = -shoulderDx * sine + shoulderDy * cosine;
+        const shoulderDistance = Math.sqrt(
+          Math.pow(
+            shoulderX / (asperity.radiusMajor * asperity.shoulderScale),
+            2
+          ) +
+            Math.pow(
+              shoulderY / (asperity.radiusMinor * asperity.shoulderScale),
+              2
+            )
+        );
+        const shoulderHeight =
+          asperity.height *
+          asperity.shoulderHeight *
+          Math.exp(-Math.pow(shoulderDistance, 1.1) * 2.25);
+        asperityHeight = Math.max(
+          asperityHeight,
+          mainHeight + shoulderHeight
+        );
       });
 
-      grains.forEach((grain) => {
-        const dx = x - grain.x;
-        const dy = y - grain.y;
-        const distance = (dx * dx + dy * dy) / (grain.radius * grain.radius);
-        height += Math.exp(-distance * 2.4) * grain.height;
-      });
+      const height = Math.max(0, base) + asperityHeight;
 
       line.push(height);
       minimum = Math.min(minimum, height);
@@ -111,12 +152,44 @@ function generateSurfaceField(size, seed) {
 
   const range = Math.max(maximum - minimum, Number.EPSILON);
   return values.map((line) =>
-    line.map((height) => Math.pow((height - minimum) / range, 0.92))
+    line.map((height) => (height - minimum) / range)
   );
 }
 
 const surfaceField = generateSurfaceField(FIELD_SIZE, FIELD_SEED);
-const surfaceSlice = surfaceField[Math.floor(FIELD_SIZE * 0.53)];
+
+function generateSurfaceProfile(size, seed) {
+  const random = seededRandom(seed);
+  const peakCount = 13;
+  const peaks = Array.from({ length: peakCount }, (_, index) => ({
+    x: (index + 0.2 + random() * 0.6) / peakCount,
+    width: 0.025 + random() * 0.025,
+    height: 0.72 + random() * 0.28
+  }));
+  const values = [];
+
+  for (let index = 0; index < size; index += 1) {
+    const x = index / (size - 1);
+    const baseline =
+      0.075 +
+      Math.sin(x * Math.PI * 3.4 + 0.35) * 0.028 +
+      Math.cos(x * Math.PI * 1.7 + 1.1) * 0.018;
+    let peakHeight = 0;
+
+    peaks.forEach((peak) => {
+      const cusp = Math.max(0, 1 - Math.abs(x - peak.x) / peak.width);
+      peakHeight = Math.max(peakHeight, peak.height * cusp);
+    });
+    values.push(Math.max(0, baseline) + peakHeight);
+  }
+
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const range = Math.max(maximum - minimum, Number.EPSILON);
+  return values.map((height) => (height - minimum) / range);
+}
+
+const surfaceProfile = generateSurfaceProfile(PROFILE_SIZE, FIELD_SEED + 17);
 
 function stateFor(pressure) {
   if (pressure < 0.1) {
@@ -189,6 +262,28 @@ function smoothPath(points) {
   path += ` Q${penultimate.x.toFixed(2)} ${penultimate.y.toFixed(2)} ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
   return path;
 }
+
+function angularPath(points) {
+  if (!points.length) return "";
+  return points
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"}${point.x.toFixed(2)} ${point.y.toFixed(2)}`
+    )
+    .join(" ");
+}
+
+function numericSignature(values) {
+  let hash = 2166136261;
+  values.forEach((value) => {
+    hash ^= Math.round(value * 1000000);
+    hash = Math.imul(hash, 16777619);
+  });
+  return (hash >>> 0).toString(16).padStart(8, "0");
+}
+
+const profileSignature = numericSignature(surfaceProfile);
+const fieldSignature = numericSignature(surfaceField.flat());
 
 function areaBetween(topPoints, bottomPoints) {
   if (!topPoints.length || !bottomPoints.length) return "";
@@ -263,22 +358,70 @@ function renderMacro(pressure) {
 function renderMicro2D(pressure) {
   if (!microSurfaceFill || !microMembrane) return;
 
-  const surfacePoints = surfaceSlice.map((height, index) => ({
-    x: 28 + (index / (surfaceSlice.length - 1)) * 464,
+  const surfacePoints = surfaceProfile.map((height, index) => ({
+    x: 28 + (index / (surfaceProfile.length - 1)) * 464,
     y: 236 - height * 88
   }));
   const threshold = contactThreshold(pressure);
   const desiredY = 236 - threshold * 88;
-  const membranePoints = surfacePoints.map((point, index) => {
+  const constraintThreshold = threshold - MICRO_CLEARANCE / 88;
+  const contactConstraints = surfacePoints.filter(
+    (_, index) => surfaceProfile[index] >= constraintThreshold
+  );
+  const compliancePenalty = 0.004 + pressure * 0.016;
+  const envelope = surfacePoints.map((point, index) => {
     const xNormal = index / (surfacePoints.length - 1);
-    const edgeLift = Math.pow(Math.abs(xNormal - 0.5) * 2, 4) * 7;
-    return {
-      x: point.x,
-      y: Math.min(desiredY - edgeLift, point.y - 3)
-    };
+    const planeY = desiredY + (xNormal - 0.5) * 2.5;
+    return contactConstraints.reduce((membraneY, constraint) => {
+      const distance = point.x - constraint.x;
+      const constraintY =
+        constraint.y - 2.5 + distance * distance * compliancePenalty;
+      return Math.min(membraneY, constraintY);
+    }, planeY);
   });
+  const clearanceLimits = surfacePoints.map(
+    (point) => point.y - MICRO_CLEARANCE
+  );
+  const projectClearance = (values) =>
+    values.map((height, index) => Math.min(height, clearanceLimits[index]));
+  let compliantEnvelope = projectClearance(envelope);
+  for (let pass = 0; pass < 2; pass += 1) {
+    const smoothedEnvelope = compliantEnvelope.map(
+      (height, index, values) => {
+        if (index === 0 || index === values.length - 1) return height;
+        const smoothed =
+          values[index - 1] * 0.24 + height * 0.52 + values[index + 1] * 0.24;
+        return Math.min(smoothed, envelope[index]);
+      }
+    );
+    compliantEnvelope = projectClearance(smoothedEnvelope);
+  }
+  compliantEnvelope = projectClearance(compliantEnvelope);
+  const membranePoints = surfacePoints.map((point, index) => ({
+    x: point.x,
+    y: compliantEnvelope[index]
+  }));
+  const contactSampleIndices = surfaceProfile
+    .map((height, index) => (height >= threshold ? index : -1))
+    .filter((index) => index >= 0);
+  const contactThirdCounts = [0, 0, 0];
+  contactSampleIndices.forEach((index) => {
+    contactThirdCounts[Math.min(Math.floor((index * 3) / PROFILE_SIZE), 2)] += 1;
+  });
+  const minimumClearance = Math.min(
+    ...surfacePoints.map(
+      (point, index) => point.y - membranePoints[index].y
+    )
+  );
 
-  const surfacePath = smoothPath(surfacePoints);
+  if (microSvg) {
+    microSvg.dataset.minimumClearance = minimumClearance.toFixed(6);
+    microSvg.dataset.contactSamples = String(contactSampleIndices.length);
+    microSvg.dataset.contactThirds = contactThirdCounts.join(",");
+    microSvg.dataset.profileSignature = profileSignature;
+  }
+
+  const surfacePath = angularPath(surfacePoints);
   const membranePath = smoothPath(membranePoints);
   microSurfaceFill.setAttribute("d", `${surfacePath} L492 300 L28 300 Z`);
   microSurfaceLine?.setAttribute("d", surfacePath);
@@ -288,14 +431,31 @@ function renderMicro2D(pressure) {
 
   if (!microContactPoints) return;
   microContactPoints.replaceChildren();
-  surfacePoints.forEach((point, index) => {
-    if (surfaceSlice[index] < threshold) return;
-    const contact = document.createElementNS(SVG_NS, "circle");
-    contact.setAttribute("cx", point.x.toFixed(2));
-    contact.setAttribute("cy", (point.y - 1).toFixed(2));
-    contact.setAttribute("r", String(2.2 + pressure * 2.4));
+  let run = [];
+  const appendContactRun = () => {
+    if (!run.length) return;
+    const contact = document.createElementNS(SVG_NS, "path");
+    contact.setAttribute("class", "micro-contact-segment");
+    if (run.length === 1) {
+      const point = run[0];
+      contact.setAttribute(
+        "d",
+        `M${(point.x - 2.5).toFixed(2)} ${point.y.toFixed(2)} H${(
+          point.x + 2.5
+        ).toFixed(2)}`
+      );
+    } else {
+      contact.setAttribute("d", angularPath(run));
+    }
     microContactPoints.append(contact);
+    run = [];
+  };
+
+  surfacePoints.forEach((point, index) => {
+    if (surfaceProfile[index] >= threshold) run.push(point);
+    else appendContactRun();
   });
+  appendContactRun();
 }
 
 function resizeCanvas() {
@@ -325,6 +485,8 @@ function renderMicro3D(pressure) {
   const originX = width * 0.5;
   const originY = height * 0.34;
   const threshold = contactThreshold(pressure);
+  let contactCellCount = 0;
+  const contactQuadrants = [0, 0, 0, 0];
 
   const project = (column, row, surfaceHeight) => ({
     x: originX + (column - row) * scaleX,
@@ -356,7 +518,28 @@ function renderMicro3D(pressure) {
         surfaceField[row + 1][column]
       ];
       const average = heights.reduce((sum, value) => sum + value, 0) / heights.length;
-      const coupled = average >= threshold;
+      const maximum = Math.max(...heights);
+      const vertexCoverage =
+        heights.filter((surfaceHeight) => surfaceHeight >= threshold).length / 4;
+      const heightStrength = Math.min(
+        Math.max((maximum - threshold) / 0.22, 0),
+        1
+      );
+      const meanStrength = Math.min(
+        Math.max((average - threshold + 0.1) / 0.2, 0),
+        1
+      );
+      const contactStrength =
+        maximum >= threshold
+          ? Math.min(vertexCoverage * 0.46 + heightStrength * 0.38 + meanStrength * 0.16, 1)
+          : 0;
+      if (contactStrength > 0) {
+        contactCellCount += 1;
+        const quadrant =
+          (row >= (FIELD_SIZE - 1) / 2 ? 2 : 0) +
+          (column >= (FIELD_SIZE - 1) / 2 ? 1 : 0);
+        contactQuadrants[quadrant] += 1;
+      }
       const points = [
         project(column, row, heights[0]),
         project(column + 1, row, heights[1]),
@@ -369,20 +552,25 @@ function renderMicro3D(pressure) {
       points.slice(1).forEach((point) => context.lineTo(point.x, point.y));
       context.closePath();
 
-      if (coupled) {
-        const amber = Math.round(124 + pressure * 58 + average * 44);
-        context.fillStyle = `rgb(${amber}, ${Math.round(amber * 0.68)}, ${Math.round(amber * 0.18)})`;
-        context.strokeStyle = "rgba(255, 210, 104, 0.24)";
-      } else {
-        const tone = Math.round(55 + average * 74);
-        context.fillStyle = `rgb(${Math.round(tone * 0.75)}, ${tone}, ${Math.round(tone * 0.91)})`;
-        context.strokeStyle = "rgba(210, 228, 220, 0.07)";
-      }
+      const tone = Math.round(55 + average * 74);
+      const baseColor = [Math.round(tone * 0.75), tone, Math.round(tone * 0.91)];
+      const contactMix = contactStrength ? 0.24 + contactStrength * 0.76 : 0;
+      const color = baseColor.map((channel, index) =>
+        Math.round(channel + ([227, 161, 40][index] - channel) * contactMix)
+      );
+      context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+      context.strokeStyle = contactStrength
+        ? `rgba(255, 218, 126, ${0.12 + contactStrength * 0.34})`
+        : "rgba(210, 228, 220, 0.07)";
 
       context.fill();
       context.stroke();
     }
   }
+
+  microCanvas.dataset.contactCells = String(contactCellCount);
+  microCanvas.dataset.contactQuadrants = contactQuadrants.join(",");
+  microCanvas.dataset.fieldSignature = fieldSignature;
 
   const membraneHeight = Math.max(threshold, 0.05);
   context.lineWidth = Math.max(pixelRatio, 1);
@@ -550,9 +738,14 @@ microTabs.forEach((tab) => {
   tab.addEventListener("keydown", (event) => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
-    let target = event.key === "ArrowLeft" ? "2d" : "3d";
-    if (event.key === "Home") target = "2d";
-    if (event.key === "End") target = "3d";
+    const currentIndex = microTabs.indexOf(event.currentTarget);
+    let targetIndex =
+      event.key === "ArrowLeft"
+        ? (currentIndex - 1 + microTabs.length) % microTabs.length
+        : (currentIndex + 1) % microTabs.length;
+    if (event.key === "Home") targetIndex = 0;
+    if (event.key === "End") targetIndex = microTabs.length - 1;
+    const target = microTabs[targetIndex].id.endsWith("3d") ? "3d" : "2d";
     setActiveMicroView(target, true);
   });
 });
