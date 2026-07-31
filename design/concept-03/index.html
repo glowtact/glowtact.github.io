@@ -135,9 +135,10 @@
                 >
                   <title id="macro-svg-title">GlowTact device-scale optical coupling diagram</title>
                   <desc id="macro-svg-desc">
-                    A black membrane deforms toward a microtextured clear gel as
-                    qualitative pressure increases, reducing reflected light and
-                    expanding the optically coupled region.
+                    A black membrane deforms toward a near-flat, approximately 9 UM
+                    microtextured clear-gel interface as qualitative pressure increases.
+                    A centered camera and field of view magnify the interface into a
+                    qualitative, approximately 100 UM local window.
                   </desc>
                   <defs>
                     <linearGradient id="gel-gradient" x1="0" y1="0" x2="0" y2="1">
@@ -213,20 +214,7 @@
                   ></path>
                   <path
                     class="macro-texture-line"
-                    d="M70 300
-                      C92 286 105 296 126 281
-                      C148 266 163 298 184 282
-                      C208 263 224 300 246 280
-                      C268 260 286 299 310 279
-                      C334 257 350 301 374 278
-                      C397 256 418 301 440 277
-                      C461 254 482 302 505 278
-                      C528 258 545 299 568 279
-                      C590 260 610 299 632 281
-                      C654 263 670 298 694 282
-                      C718 265 734 297 756 282
-                      C779 268 797 294 820 281
-                      C832 274 842 278 850 282"
+                    d="M70 286 C260 284 660 288 850 286"
                   ></path>
                   <rect class="macro-acrylic" x="70" y="448" width="780" height="52"></rect>
                   <ellipse id="macro-coupling-glow" class="macro-coupling-glow" cx="460" cy="290" rx="80" ry="28"></ellipse>
@@ -245,10 +233,28 @@
                     <text x="778" y="366" text-anchor="end">TEXTURED XP-565 GEL</text>
                   </g>
 
+                  <g class="macro-interface-note">
+                    <path d="M116 268H214L244 284"></path>
+                    <text x="116" y="258">~9 UM TEXTURE / EXAGGERATED</text>
+                  </g>
+
+                  <g class="macro-scale-marker">
+                    <circle cx="626" cy="286" r="7"></circle>
+                    <path d="M633 286H720"></path>
+                    <text x="728" y="290">ZOOM TO ~100 UM WINDOW</text>
+                  </g>
+
+                  <path
+                    id="macro-field-of-view"
+                    class="macro-field-of-view"
+                    d="M422 448L460 372L498 448Z"
+                  ></path>
                   <g class="macro-camera">
-                    <path d="M420 500H500L516 530H404Z"></path>
-                    <circle cx="460" cy="510" r="11"></circle>
-                    <text x="460" y="536" text-anchor="middle">CAMERA</text>
+                    <path class="macro-camera-body" d="M408 482H512L528 536H392Z"></path>
+                    <circle class="macro-camera-ring" cx="460" cy="486" r="30"></circle>
+                    <circle class="macro-camera-lens" cx="460" cy="486" r="20"></circle>
+                    <circle class="macro-camera-aperture" cx="460" cy="486" r="8"></circle>
+                    <text x="460" y="529" text-anchor="middle">CENTERED CAMERA</text>
                   </g>
                   <g class="macro-led macro-led--left">
                     <circle cx="116" cy="470" r="8"></circle>
@@ -376,7 +382,7 @@
               </div>
 
               <footer class="microscope-readout">
-                <span>CONTACT FRACTION / QUALITATIVE</span>
+                <span class="micro-window-label">LOCAL WINDOW / ~100 UM / QUALITATIVE</span>
                 <output id="contact-fraction">24%</output>
               </footer>
             </article>

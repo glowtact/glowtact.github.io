@@ -229,8 +229,68 @@ def element_center(page: Page, selector: str) -> tuple[float, float]:
 def assert_centered(
     page: Page, subject: str, container: str, tolerance: float = 1.0
 ) -> None:
-    subject_x, subject_y = element_center(page, subject)
-    container_x, container_y = element_center(page, container)
+    snapshot = page.evaluate(
+        """([subjectSelector, containerSelector]) => {
+            const subjects = document.querySelectorAll(subjectSelector);
+            const containers = document.querySelectorAll(containerSelector);
+            if (subjects.length !== 1) {
+                return {
+                    error: "count",
+                    selector: subjectSelector,
+                    count: subjects.length,
+                };
+            }
+            if (containers.length !== 1) {
+                return {
+                    error: "count",
+                    selector: containerSelector,
+                    count: containers.length,
+                };
+            }
+            const subject = subjects[0];
+            const container = containers[0];
+            const subjectRect = subject.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            for (const [selector, rect] of [
+                [subjectSelector, subjectRect],
+                [containerSelector, containerRect],
+            ]) {
+                if (rect.width <= 0 || rect.height <= 0) {
+                    return {
+                        error: "bounds",
+                        selector,
+                        width: rect.width,
+                        height: rect.height,
+                    };
+                }
+            }
+            return {
+                subject: {
+                    x: subjectRect.x + subjectRect.width / 2,
+                    y: subjectRect.y + subjectRect.height / 2,
+                },
+                container: {
+                    x: containerRect.x + containerRect.width / 2,
+                    y: containerRect.y + containerRect.height / 2,
+                },
+            };
+        }""",
+        [subject, container],
+    )
+    if snapshot.get("error") == "count":
+        raise AssertionError(
+            f"signal: expected one {snapshot['selector']}, "
+            f"found {snapshot['count']}"
+        )
+    if snapshot.get("error") == "bounds":
+        raise AssertionError(
+            f"signal: {snapshot['selector']} has non-positive rendered bounds "
+            f"{snapshot['width']:.2f}x{snapshot['height']:.2f}"
+        )
+    subject_x = snapshot["subject"]["x"]
+    subject_y = snapshot["subject"]["y"]
+    container_x = snapshot["container"]["x"]
+    container_y = snapshot["container"]["y"]
     delta_x = abs(subject_x - container_x)
     delta_y = abs(subject_y - container_y)
     if delta_x > tolerance or delta_y > tolerance:
@@ -263,7 +323,7 @@ def assert_scale_label(page: Page, selector: str, value: int) -> None:
         raise AssertionError(f"signal: expected one {selector}, found {count}")
     if not locator.is_visible():
         raise AssertionError(f"signal: {selector} is not visible")
-    label = " ".join(locator.inner_text().split())
+    label = " ".join((locator.text_content() or "").split())
     pattern = rf"(?<!\d){value}\s*(?:u|µ|μ)\s*m(?![a-z0-9])"
     if re.search(pattern, label, flags=re.IGNORECASE) is None:
         raise AssertionError(

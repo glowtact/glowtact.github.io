@@ -735,6 +735,39 @@ main {
   letter-spacing: 0.08em;
 }
 
+.macro-scale-marker path,
+.macro-scale-marker circle {
+  fill: none;
+  stroke: var(--signal-amber);
+  stroke-width: 1.5;
+}
+
+.macro-scale-marker text {
+  fill: var(--signal-amber);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+}
+
+.macro-interface-note path {
+  fill: none;
+  stroke: rgba(255, 192, 74, 0.56);
+  stroke-width: 1;
+}
+
+.macro-interface-note text {
+  fill: var(--readout-tertiary);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+}
+
+.macro-field-of-view {
+  fill: rgba(227, 161, 40, 0.1);
+  stroke: var(--signal-amber);
+  stroke-width: 1.5;
+}
+
 .macro-camera path {
   fill: #0b0e0c;
   stroke: var(--optic-ring);
@@ -1007,11 +1040,11 @@ main {
 }
 
 .camera-contact {
+  inset: auto;
   top: 50%;
   left: 50%;
   width: clamp(64px, var(--coupling-width), 210px);
   height: calc(clamp(64px, var(--coupling-width), 210px) * 0.72);
-  inset: auto;
   display: grid;
   place-items: center;
   border-radius: 48% 52% 46% 54%;
@@ -1019,11 +1052,8 @@ main {
   box-shadow:
     0 0 38px 16px rgba(7, 10, 8, calc(var(--pressure) * 0.22)),
     0 0 0 1px rgba(255, 255, 255, 0.05);
-  transform: translate(-50%, -50%) rotate(-6deg);
-  transition:
-    width 100ms linear,
-    height 100ms linear,
-    background-color 100ms linear;
+  transform: translate(-50%, -50%);
+  transition: background-color 100ms linear;
 }
 
 .camera-contact i {

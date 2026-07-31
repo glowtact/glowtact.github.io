@@ -25,6 +25,8 @@ const macroMembraneShadow = document.querySelector("#macro-membrane-shadow");
 const macroAirGap = document.querySelector("#macro-air-gap");
 const macroCouplingLine = document.querySelector("#macro-coupling-line");
 const macroCouplingGlow = document.querySelector("#macro-coupling-glow");
+const macroFieldOfView = document.querySelector("#macro-field-of-view");
+const macroCameraAperture = document.querySelector(".macro-camera-aperture");
 
 const microSurfaceFill = document.querySelector("#micro-surface-fill");
 const microSurfaceLine = document.querySelector("#micro-surface-line");
@@ -198,13 +200,12 @@ function areaBetween(topPoints, bottomPoints) {
     .join(" ")} Z`;
 }
 
-function macroSurfaceY(x, pressure) {
-  const texture =
-    Math.sin(x * 0.061) * 7 +
-    Math.sin(x * 0.127 + 0.8) * 4 +
-    Math.sin(x * 0.029 + 2.2) * 3;
-  const center = Math.exp(-Math.pow((x - 460) / 170, 4));
-  return 286 + texture + center * pressure * 13;
+function macroSurfaceY(x) {
+  return 286 + Math.sin(x * 0.061) * 0.9 + Math.sin(x * 0.127 + 0.8) * 0.45;
+}
+
+function macroIndentationWeight(x) {
+  return Math.exp(-Math.pow((x - 460) / 180, 4));
 }
 
 function renderMacro(pressure) {
@@ -218,10 +219,9 @@ function renderMacro(pressure) {
 
   for (let index = 0; index < samples; index += 1) {
     const x = start + (index / (samples - 1)) * (end - start);
-    const center = Math.exp(-Math.pow((x - 460) / 180, 4));
-    const shoulder = Math.exp(-Math.pow((x - 460) / 255, 6));
-    const surfaceY = macroSurfaceY(x, pressure);
-    const desiredMembraneY = 254 + center * pressure * 74 + shoulder * pressure * 4;
+    const indentation = macroIndentationWeight(x);
+    const surfaceY = macroSurfaceY(x);
+    const desiredMembraneY = 254 + indentation * pressure * 78;
     const membraneY = Math.min(desiredMembraneY, surfaceY - 4);
 
     surfacePoints.push({ x, y: surfaceY });
@@ -239,15 +239,25 @@ function renderMacro(pressure) {
   macroMembraneShadow?.setAttribute("d", membranePath);
   macroAirGap?.setAttribute("d", gapPath);
 
-  const coupled = surfacePoints.filter((point, index) => {
-    const gap = point.y - membranePoints[index].y;
-    return gap <= 5.2;
-  });
+  const centerIndex = Math.floor(samples / 2);
+  let coupledStart = centerIndex;
+  let coupledEnd = centerIndex;
+  const isCoupled = (index) =>
+    surfacePoints[index].y - membranePoints[index].y <= 5.2;
+  if (isCoupled(centerIndex)) {
+    while (coupledStart > 0 && isCoupled(coupledStart - 1)) coupledStart -= 1;
+    while (coupledEnd < samples - 1 && isCoupled(coupledEnd + 1)) coupledEnd += 1;
+  }
+  const coupled = isCoupled(centerIndex)
+    ? surfacePoints.slice(coupledStart, coupledEnd + 1)
+    : [];
   macroCouplingLine?.setAttribute("d", coupled.length > 1 ? smoothPath(coupled) : "");
 
   const ratio = contactRatio(pressure);
   macroCouplingGlow?.setAttribute("rx", String(32 + ratio * 230));
   macroCouplingGlow?.setAttribute("ry", String(14 + ratio * 36));
+  macroFieldOfView?.setAttribute("opacity", (0.22 + ratio * 0.72).toFixed(3));
+  macroCameraAperture?.setAttribute("opacity", (0.48 + ratio * 0.52).toFixed(3));
 }
 
 function renderMicro2D(pressure) {
