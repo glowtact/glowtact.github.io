@@ -609,7 +609,6 @@ main {
 .macro-readout div {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
   gap: 10px;
 }
 
@@ -1184,15 +1183,15 @@ main {
   font-size: 8px;
 }
 
+/* 4:3 matches the 640x480 sensor frames the constants were measured from. */
 .camera-stage {
   position: relative;
   aspect-ratio: 4 / 3;
   min-height: 0;
   overflow: hidden;
-  background: #8d968b;
+  background: #797f78;
 }
 
-.camera-vignette,
 .camera-contact,
 .camera-reticle {
   position: absolute;
@@ -1206,11 +1205,6 @@ main {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.camera-vignette {
-  background: radial-gradient(circle at 50% 48%, transparent 46%, rgba(12, 20, 16, 0.42) 100%);
-  pointer-events: none;
 }
 
 /*
@@ -1236,21 +1230,6 @@ main {
   opacity: var(--camera-response-opacity);
   transform: translate(-50%, -50%);
   transition: opacity 120ms linear;
-}
-
-/*
- * Statistical reference only: a low-contrast, heavily scaled-down sample of a
- * real frame supplying grain and tint. It is never enlarged to stand in for
- * the response itself.
- */
-.camera-reference {
-  position: absolute;
-  inset: 0;
-  background: url("./assets/camera-response-screw-cross.png") center / 62px 62px repeat;
-  filter: grayscale(0.86) contrast(0.42) brightness(1.12);
-  mix-blend-mode: overlay;
-  opacity: 0.16;
-  pointer-events: none;
 }
 
 .camera-reticle--x {
@@ -1975,17 +1954,19 @@ main {
     justify-self: start;
   }
 
+  /* One column: the areas must be restated, or the two-column template from
+     the desktop rule spills the views into implicit columns. */
   .mechanism-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-  }
-
-  .macro-view {
-    grid-row: auto;
+    grid-template-areas:
+      "macro"
+      "micro"
+      "camera";
   }
 
   .macro-stage {
-    min-height: 580px;
+    min-height: 400px;
   }
 
   .mechanism-console {
@@ -2131,9 +2112,11 @@ main {
     padding-inline: 14px;
   }
 
+  /* Hug the diagram: with the labels hidden there is nothing to reserve
+     vertical room for, and the letterbox band read as a gap in the story. */
   .macro-stage {
-    min-height: 420px;
-    padding: 10px 6px 50px;
+    min-height: 0;
+    padding: 12px 6px 46px;
   }
 
   .macro-label {
@@ -2156,8 +2139,17 @@ main {
     height: 256px;
   }
 
-  .micro-annotation--membrane,
-  .micro-annotation--surface {
+  /*
+   * Every in-diagram label renders at roughly 3px once the drawings are
+   * scaled to a phone, so they are dropped rather than left as noise. The
+   * shapes stay legible and each view's readout strip carries the wording.
+   */
+  .macro-interface-note,
+  .macro-scale-marker text,
+  .macro-fov text,
+  .macro-camera text,
+  #macro-indenter text,
+  .micro-annotation {
     display: none;
   }
 
@@ -2165,13 +2157,44 @@ main {
     max-width: 130px;
   }
 
+  /* Set the load first, then read the three consequences top to bottom. */
+  .mechanism-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mechanism-toolbar {
+    order: 0;
+  }
+
   .mechanism-console {
+    order: 1;
     grid-template-columns: 1fr;
     grid-template-areas:
       "pressure"
-      "rail"
       "play"
+      "rail"
       "explanation";
+  }
+
+  .mechanism-grid {
+    order: 2;
+  }
+
+  .instrument-disclosure {
+    order: 3;
+  }
+
+  .macro-readout {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    padding-block: 10px;
+  }
+
+  .macro-readout div {
+    display: grid;
+    gap: 4px;
+    justify-items: start;
   }
 
   .sequence-control,

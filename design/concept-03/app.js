@@ -115,6 +115,15 @@ const MICRO_FIRST_CONTACT_COUPLING =
 const MACRO_COUPLING_GAP =
   MACRO_INITIAL_GAP -
   (MACRO_INITIAL_GAP - MACRO_MIN_GAP) * MICRO_FIRST_CONTACT_COUPLING;
+/**
+ * Slider position at which the first asperity couples. The state rail keys off
+ * this rather than off indenter contact, so "Local coupling" cannot be
+ * announced while the interface is still entirely uncoupled.
+ */
+const FIRST_COUPLING_PRESSURE =
+  INDENTER_CONTACT_PRESSURE +
+  (1 - INDENTER_CONTACT_PRESSURE) *
+    Math.pow(MICRO_FIRST_CONTACT_COUPLING, 1 / 0.75);
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 let activeMicroView = "2d";
@@ -375,15 +384,14 @@ function fieldContactCoverage(patches, x, y, featherRadius) {
 }
 
 function stateFor(pressure) {
-  if (pressure < INDENTER_CONTACT_PRESSURE) {
+  if (pressure < FIRST_COUPLING_PRESSURE) {
     return {
       key: "gap",
       index: "STATE 00",
       title: "Air gap",
-      reflection: "Diffuse reflection",
       intensity: "No signal",
       copy:
-        "The indenter is approaching the membrane. A thin microscopic air gap still separates the membrane from the gel, so the camera sees no dark contact signal."
+        "The membrane rests on a film of air over the textured gel. Light reflects diffusely at the gel–air boundary, so the window reads uniformly bright and the frame carries no contact signal."
     };
   }
 
@@ -392,10 +400,9 @@ function stateFor(pressure) {
       key: "local",
       index: "STATE 01",
       title: "Local coupling",
-      reflection: "Reduced locally",
-      intensity: "Reduced",
+      intensity: "Local darkening",
       copy:
-        "Pressure closes local gaps. The black membrane begins to absorb light where it optically couples to the gel."
+        "The tallest asperities flatten against the membrane. Where the air film is displaced, light couples into the absorbing membrane instead of reflecting, and those patches darken first."
     };
   }
 
@@ -403,10 +410,9 @@ function stateFor(pressure) {
     key: "expanded",
     index: "STATE 02",
     title: "Expanded coupling",
-    reflection: "Further reduced",
-    intensity: "Dark region",
+    intensity: "Expanded dark region",
     copy:
-      "More asperities enter contact and neighboring contact islands connect. The absorbing region becomes larger and darker."
+      "Shorter asperities reach the membrane and each contact patch widens. Real contact area grows, so the darkened region spreads and deepens."
   };
 }
 
@@ -878,6 +884,33 @@ function renderMicro2D(pressure) {
  * area. So the dark region's extent comes from View A and its depth comes from
  * View B, instead of an ellipse that happened to grow with the slider.
  * ---------------------------------------------------------------------- */
+/*
+ * Radiometric constants measured from the supplied raw GlowTact frames
+ * (3d_recon_pad/*_tactile.png, 640x480). Rather than tiling a sample image
+ * over the panel, the frame is synthesised from those statistics:
+ *
+ *   uncoupled gel      RGB (210, 213, 211), i.e. a near-neutral light grey
+ *   fully coupled      luminance ~6, essentially black
+ *   illumination       rises from 0.735 at the centre to 1.0 at the corner,
+ *                      because the LEDs sit at the edges of the window
+ *   channel ratios     R/G 0.986, B/G 0.991
+ */
+/**
+ * Display exposure. The measured peak is 236, which on this dark panel reads
+ * as a blown-out white block and pulls the eye to the unloaded background
+ * rather than to the signal. Scaling the whole transfer keeps the measured
+ * contrast ratio and the side-lit falloff intact while seating the frame in
+ * the page's tonal range, the same way a figure sets a display window.
+ */
+const CAMERA_DISPLAY_EXPOSURE = 0.66;
+const CAMERA_PEAK_LEVEL = 236 * CAMERA_DISPLAY_EXPOSURE;
+const CAMERA_CENTRE_FALLOFF = 0.735;
+const CAMERA_EDGE_GAIN = 0.194;
+const CAMERA_CONTACT_FLOOR = 6 * CAMERA_DISPLAY_EXPOSURE;
+const CAMERA_CHANNEL_R = 0.986;
+const CAMERA_CHANNEL_B = 0.991;
+const CAMERA_GRAIN_SIGMA = 5.5 * CAMERA_DISPLAY_EXPOSURE;
+
 const CAMERA_LUT_STEPS = 64;
 const CAMERA_FRACTION_LUT = Array.from(
   { length: CAMERA_LUT_STEPS + 1 },
@@ -960,20 +993,26 @@ function renderCamera(couplingPressure) {
 
       // Unresolved individual asperity contacts show up as grain in the
       // darkened area, so the patch reads as texture rather than a soft blob.
-      const signal =
+      const signal = Math.min(
         Math.pow(
           Math.min(localFraction / MAX_FIELD_CONTACT_FRACTION, 1),
           0.55
-        ) * (0.82 + grain * 0.36);
+        ) * (0.82 + grain * 0.36),
+        1
+      );
 
-      const illumination = 1 - 0.16 * Math.hypot(u, v) * Math.hypot(u, v);
-      const base = 152 * illumination + (grain - 0.5) * 9;
-      const level = base * (1 - Math.min(signal, 1) * 0.79);
+      // Side-lit window: brightest at the edges, dimmest at the centre.
+      const radius2 = u * u + v * v;
+      const illumination = CAMERA_CENTRE_FALLOFF + CAMERA_EDGE_GAIN * radius2;
+      const unloaded =
+        CAMERA_PEAK_LEVEL * illumination + (grain - 0.5) * CAMERA_GRAIN_SIGMA * 2;
+      const level =
+        unloaded + (CAMERA_CONTACT_FLOOR - unloaded) * signal;
 
       const offset = (row * width + column) * 4;
-      data[offset] = Math.max(level * 0.94, 0);
-      data[offset + 1] = Math.max(level * 1.02, 0);
-      data[offset + 2] = Math.max(level * 0.93, 0);
+      data[offset] = Math.max(level * CAMERA_CHANNEL_R, 0);
+      data[offset + 1] = Math.max(level, 0);
+      data[offset + 2] = Math.max(level * CAMERA_CHANNEL_B, 0);
       data[offset + 3] = 255;
     }
   }
@@ -1282,6 +1321,23 @@ function revealContent() {
 
   items.forEach((item) => observer.observe(item));
 }
+
+/*
+ * Below the small breakpoint the section's annotations are hidden, so the band
+ * they occupied is cropped away and the relief fills the panel instead of
+ * floating under an empty margin.
+ */
+const compactViewport = window.matchMedia("(max-width: 640px)");
+
+function applyMicroFraming() {
+  microSvg?.setAttribute(
+    "viewBox",
+    compactViewport.matches ? "0 92 520 228" : "0 0 520 320"
+  );
+}
+
+applyMicroFraming();
+compactViewport.addEventListener("change", applyMicroFraming);
 
 microTabs.forEach((tab) => {
   tab.addEventListener("click", () => {

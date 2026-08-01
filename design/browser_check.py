@@ -408,8 +408,8 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError("signal: default pressure is not 0%")
     if page.locator("#camera-intensity").inner_text() != "No signal":
         raise AssertionError("signal: default camera response is not gated off")
-    if page.locator(".camera-reference").count() != 1:
-        raise AssertionError("signal: missing realistic camera response reference layer")
+    if page.locator("#camera-canvas").count() != 1:
+        raise AssertionError("signal: camera response is not rendered from the model")
     camera_stage_box = page.locator(".camera-stage").bounding_box()
     if camera_stage_box is None:
         raise AssertionError("signal: camera stage has no rendered box")
@@ -418,11 +418,15 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(
             f"signal: camera ROI aspect ratio {camera_aspect:.3f} is not close to 4:3"
         )
-    camera_reference_style = page.locator(".camera-reference").evaluate(
-        "element => { const style = getComputedStyle(element); return { image: style.backgroundImage, size: style.backgroundSize }; }"
+    # The frame must be synthesised, never a supplied tactile image scaled up.
+    camera_uses_bitmap = page.locator(".camera-stage").evaluate(
+        "element => [...element.querySelectorAll('*')].some(node =>"
+        " node.tagName === 'IMG' ||"
+        " getComputedStyle(node).backgroundImage.includes('.png') ||"
+        " getComputedStyle(node).backgroundImage.includes('.jpg'))"
     )
-    if "camera-response-screw-cross.png" in camera_reference_style["image"] and "cover" in camera_reference_style["size"]:
-        raise AssertionError("signal: camera response directly enlarges the tactile reference image")
+    if camera_uses_bitmap:
+        raise AssertionError("signal: camera response embeds a supplied tactile bitmap")
     default_opacity = float(
         page.locator(".camera-contact").evaluate(
             "element => getComputedStyle(element).opacity"
@@ -462,6 +466,7 @@ def check_signal_interactions(browser) -> None:
     dense_pressures = sorted(set(range(0, 101, 5)) | {2, 15, 16})
     contact_samples = []
     coupled_fractions: list[tuple[int, float]] = []
+    camera_levels: list[tuple[int, float]] = []
     profile_signature = None
     for pressure_value in dense_pressures:
         pressure.fill(str(pressure_value))
@@ -497,6 +502,20 @@ def check_signal_interactions(browser) -> None:
                 f"{minimum_clearance} at {pressure_value}% pressure"
             )
         coupled_fractions.append((pressure_value, coupled_fraction))
+        centre_level = page.evaluate(
+            """() => {
+              const canvas = document.querySelector('#camera-canvas');
+              const context = canvas.getContext('2d');
+              const size = 24;
+              const data = context.getImageData(
+                (canvas.width - size) / 2, (canvas.height - size) / 2, size, size
+              ).data;
+              let total = 0;
+              for (let i = 0; i < data.length; i += 4) total += data[i + 1];
+              return total / (data.length / 4);
+            }"""
+        )
+        camera_levels.append((pressure_value, round(centre_level, 2)))
         signature = page.locator("#micro-svg").get_attribute(
             "data-profile-signature"
         )
@@ -538,6 +557,16 @@ def check_signal_interactions(browser) -> None:
     if fractions[-1] <= 0.2:
         raise AssertionError(
             f"signal: coupled fraction stays negligible at full load: {fractions[-1]}"
+        )
+    # The rendered frame must keep darkening across the whole slider range.
+    levels = [value for _, value in camera_levels]
+    if levels != sorted(levels, reverse=True):
+        raise AssertionError(
+            f"signal: camera frame is not monotonically darkening: {camera_levels}"
+        )
+    if levels[0] - levels[-1] < 60:
+        raise AssertionError(
+            f"signal: camera frame barely responds across the range: {camera_levels}"
         )
 
     pressure.fill("55")
