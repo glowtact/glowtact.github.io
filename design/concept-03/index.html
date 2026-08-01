@@ -182,13 +182,13 @@
                     <text x="460" y="92" text-anchor="middle">INDENTER</text>
                   </g>
 
-                  <g id="macro-rays" class="macro-rays" aria-hidden="true">
-                    <path class="ray ray--incident" d="M126 444L268 292"></path>
-                    <path class="ray ray--reflected ray--left" d="M274 294L428 438" marker-end="url(#ray-arrow)"></path>
-                    <path class="ray ray--incident" d="M794 444L652 292"></path>
-                    <path class="ray ray--reflected ray--right" d="M646 294L492 438" marker-end="url(#ray-arrow)"></path>
-                    <path class="ray ray--center" d="M460 300L460 436" marker-end="url(#ray-arrow)"></path>
-                  </g>
+                  <!--
+                    Generated in renderMacro so each ray reflects off the real
+                    interface. Rays that land outside the coupled span keep
+                    returning light; the ones that land inside it are quenched
+                    as the membrane couples, which is the whole mechanism.
+                  -->
+                  <g id="macro-rays" class="macro-rays" aria-hidden="true"></g>
 
                   <path
                     class="macro-gel"

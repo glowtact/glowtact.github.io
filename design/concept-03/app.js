@@ -31,6 +31,7 @@ const macroFieldOfView = document.querySelector("#macro-field-of-view");
 const macroFovAxis = document.querySelector("#macro-fov-axis");
 const macroCameraAperture = document.querySelector(".macro-camera-aperture");
 const macroIndenter = document.querySelector("#macro-indenter");
+const macroRays = document.querySelector("#macro-rays");
 const macroGapReadout = document.querySelector("#macro-gap-readout");
 const macroSpanReadout = document.querySelector("#macro-span-readout");
 const macroIndenterReadout = document.querySelector("#macro-indenter-readout");
@@ -97,9 +98,16 @@ const MACRO_BULK_INDENT = 26;
 const MACRO_MEMBRANE_HALF_THICKNESS = 7.5;
 const MACRO_INDENTER_BASE_Y = 197;
 const MACRO_INDENTER_APPROACH_GAP = 60;
-/** Flat part of the indenter face, matching the drawn geometry. */
-const MACRO_INDENTER_FACE_HALF_WIDTH = 24;
-const MACRO_INDENTATION_DECAY = 105;
+/**
+ * Flat part of the indenter face, matching the drawn geometry, and the length
+ * over which the surrounding interface is drawn down with it. The decay was
+ * wide enough that the coupled span reached 2.4x the indenter width and
+ * overflowed the field of view, so the frame read as uniform haze instead of a
+ * bounded contact patch. A real sensor images a window several times larger
+ * than the object touching it.
+ */
+const MACRO_INDENTER_FACE_HALF_WIDTH = 20;
+const MACRO_INDENTATION_DECAY = 48;
 const MACRO_FOV_APEX_X = 460;
 const MACRO_FOV_APEX_Y = 492;
 /** Fixed cone half-angle, so a nearer interface plane gives a smaller footprint. */
@@ -646,6 +654,68 @@ function macroIndentationWeight(x) {
   );
 }
 
+/** Illumination enters at the window edges; the lens collects at the centre. */
+const MACRO_LED_POSITIONS = [116, 804];
+/**
+ * Reflection points, as offsets from the optical axis. Both sit inside the
+ * lens footprint, or the camera could not collect them; the outer one stays
+ * clear of the widest coupled span so it never quenches.
+ */
+const MACRO_RAY_OFFSETS = [130, 45];
+const MACRO_LENS_ENTRY_Y = 486;
+const MACRO_RAY_OPACITY = 0.42;
+const MACRO_RAY_QUENCH_RAMP = 34;
+
+/**
+ * One polyline per ray: LED, reflection point on the interface, lens. A ray
+ * whose reflection point lies inside the coupled span is progressively
+ * quenched, because that patch now transmits into the absorbing membrane
+ * instead of reflecting. Rays landing outside it keep their full strength,
+ * which is why the frame darkens locally rather than everywhere.
+ */
+function renderMacroRays(surfacePoints, coupledHalfSpan) {
+  if (!macroRays) return;
+  macroRays.replaceChildren();
+
+  const interfaceYAt = (x) => {
+    const first = surfacePoints[0];
+    const last = surfacePoints[surfacePoints.length - 1];
+    if (x <= first.x) return first.y;
+    if (x >= last.x) return last.y;
+    const step = (last.x - first.x) / (surfacePoints.length - 1);
+    const index = Math.min(
+      Math.floor((x - first.x) / step),
+      surfacePoints.length - 2
+    );
+    const left = surfacePoints[index];
+    const right = surfacePoints[index + 1];
+    const blend = (x - left.x) / (right.x - left.x);
+    return left.y + (right.y - left.y) * blend;
+  };
+
+  MACRO_RAY_OFFSETS.forEach((offset) => {
+    // Ramp rather than a switch, so a ray dims as the coupled span sweeps
+    // over its reflection point instead of stepping when it crosses.
+    const quenched = Math.min(
+      Math.max((coupledHalfSpan - offset) / MACRO_RAY_QUENCH_RAMP, 0),
+      1
+    );
+    MACRO_LED_POSITIONS.forEach((ledX) => {
+      const reflectX = MACRO_FOV_APEX_X + (ledX < MACRO_FOV_APEX_X ? -offset : offset);
+      const reflectY = interfaceYAt(reflectX);
+      const ray = document.createElementNS(SVG_NS, "path");
+      ray.setAttribute("class", "ray");
+      ray.setAttribute("opacity", (MACRO_RAY_OPACITY * (1 - 0.94 * quenched)).toFixed(3));
+      ray.setAttribute(
+        "d",
+        `M${ledX} 462L${reflectX.toFixed(1)} ${reflectY.toFixed(1)}L${MACRO_FOV_APEX_X} ${MACRO_LENS_ENTRY_Y}`
+      );
+      ray.setAttribute("marker-end", "url(#ray-arrow)");
+      macroRays.append(ray);
+    });
+  });
+}
+
 function renderMacro(pressure) {
   if (!macroMembrane || !macroGel) return;
 
@@ -736,6 +806,8 @@ function renderMacro(pressure) {
   // glow cannot claim a wider coupled region than the geometry supports.
   const coupledHalfSpan =
     coupled.length > 1 ? (coupled[coupled.length - 1].x - coupled[0].x) / 2 : 0;
+
+  renderMacroRays(surfacePoints, coupledHalfSpan);
 
   if (macroGapReadout) {
     const centerGap =
@@ -911,6 +983,14 @@ const CAMERA_CHANNEL_R = 0.986;
 const CAMERA_CHANNEL_B = 0.991;
 const CAMERA_GRAIN_SIGMA = 5.5 * CAMERA_DISPLAY_EXPOSURE;
 
+/**
+ * Perceptual response exponent. Real contact area is a few percent even under
+ * firm load, but darkening is not linear in it: partial gap closure already
+ * cuts the reflected return. One exponent drives both the rendered frame and
+ * the panel gating so they cannot drift apart.
+ */
+const CAMERA_RESPONSE_GAMMA = 0.45;
+
 const CAMERA_LUT_STEPS = 64;
 const CAMERA_FRACTION_LUT = Array.from(
   { length: CAMERA_LUT_STEPS + 1 },
@@ -996,7 +1076,7 @@ function renderCamera(couplingPressure) {
       const signal = Math.min(
         Math.pow(
           Math.min(localFraction / MAX_FIELD_CONTACT_FRACTION, 1),
-          0.55
+          CAMERA_RESPONSE_GAMMA
         ) * (0.82 + grain * 0.36),
         1
       );
@@ -1210,14 +1290,13 @@ function render(value) {
   // gamma keeps the first coupled patches visible without ever flattening out.
   const cameraSignal = Math.pow(
     Math.min(Math.max(ratio / MAX_FIELD_CONTACT_FRACTION, 0), 1),
-    0.45
+    CAMERA_RESPONSE_GAMMA
   );
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
   root.style.setProperty("--signal-level", `${percent}%`);
   root.style.setProperty("--coupling-width", `${48 + cameraSignal * 162}px`);
-  root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
   root.style.setProperty("--camera-darkness", (0.18 + cameraSignal * 0.78).toFixed(3));
   root.style.setProperty("--camera-response-opacity", cameraSignal.toFixed(3));
 

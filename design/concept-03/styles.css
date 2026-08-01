@@ -23,7 +23,6 @@
   --pressure: 0;
   --signal-level: 0%;
   --coupling-width: 0%;
-  --reflection-opacity: 0.76;
   --camera-darkness: 0.18;
   --camera-response-opacity: 0;
   --indenter-y: 34px;
@@ -780,17 +779,8 @@ main {
   stroke-width: 2;
 }
 
-.macro-rays .ray--incident {
-  opacity: 0.34;
-}
-
-.macro-rays .ray--reflected {
-  opacity: var(--reflection-opacity);
-}
-
-.macro-rays .ray--center {
-  opacity: calc(0.3 - var(--pressure) * 0.22);
-}
+/* Per-ray opacity is set in renderMacroRays from how far the coupled span
+   has swept over each reflection point. */
 
 .macro-label path {
   fill: none;
@@ -946,7 +936,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  color: var(--readout-dim);
+  color: var(--readout-tertiary);
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 8px;
   letter-spacing: 0.08em;
@@ -1128,7 +1118,7 @@ main {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  color: var(--readout-dim);
+  color: var(--readout-tertiary);
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 8px;
   letter-spacing: 0.08em;
