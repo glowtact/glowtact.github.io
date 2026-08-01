@@ -327,7 +327,7 @@ main {
 .hero-capabilities dt {
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.12em;
 }
 
@@ -402,7 +402,7 @@ main {
 .hero-figure figcaption span {
   color: var(--signal-amber);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -425,7 +425,7 @@ main {
   color: var(--readout-dim);
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -529,7 +529,7 @@ main {
 .toolbar-status > span {
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -602,7 +602,7 @@ main {
   background: rgba(8, 10, 9, 0.35);
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.08em;
 }
 
@@ -614,7 +614,7 @@ main {
 
 .macro-readout output {
   color: var(--signal-amber);
-  font-size: 8px;
+  font-size: 9px;
 }
 
 .view-header {
@@ -637,7 +637,7 @@ main {
 .view-badge {
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -948,7 +948,7 @@ main {
   gap: 20px;
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.08em;
 }
 
@@ -1130,7 +1130,7 @@ main {
   gap: 20px;
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.08em;
 }
 
@@ -1173,14 +1173,14 @@ main {
   background: rgba(8, 10, 9, 0.35);
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.08em;
 }
 
 .microscope-readout output,
 .camera-readout output {
   color: var(--signal-amber);
-  font-size: 8px;
+  font-size: 9px;
 }
 
 /* 4:3 matches the 640x480 sensor frames the constants were measured from. */
@@ -1250,7 +1250,7 @@ main {
   bottom: 10px;
   color: rgba(18, 25, 21, 0.62);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.08em;
 }
 
@@ -1281,7 +1281,7 @@ main {
   display: block;
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.1em;
 }
 
@@ -1430,7 +1430,7 @@ main {
 
 .state-rail span {
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
 }
 
 .state-rail strong {
@@ -1485,7 +1485,7 @@ main {
   background: #0b0d0b;
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.02em;
   line-height: 1.55;
 }
@@ -1522,7 +1522,7 @@ main {
   gap: 18px;
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.08em;
 }
 
@@ -1567,7 +1567,7 @@ main {
 .capability-stack span {
   color: var(--signal-amber);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.1em;
 }
 
@@ -1611,7 +1611,7 @@ main {
   grid-column: 1 / -1;
   color: var(--signal-amber);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.1em;
 }
 
@@ -1806,7 +1806,7 @@ main {
 .research-meta dt {
   color: var(--readout-dim);
   font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.1em;
 }
 
@@ -1965,8 +1965,37 @@ main {
       "camera";
   }
 
+  /*
+   * Stacked, a full-width 4:3 frame becomes the largest and brightest block
+   * on the page and outweighs the two views that explain it. Narrowing the
+   * whole instrument keeps the three views comparable without capping any
+   * single render surface, which would fight their aspect ratios.
+   */
+  .mechanism-shell {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+
+  /*
+   * Below this width the drawings render at roughly half scale, putting every
+   * in-diagram label under 5px. They are dropped rather than left as noise;
+   * the shapes stay legible and each view's readout strip carries the wording.
+   */
+  .macro-label,
+  .macro-interface-note,
+  .macro-scale-marker text,
+  .macro-sample-leader,
+  .macro-fov text,
+  .macro-camera text,
+  #macro-indenter text,
+  .micro-annotation {
+    display: none;
+  }
+
+  /* Nothing left to reserve room for once the labels are hidden. */
   .macro-stage {
-    min-height: 400px;
+    min-height: 0;
+    padding-block: 18px 52px;
   }
 
   .mechanism-console {
@@ -2139,20 +2168,6 @@ main {
     height: 256px;
   }
 
-  /*
-   * Every in-diagram label renders at roughly 3px once the drawings are
-   * scaled to a phone, so they are dropped rather than left as noise. The
-   * shapes stay legible and each view's readout strip carries the wording.
-   */
-  .macro-interface-note,
-  .macro-scale-marker text,
-  .macro-fov text,
-  .macro-camera text,
-  #macro-indenter text,
-  .micro-annotation {
-    display: none;
-  }
-
   .canvas-fallback {
     max-width: 130px;
   }
@@ -2293,7 +2308,7 @@ main {
 
   .research-meta pre {
     padding: 16px;
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .instrument-footer {

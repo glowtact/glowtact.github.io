@@ -1327,7 +1327,7 @@ function revealContent() {
  * they occupied is cropped away and the relief fills the panel instead of
  * floating under an empty margin.
  */
-const compactViewport = window.matchMedia("(max-width: 640px)");
+const compactViewport = window.matchMedia("(max-width: 900px)");
 
 function applyMicroFraming() {
   microSvg?.setAttribute(
