@@ -27,6 +27,7 @@ const macroCouplingLine = document.querySelector("#macro-coupling-line");
 const macroCouplingGlow = document.querySelector("#macro-coupling-glow");
 const macroFieldOfView = document.querySelector("#macro-field-of-view");
 const macroCameraAperture = document.querySelector(".macro-camera-aperture");
+const macroIndenter = document.querySelector("#macro-indenter");
 
 const microSurfaceFill = document.querySelector("#micro-surface-fill");
 const microSvg = document.querySelector("#micro-svg");
@@ -42,6 +43,7 @@ const FIELD_SEED = 2500;
 const MICRO_CLEARANCE = 2.5;
 const MACRO_INITIAL_GAP = 18;
 const MACRO_MIN_GAP = 1.8;
+const INDENTER_CONTACT_PRESSURE = 0.22;
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 let activeMicroView = "2d";
@@ -220,7 +222,7 @@ function planeHeightFor(sortedDescending, fraction) {
 }
 
 function stateFor(pressure) {
-  if (pressure < 0.1) {
+  if (pressure < INDENTER_CONTACT_PRESSURE) {
     return {
       key: "gap",
       index: "STATE 00",
@@ -228,7 +230,7 @@ function stateFor(pressure) {
       reflection: "Diffuse reflection",
       intensity: "No signal",
       copy:
-        "The indenter is just touching the membrane. A thin microscopic air gap still separates the membrane from the gel, so the camera sees no dark contact signal."
+        "The indenter is approaching the membrane. A thin microscopic air gap still separates the membrane from the gel, so the camera sees no dark contact signal."
     };
   }
 
@@ -274,6 +276,20 @@ function contactRatio(pressure) {
     });
   });
   return total ? count / total : 0;
+}
+
+function couplingPressureFor(pressure) {
+  const normalized = Math.min(
+    Math.max((pressure - INDENTER_CONTACT_PRESSURE) / (1 - INDENTER_CONTACT_PRESSURE), 0),
+    1
+  );
+  return Math.pow(normalized, 0.75);
+}
+
+function indenterYFor(pressure) {
+  const approach = Math.min(pressure / INDENTER_CONTACT_PRESSURE, 1);
+  const coupling = couplingPressureFor(pressure);
+  return 34 + approach * 29 + coupling * 24;
 }
 
 function smoothPath(points) {
@@ -338,6 +354,7 @@ function macroIndentationWeight(x) {
 function renderMacro(pressure) {
   if (!macroMembrane || !macroGel) return;
 
+  const couplingPressure = couplingPressureFor(pressure);
   const surfacePoints = [];
   const membranePoints = [];
   const start = 70;
@@ -351,7 +368,7 @@ function renderMacro(pressure) {
     const surfaceY = macroSurfaceY(x);
     const localGap =
       MACRO_INITIAL_GAP -
-      indentation * pressure * (MACRO_INITIAL_GAP - MACRO_MIN_GAP);
+      indentation * couplingPressure * (MACRO_INITIAL_GAP - MACRO_MIN_GAP);
     const membraneY = surfaceY - Math.max(MACRO_MIN_GAP, localGap);
 
     surfacePoints.push({ x, y: surfaceY });
@@ -372,6 +389,14 @@ function renderMacro(pressure) {
     const centerGap = surfacePoints[centerIndex].y - membranePoints[centerIndex].y;
     macroAirGap.dataset.centerClearance = centerGap.toFixed(3);
   }
+  if (macroIndenter) {
+    const indenterY = indenterYFor(pressure);
+    macroIndenter.dataset.contactState =
+      pressure >= INDENTER_CONTACT_PRESSURE ? "touching" : "approaching";
+    macroIndenter.dataset.distanceToMembrane =
+      Math.max(0, INDENTER_CONTACT_PRESSURE - pressure).toFixed(3);
+    root.style.setProperty("--indenter-y", `${indenterY.toFixed(2)}px`);
+  }
 
   let coupledStart = centerIndex;
   let coupledEnd = centerIndex;
@@ -386,7 +411,7 @@ function renderMacro(pressure) {
     : [];
   macroCouplingLine?.setAttribute("d", coupled.length > 1 ? smoothPath(coupled) : "");
 
-  const ratio = contactRatio(pressure);
+  const ratio = contactRatio(couplingPressure);
   macroCouplingGlow?.setAttribute("rx", String(12 + ratio * 250));
   macroCouplingGlow?.setAttribute("ry", String(14 + ratio * 36));
   macroFieldOfView?.setAttribute("opacity", (0.18 + ratio * 0.72).toFixed(3));
@@ -396,8 +421,9 @@ function renderMacro(pressure) {
 function renderMicro2D(pressure) {
   if (!microSurfaceFill || !microMembrane) return;
 
-  const threshold = profileThreshold(pressure);
-  const compression = Math.min(pressure * 0.18, 0.15);
+  const couplingPressure = couplingPressureFor(pressure);
+  const threshold = profileThreshold(couplingPressure);
+  const compression = Math.min(couplingPressure * 0.18, 0.15);
   const surfacePoints = surfaceProfile.map((height, index) => {
     const aboveThreshold = Math.max(height - threshold, 0);
     const localCompression =
@@ -531,7 +557,8 @@ function renderMicro3D(pressure) {
   const heightScale = height * 0.24;
   const originX = width * 0.5;
   const originY = height * 0.34;
-  const threshold = contactThreshold(pressure);
+  const couplingPressure = couplingPressureFor(pressure);
+  const threshold = contactThreshold(couplingPressure);
   let contactCellCount = 0;
   const contactQuadrants = [0, 0, 0, 0];
 
@@ -644,7 +671,7 @@ function renderMicro3D(pressure) {
   context.fillText("P2500-INSPIRED HEIGHT FIELD", 18 * pixelRatio, 28 * pixelRatio);
   context.fillStyle = "rgba(227, 161, 40, 0.82)";
   context.fillText(
-    `${Math.round(contactRatio(pressure) * 100)}% COUPLED / QUALITATIVE`,
+    `${Math.round(contactRatio(couplingPressure) * 100)}% COUPLED / QUALITATIVE`,
     18 * pixelRatio,
     47 * pixelRatio
   );
@@ -670,7 +697,8 @@ function render(value) {
   const pressure = Math.min(Math.max(Number(value), 0), 1);
   const percent = Math.round(pressure * 100);
   const state = stateFor(pressure);
-  const ratio = contactRatio(pressure);
+  const couplingPressure = couplingPressureFor(pressure);
+  const ratio = contactRatio(couplingPressure);
   const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
 
   currentPressure = pressure;

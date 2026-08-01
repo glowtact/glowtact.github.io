@@ -408,6 +408,13 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError("signal: default pressure is not 0%")
     if page.locator("#camera-intensity").inner_text() != "No signal":
         raise AssertionError("signal: default camera response is not gated off")
+    if page.locator(".camera-reference").count() != 1:
+        raise AssertionError("signal: missing realistic camera response reference layer")
+    camera_reference_image = page.locator(".camera-reference").evaluate(
+        "element => getComputedStyle(element).backgroundImage"
+    )
+    if "camera-response-screw-cross.png" not in camera_reference_image:
+        raise AssertionError("signal: camera response does not use the GlowTact reference texture")
     default_opacity = float(
         page.locator(".camera-contact").evaluate(
             "element => getComputedStyle(element).opacity"
@@ -424,6 +431,19 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError("signal: macro center air-gap metric is missing")
     if not 10 <= float(initial_gap) <= 22:
         raise AssertionError(f"signal: initial macro air gap is not small: {initial_gap}")
+    if page.locator("#macro-indenter").get_attribute("data-contact-state") != "approaching":
+        raise AssertionError("signal: indenter should start above the membrane")
+
+    pressure.fill("20")
+    precontact_opacity = float(
+        page.locator(".camera-contact").evaluate(
+            "element => getComputedStyle(element).opacity"
+        )
+    )
+    if precontact_opacity > 0.05:
+        raise AssertionError(
+            f"signal: camera response appeared before membrane contact: {precontact_opacity}"
+        )
 
     if micro_2d.get_attribute("aria-selected") != "true":
         raise AssertionError("signal: 2D microscope is not selected by default")
@@ -463,7 +483,10 @@ def check_signal_interactions(browser) -> None:
             if sample_count is None:
                 raise AssertionError("signal: 2D contact-sample metric is missing")
             contact_samples.append(int(sample_count))
-        if pressure_value == 25:
+        if pressure_value == 35:
+            if page.locator("#macro-indenter").get_attribute("data-contact-state") != "touching":
+                raise AssertionError("signal: indenter did not reach membrane before camera response")
+            page.wait_for_timeout(140)
             response_opacity = float(
                 page.locator(".camera-contact").evaluate(
                     "element => getComputedStyle(element).opacity"

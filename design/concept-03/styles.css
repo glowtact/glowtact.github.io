@@ -26,6 +26,7 @@
   --reflection-opacity: 0.76;
   --camera-darkness: 0.18;
   --camera-response-opacity: 0;
+  --indenter-y: 34px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
   background: var(--camera-black);
@@ -621,13 +622,13 @@ main {
 }
 
 #macro-indenter {
-  transform: translateY(calc(64px + var(--pressure) * 24px));
+  transform: translateY(var(--indenter-y));
   transition: transform 100ms linear;
 }
 
 #macro-indenter > path:first-child {
-  fill: #070908;
-  stroke: rgba(255, 255, 255, 0.13);
+  fill: #121612;
+  stroke: rgba(255, 255, 255, 0.16);
   stroke-width: 2;
 }
 
@@ -654,18 +655,18 @@ main {
 
 .macro-membrane-shadow {
   fill: none;
-  stroke: rgba(227, 161, 40, 0.15);
+  stroke: rgba(227, 161, 40, 0.1);
   stroke-linecap: round;
-  stroke-width: 18;
+  stroke-width: 14;
   filter: url("#soft-glow");
 }
 
 .macro-membrane {
   fill: none;
-  stroke: #050605;
+  stroke: #1a201b;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 19;
+  stroke-width: 15;
 }
 
 .macro-gel {
@@ -741,7 +742,21 @@ main {
 .macro-scale-marker circle {
   fill: none;
   stroke: var(--signal-amber-bright);
+  stroke-width: 1.7;
+}
+
+.macro-scale-marker .macro-sample-window {
+  fill: rgba(255, 192, 74, 0.055);
   stroke-width: 2;
+}
+
+.macro-scale-marker .macro-sample-crosshair {
+  stroke-dasharray: 2 5;
+  stroke-opacity: 0.58;
+}
+
+.macro-scale-marker .macro-sample-leader {
+  stroke-width: 1.4;
 }
 
 .macro-scale-marker text {
@@ -1077,9 +1092,10 @@ main {
   min-height: 236px;
   overflow: hidden;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px) 0 0 / 24px 24px,
-    #aab1aa;
+    radial-gradient(circle at 48% 46%, rgba(238, 242, 232, 0.34), transparent 44%),
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px) 0 0 / 22px 22px,
+    #aeb6ad;
 }
 
 .camera-vignette,
@@ -1095,10 +1111,10 @@ main {
 }
 
 .camera-noise {
-  opacity: 0.3;
+  opacity: 0.18;
   background:
-    repeating-linear-gradient(0deg, rgba(18, 25, 21, 0.11) 0 1px, transparent 1px 7px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 11px);
+    repeating-linear-gradient(0deg, rgba(18, 25, 21, 0.09) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 10px);
   mix-blend-mode: multiply;
 }
 
@@ -1110,28 +1126,35 @@ main {
   height: calc(clamp(48px, var(--coupling-width), 210px) * 0.72);
   display: grid;
   place-items: center;
-  border-radius: 50%;
+  border-radius: 42% 45% 46% 43% / 38% 40% 44% 42%;
   background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(194, 207, 199, calc(0.14 - var(--pressure) * 0.06)) 0 2px,
-      transparent 2px 10px
-    ),
-    rgba(3, 4, 3, var(--camera-darkness));
+    radial-gradient(circle at 48% 45%, rgba(10, 14, 12, calc(var(--camera-darkness) * 0.72)), transparent 58%),
+    rgba(52, 62, 56, calc(var(--camera-darkness) * 0.28));
   box-shadow:
-    0 0 34px 14px rgba(7, 10, 8, calc(var(--pressure) * 0.2)),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 0 34px 14px rgba(12, 17, 14, calc(var(--camera-response-opacity) * 0.16)),
+    0 0 0 1px rgba(255, 255, 255, calc(var(--camera-response-opacity) * 0.08));
   opacity: var(--camera-response-opacity);
   transform: translate(-50%, -50%);
   transition: background-color 100ms linear, box-shadow 100ms linear, opacity 120ms linear;
 }
 
+.camera-reference {
+  position: absolute;
+  inset: -14%;
+  border-radius: inherit;
+  background:
+    linear-gradient(rgba(175, 187, 176, calc(0.08 + var(--camera-response-opacity) * 0.08)), rgba(175, 187, 176, 0)),
+    url("./assets/camera-response-screw-cross.png") center / cover no-repeat;
+  filter: grayscale(0.18) contrast(calc(0.9 + var(--camera-response-opacity) * 0.36)) brightness(calc(1.05 - var(--camera-response-opacity) * 0.22));
+  mix-blend-mode: multiply;
+}
+
 .camera-contact i {
   position: absolute;
-  width: 48%;
-  height: 2px;
+  width: 34%;
+  height: 1px;
   border-radius: 999px;
-  background: rgba(204, 215, 207, calc(0.4 - var(--pressure) * 0.18));
+  background: rgba(44, 52, 47, calc(var(--camera-response-opacity) * 0.28));
 }
 
 .camera-contact i:nth-child(1) { transform: translateY(-24px); }
