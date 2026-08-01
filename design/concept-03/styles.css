@@ -20,11 +20,12 @@
   --optic-ring-soft: rgba(255, 255, 255, 0.048);
   --optic-grid: rgba(255, 255, 255, 0.036);
   --focus: #ffc04a;
-  --pressure: 0.32;
-  --signal-level: 32%;
-  --coupling-width: 28%;
-  --reflection-opacity: 0.66;
-  --camera-darkness: 0.48;
+  --pressure: 0;
+  --signal-level: 0%;
+  --coupling-width: 0%;
+  --reflection-opacity: 0.76;
+  --camera-darkness: 0.18;
+  --camera-response-opacity: 0;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
   background: var(--camera-black);
@@ -620,7 +621,7 @@ main {
 }
 
 #macro-indenter {
-  transform: translateY(calc(var(--pressure) * 58px));
+  transform: translateY(calc(64px + var(--pressure) * 24px));
   transition: transform 100ms linear;
 }
 
@@ -647,7 +648,7 @@ main {
 .macro-air-gap {
   fill: var(--air-gap);
   stroke: rgba(177, 204, 198, 0.14);
-  stroke-dasharray: 3 6;
+  stroke-dasharray: 2 5;
   stroke-width: 1;
 }
 
@@ -767,21 +768,65 @@ main {
   letter-spacing: 0.06em;
 }
 
+.macro-fov {
+  color: var(--signal-amber-bright);
+  pointer-events: none;
+}
+
 .macro-field-of-view {
-  fill: rgba(227, 161, 40, 0.1);
-  stroke: var(--signal-amber-bright);
+  fill: rgba(227, 161, 40, 0.07);
+  stroke: currentColor;
   stroke-width: 1.5;
 }
 
-.macro-camera path {
-  fill: #0b0e0c;
-  stroke: rgba(255, 192, 74, 0.26);
-  stroke-width: 1.25;
+.macro-fov-axis {
+  fill: none;
+  stroke: currentColor;
+  stroke-dasharray: 3 6;
+  stroke-opacity: 0.38;
+  stroke-width: 1;
 }
 
-.macro-camera circle {
+.macro-fov text {
+  fill: rgba(255, 192, 74, 0.62);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+}
+
+.macro-camera-body,
+.macro-camera-mount {
+  fill: #0b0e0c;
+  stroke: rgba(215, 228, 222, 0.3);
+  stroke-width: 1.5;
+}
+
+.macro-camera-sensor {
+  fill: rgba(24, 31, 27, 0.92);
+  stroke: rgba(255, 192, 74, 0.2);
+  stroke-width: 1;
+}
+
+.macro-camera-ring {
+  fill: #101511;
+  stroke: rgba(214, 230, 223, 0.58);
+  stroke-width: 4;
+}
+
+.macro-camera-lens {
   fill: #010201;
-  stroke: rgba(255, 192, 74, 0.34);
+  stroke: rgba(255, 192, 74, 0.42);
+  stroke-width: 2.5;
+}
+
+.macro-camera-glass {
+  fill: rgba(181, 209, 198, 0.22);
+  stroke: none;
+}
+
+.macro-camera-aperture {
+  fill: #000;
+  stroke: rgba(255, 192, 74, 0.5);
   stroke-width: 1.25;
 }
 
@@ -923,7 +968,7 @@ main {
   stroke: rgba(227, 161, 40, 0.18);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 17;
+  stroke-width: 11;
 }
 
 .micro-membrane {
@@ -931,7 +976,7 @@ main {
   stroke: #030403;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 12;
+  stroke-width: 7;
 }
 
 .micro-contact-segment {
@@ -1061,8 +1106,8 @@ main {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: clamp(64px, var(--coupling-width), 210px);
-  height: calc(clamp(64px, var(--coupling-width), 210px) * 0.72);
+  width: clamp(48px, var(--coupling-width), 210px);
+  height: calc(clamp(48px, var(--coupling-width), 210px) * 0.72);
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -1076,8 +1121,9 @@ main {
   box-shadow:
     0 0 34px 14px rgba(7, 10, 8, calc(var(--pressure) * 0.2)),
     0 0 0 1px rgba(255, 255, 255, 0.05);
+  opacity: var(--camera-response-opacity);
   transform: translate(-50%, -50%);
-  transition: background-color 100ms linear, box-shadow 100ms linear;
+  transition: background-color 100ms linear, box-shadow 100ms linear, opacity 120ms linear;
 }
 
 .camera-contact i {

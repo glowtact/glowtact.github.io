@@ -244,17 +244,24 @@
                     <text x="840" y="182" text-anchor="end">ZOOM TO ~100 UM WINDOW</text>
                   </g>
 
-                  <path
-                    id="macro-field-of-view"
-                    class="macro-field-of-view"
-                    d="M422 448L460 372L498 448Z"
-                  ></path>
+                  <g class="macro-fov" aria-label="Camera field of view">
+                    <path
+                      id="macro-field-of-view"
+                      class="macro-field-of-view"
+                      d="M402 448L460 346L518 448Z"
+                    ></path>
+                    <path class="macro-fov-axis" d="M460 448V348"></path>
+                    <text x="528" y="410">FIELD OF VIEW</text>
+                  </g>
                   <g class="macro-camera">
-                    <path class="macro-camera-body" d="M408 482H512L528 536H392Z"></path>
-                    <circle class="macro-camera-ring" cx="460" cy="486" r="30"></circle>
-                    <circle class="macro-camera-lens" cx="460" cy="486" r="20"></circle>
-                    <circle class="macro-camera-aperture" cx="460" cy="486" r="8"></circle>
-                    <text x="460" y="529" text-anchor="middle">CENTERED CAMERA</text>
+                    <path class="macro-camera-mount" d="M438 448H482L490 468H430Z"></path>
+                    <path class="macro-camera-body" d="M390 478H530L540 532H380Z"></path>
+                    <rect class="macro-camera-sensor" x="414" y="490" width="92" height="26" rx="4"></rect>
+                    <circle class="macro-camera-ring" cx="460" cy="505" r="31"></circle>
+                    <circle class="macro-camera-lens" cx="460" cy="505" r="21"></circle>
+                    <circle class="macro-camera-glass" cx="452" cy="499" r="6"></circle>
+                    <circle class="macro-camera-aperture" cx="460" cy="505" r="8"></circle>
+                    <text x="460" y="545" text-anchor="middle">CAMERA</text>
                   </g>
                   <g class="macro-led macro-led--left">
                     <circle cx="116" cy="470" r="8"></circle>
@@ -408,7 +415,7 @@
               </div>
               <footer class="camera-readout">
                 <span>LOCAL INTENSITY</span>
-                <output id="camera-intensity">Reduced</output>
+                <output id="camera-intensity">No signal</output>
               </footer>
             </article>
           </div>
@@ -425,24 +432,24 @@
             <div class="pressure-control">
               <label for="signal-pressure">
                 <span>QUALITATIVE INDENTATION</span>
-                <output id="pressure-percent" for="signal-pressure">32%</output>
+                <output id="pressure-percent" for="signal-pressure">0%</output>
               </label>
               <input
                 id="signal-pressure"
                 type="range"
                 min="0"
                 max="100"
-                value="32"
+                value="0"
                 aria-describedby="instrument-disclosure"
               >
             </div>
 
             <ol class="state-rail" aria-label="Coupling states">
-              <li data-state="gap">
+              <li data-state="gap" class="is-active" aria-current="step">
                 <span>00</span>
                 <strong>Air gap</strong>
               </li>
-              <li data-state="local" class="is-active" aria-current="step">
+              <li data-state="local">
                 <span>01</span>
                 <strong>Local coupling</strong>
               </li>
@@ -453,10 +460,11 @@
             </ol>
 
             <div class="state-explanation" aria-live="polite">
-              <span id="state-index">STATE 01</span>
+              <span id="state-index">STATE 00</span>
               <p id="state-copy">
-                Pressure closes local gaps. The black membrane begins to absorb
-                light where it optically couples to the gel.
+                The indenter is just touching the membrane. A thin microscopic
+                air gap still separates the membrane from the gel, so the camera
+                sees no dark contact signal.
               </p>
             </div>
           </div>

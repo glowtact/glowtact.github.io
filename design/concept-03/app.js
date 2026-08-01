@@ -40,10 +40,12 @@ const FIELD_SIZE = 41;
 const PROFILE_SIZE = 65;
 const FIELD_SEED = 2500;
 const MICRO_CLEARANCE = 2.5;
+const MACRO_INITIAL_GAP = 18;
+const MACRO_MIN_GAP = 1.8;
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 let activeMicroView = "2d";
-let currentPressure = Number(pressureInput?.value ?? 32) / 100;
+let currentPressure = Number(pressureInput?.value ?? 0) / 100;
 let isPlaying = false;
 let startedAt = 0;
 let frame = 0;
@@ -224,9 +226,9 @@ function stateFor(pressure) {
       index: "STATE 00",
       title: "Air gap",
       reflection: "Diffuse reflection",
-      intensity: "Light-gray field",
+      intensity: "No signal",
       copy:
-        "The taut membrane rests near the highest asperities. Microscopic air gaps preserve the reflective gel–air interface."
+        "The indenter is just touching the membrane. A thin microscopic air gap still separates the membrane from the gel, so the camera sees no dark contact signal."
     };
   }
 
@@ -341,13 +343,16 @@ function renderMacro(pressure) {
   const start = 70;
   const end = 850;
   const samples = 65;
+  const centerIndex = Math.floor(samples / 2);
 
   for (let index = 0; index < samples; index += 1) {
     const x = start + (index / (samples - 1)) * (end - start);
     const indentation = macroIndentationWeight(x);
     const surfaceY = macroSurfaceY(x);
-    const desiredMembraneY = 254 + indentation * pressure * 78;
-    const membraneY = Math.min(desiredMembraneY, surfaceY - 4);
+    const localGap =
+      MACRO_INITIAL_GAP -
+      indentation * pressure * (MACRO_INITIAL_GAP - MACRO_MIN_GAP);
+    const membraneY = surfaceY - Math.max(MACRO_MIN_GAP, localGap);
 
     surfacePoints.push({ x, y: surfaceY });
     membranePoints.push({ x, y: membraneY });
@@ -363,8 +368,11 @@ function renderMacro(pressure) {
   macroMembrane.setAttribute("d", membranePath);
   macroMembraneShadow?.setAttribute("d", membranePath);
   macroAirGap?.setAttribute("d", gapPath);
+  if (macroAirGap) {
+    const centerGap = surfacePoints[centerIndex].y - membranePoints[centerIndex].y;
+    macroAirGap.dataset.centerClearance = centerGap.toFixed(3);
+  }
 
-  const centerIndex = Math.floor(samples / 2);
   let coupledStart = centerIndex;
   let coupledEnd = centerIndex;
   const isCoupled = (index) =>
@@ -379,20 +387,29 @@ function renderMacro(pressure) {
   macroCouplingLine?.setAttribute("d", coupled.length > 1 ? smoothPath(coupled) : "");
 
   const ratio = contactRatio(pressure);
-  macroCouplingGlow?.setAttribute("rx", String(32 + ratio * 230));
+  macroCouplingGlow?.setAttribute("rx", String(12 + ratio * 250));
   macroCouplingGlow?.setAttribute("ry", String(14 + ratio * 36));
-  macroFieldOfView?.setAttribute("opacity", (0.22 + ratio * 0.72).toFixed(3));
+  macroFieldOfView?.setAttribute("opacity", (0.18 + ratio * 0.72).toFixed(3));
   macroCameraAperture?.setAttribute("opacity", (0.48 + ratio * 0.52).toFixed(3));
 }
 
 function renderMicro2D(pressure) {
   if (!microSurfaceFill || !microMembrane) return;
 
-  const surfacePoints = surfaceProfile.map((height, index) => ({
-    x: 28 + (index / (surfaceProfile.length - 1)) * 464,
-    y: 236 - height * 88
-  }));
   const threshold = profileThreshold(pressure);
+  const compression = Math.min(pressure * 0.18, 0.15);
+  const surfacePoints = surfaceProfile.map((height, index) => {
+    const aboveThreshold = Math.max(height - threshold, 0);
+    const localCompression =
+      aboveThreshold > 0
+        ? Math.min(aboveThreshold * 0.58 + compression, 0.18)
+        : 0;
+    const displayedHeight = Math.max(height - localCompression, 0);
+    return {
+      x: 28 + (index / (surfaceProfile.length - 1)) * 464,
+      y: 236 - displayedHeight * 88
+    };
+  });
   const desiredY = 236 - threshold * 88;
   const constraintThreshold = threshold - MICRO_CLEARANCE / 88;
   const contactConstraints = surfacePoints.filter(
@@ -405,7 +422,7 @@ function renderMicro2D(pressure) {
     return contactConstraints.reduce((membraneY, constraint) => {
       const distance = point.x - constraint.x;
       const constraintY =
-        constraint.y - 2.5 + distance * distance * compliancePenalty;
+        constraint.y - MICRO_CLEARANCE + distance * distance * compliancePenalty;
       return Math.min(membraneY, constraintY);
     }, planeY);
   });
@@ -654,13 +671,15 @@ function render(value) {
   const percent = Math.round(pressure * 100);
   const state = stateFor(pressure);
   const ratio = contactRatio(pressure);
+  const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
   root.style.setProperty("--signal-level", `${percent}%`);
-  root.style.setProperty("--coupling-width", `${10 + pressure * 56}%`);
+  root.style.setProperty("--coupling-width", `${48 + cameraSignal * 162}px`);
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
-  root.style.setProperty("--camera-darkness", (0.2 + pressure * 0.76).toFixed(3));
+  root.style.setProperty("--camera-darkness", (0.18 + cameraSignal * 0.78).toFixed(3));
+  root.style.setProperty("--camera-response-opacity", cameraSignal.toFixed(3));
 
   if (pressureInput) pressureInput.value = String(percent);
   if (pressurePercent) pressurePercent.value = `${percent}%`;

@@ -404,6 +404,27 @@ def check_signal_interactions(browser) -> None:
     panel_2d = page.locator("#micro-panel-2d")
     panel_3d = page.locator("#micro-panel-3d")
     pressure = page.locator("#signal-pressure")
+    if page.locator("#pressure-percent").inner_text() != "0%":
+        raise AssertionError("signal: default pressure is not 0%")
+    if page.locator("#camera-intensity").inner_text() != "No signal":
+        raise AssertionError("signal: default camera response is not gated off")
+    default_opacity = float(
+        page.locator(".camera-contact").evaluate(
+            "element => getComputedStyle(element).opacity"
+        )
+    )
+    if default_opacity > 0.05:
+        raise AssertionError(
+            f"signal: camera contact should be hidden at 0%, opacity {default_opacity}"
+        )
+    initial_gap = page.locator("#macro-air-gap").get_attribute(
+        "data-center-clearance"
+    )
+    if initial_gap is None:
+        raise AssertionError("signal: macro center air-gap metric is missing")
+    if not 10 <= float(initial_gap) <= 22:
+        raise AssertionError(f"signal: initial macro air gap is not small: {initial_gap}")
+
     if micro_2d.get_attribute("aria-selected") != "true":
         raise AssertionError("signal: 2D microscope is not selected by default")
     if panel_2d.is_hidden() or not panel_3d.is_hidden():
@@ -442,6 +463,16 @@ def check_signal_interactions(browser) -> None:
             if sample_count is None:
                 raise AssertionError("signal: 2D contact-sample metric is missing")
             contact_samples.append(int(sample_count))
+        if pressure_value == 25:
+            response_opacity = float(
+                page.locator(".camera-contact").evaluate(
+                    "element => getComputedStyle(element).opacity"
+                )
+            )
+            if response_opacity <= 0.12:
+                raise AssertionError(
+                    "signal: camera response did not appear after coupling began"
+                )
     if contact_samples != sorted(contact_samples):
         raise AssertionError(
             f"signal: 2D contact samples are not monotonic: {contact_samples}"
