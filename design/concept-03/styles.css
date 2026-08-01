@@ -673,9 +673,9 @@ main {
 
 .macro-texture-line {
   fill: none;
-  stroke: rgba(194, 218, 211, 0.72);
+  stroke: rgba(226, 240, 235, 0.92);
   stroke-linecap: round;
-  stroke-width: 2;
+  stroke-width: 7;
 }
 
 .macro-acrylic {
@@ -697,6 +697,7 @@ main {
   stroke: var(--signal-amber-bright);
   stroke-linecap: round;
   stroke-width: 4;
+  filter: url("#soft-glow");
 }
 
 .macro-rays {
@@ -738,25 +739,29 @@ main {
 .macro-scale-marker path,
 .macro-scale-marker circle {
   fill: none;
-  stroke: var(--signal-amber);
-  stroke-width: 1.5;
+  stroke: var(--signal-amber-bright);
+  stroke-width: 2;
 }
 
 .macro-scale-marker text {
-  fill: var(--signal-amber);
+  fill: var(--signal-amber-bright);
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 8px;
   letter-spacing: 0.06em;
+  paint-order: stroke;
+  stroke: rgba(8, 10, 9, 0.72);
+  stroke-linejoin: round;
+  stroke-width: 3px;
 }
 
 .macro-interface-note path {
   fill: none;
-  stroke: rgba(255, 192, 74, 0.56);
+  stroke: rgba(10, 18, 15, 0.5);
   stroke-width: 1;
 }
 
 .macro-interface-note text {
-  fill: var(--readout-tertiary);
+  fill: rgba(9, 16, 13, 0.82);
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 8px;
   letter-spacing: 0.06em;
@@ -764,18 +769,20 @@ main {
 
 .macro-field-of-view {
   fill: rgba(227, 161, 40, 0.1);
-  stroke: var(--signal-amber);
+  stroke: var(--signal-amber-bright);
   stroke-width: 1.5;
 }
 
 .macro-camera path {
   fill: #0b0e0c;
-  stroke: var(--optic-ring);
+  stroke: rgba(255, 192, 74, 0.26);
+  stroke-width: 1.25;
 }
 
 .macro-camera circle {
   fill: #010201;
-  stroke: var(--signal-amber-dim);
+  stroke: rgba(255, 192, 74, 0.34);
+  stroke-width: 1.25;
 }
 
 .macro-camera text {
@@ -930,9 +937,10 @@ main {
 .micro-contact-segment {
   fill: none;
   stroke: var(--signal-amber-bright);
-  stroke-linecap: round;
+  stroke-linecap: butt;
   stroke-linejoin: round;
-  stroke-width: 4.5;
+  stroke-width: 3.25;
+  filter: drop-shadow(0 0 4px rgba(255, 192, 74, 0.34));
 }
 
 .micro-annotation path {
@@ -946,6 +954,14 @@ main {
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 8px;
   letter-spacing: 0.08em;
+}
+
+.micro-annotation--surface path {
+  stroke: rgba(10, 18, 15, 0.42);
+}
+
+.micro-annotation--surface text {
+  fill: rgba(9, 16, 13, 0.78);
 }
 
 .micro-scale {
@@ -1016,9 +1032,9 @@ main {
   min-height: 236px;
   overflow: hidden;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px) 0 0 / 28px 28px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px) 0 0 / 28px 28px,
-    #a9afa8;
+    linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px) 0 0 / 24px 24px,
+    #aab1aa;
 }
 
 .camera-vignette,
@@ -1034,10 +1050,10 @@ main {
 }
 
 .camera-noise {
-  opacity: 0.35;
+  opacity: 0.3;
   background:
-    repeating-radial-gradient(circle at 20% 30%, rgba(18, 25, 21, 0.2) 0 1px, transparent 1px 5px),
-    repeating-radial-gradient(circle at 74% 62%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px 6px);
+    repeating-linear-gradient(0deg, rgba(18, 25, 21, 0.11) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 11px);
   mix-blend-mode: multiply;
 }
 
@@ -1049,21 +1065,27 @@ main {
   height: calc(clamp(64px, var(--coupling-width), 210px) * 0.72);
   display: grid;
   place-items: center;
-  border-radius: 48% 52% 46% 54%;
-  background: rgba(3, 4, 3, var(--camera-darkness));
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(194, 207, 199, calc(0.14 - var(--pressure) * 0.06)) 0 2px,
+      transparent 2px 10px
+    ),
+    rgba(3, 4, 3, var(--camera-darkness));
   box-shadow:
-    0 0 38px 16px rgba(7, 10, 8, calc(var(--pressure) * 0.22)),
+    0 0 34px 14px rgba(7, 10, 8, calc(var(--pressure) * 0.2)),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   transform: translate(-50%, -50%);
-  transition: background-color 100ms linear;
+  transition: background-color 100ms linear, box-shadow 100ms linear;
 }
 
 .camera-contact i {
   position: absolute;
   width: 48%;
-  height: 3px;
+  height: 2px;
   border-radius: 999px;
-  background: rgba(194, 207, 199, calc(0.48 - var(--pressure) * 0.22));
+  background: rgba(204, 215, 207, calc(0.4 - var(--pressure) * 0.18));
 }
 
 .camera-contact i:nth-child(1) { transform: translateY(-24px); }

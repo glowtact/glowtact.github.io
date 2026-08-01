@@ -191,6 +191,32 @@ function generateSurfaceProfile(size, seed) {
 
 const surfaceProfile = generateSurfaceProfile(PROFILE_SIZE, FIELD_SEED + 17);
 
+const fieldHeightsDescending = [...surfaceField.flat()].sort((a, b) => b - a);
+const profileHeightsDescending = [...surfaceProfile].sort((a, b) => b - a);
+
+/**
+ * Qualitative real-contact-area law. Contact starts at the single highest
+ * asperity and grows superlinearly with indentation, which keeps the 2D
+ * section, the 3D field, and the readout describing one coupled fraction.
+ */
+function targetContactFraction(pressure) {
+  return 0.55 * Math.pow(Math.min(Math.max(pressure, 0), 1), 1.7);
+}
+
+/**
+ * Height of the descending membrane plane that leaves the requested fraction
+ * of a sampled surface above it.
+ */
+function planeHeightFor(sortedDescending, fraction) {
+  if (!sortedDescending.length) return 1;
+  if (fraction <= 0) return sortedDescending[0] + 1e-6;
+  const count = Math.max(
+    1,
+    Math.min(sortedDescending.length, Math.round(fraction * sortedDescending.length))
+  );
+  return sortedDescending[count - 1];
+}
+
 function stateFor(pressure) {
   if (pressure < 0.1) {
     return {
@@ -228,7 +254,11 @@ function stateFor(pressure) {
 }
 
 function contactThreshold(pressure) {
-  return 1.015 - pressure * 0.78;
+  return planeHeightFor(fieldHeightsDescending, targetContactFraction(pressure));
+}
+
+function profileThreshold(pressure) {
+  return planeHeightFor(profileHeightsDescending, targetContactFraction(pressure));
 }
 
 function contactRatio(pressure) {
@@ -362,7 +392,7 @@ function renderMicro2D(pressure) {
     x: 28 + (index / (surfaceProfile.length - 1)) * 464,
     y: 236 - height * 88
   }));
-  const threshold = contactThreshold(pressure);
+  const threshold = profileThreshold(pressure);
   const desiredY = 236 - threshold * 88;
   const constraintThreshold = threshold - MICRO_CLEARANCE / 88;
   const contactConstraints = surfacePoints.filter(
@@ -529,8 +559,11 @@ function renderMicro3D(pressure) {
         Math.max((average - threshold + 0.1) / 0.2, 0),
         1
       );
+      // Shade a facet as coupled only when most of it clears the membrane
+      // plane, so the amber area tracks the reported coupled fraction instead
+      // of flooding outward from every isolated peak vertex.
       const contactStrength =
-        maximum >= threshold
+        vertexCoverage >= 0.5
           ? Math.min(vertexCoverage * 0.46 + heightStrength * 0.38 + meanStrength * 0.16, 1)
           : 0;
       if (contactStrength > 0) {
