@@ -423,17 +423,30 @@ function renderMicro2D(pressure) {
 
   const couplingPressure = couplingPressureFor(pressure);
   const threshold = profileThreshold(couplingPressure);
-  const compression = Math.min(couplingPressure * 0.18, 0.15);
-  const surfacePoints = surfaceProfile.map((height, index) => {
-    const aboveThreshold = Math.max(height - threshold, 0);
-    const localCompression =
-      aboveThreshold > 0
-        ? Math.min(aboveThreshold * 0.58 + compression, 0.18)
+  const contactIndentations = surfaceProfile.map((height) =>
+    Math.max(height - threshold, 0)
+  );
+  const deformedProfile = surfaceProfile.map((height, index) => {
+    const localIndentation = contactIndentations[index];
+    const tipFlattening =
+      localIndentation > 0
+        ? Math.min(localIndentation * 0.62 + couplingPressure * 0.055, 0.16)
         : 0;
-    const displayedHeight = Math.max(height - localCompression, 0);
+    const lateralWidening = contactIndentations.reduce((widening, indentation, neighborIndex) => {
+      if (indentation <= 0 || neighborIndex === index) return widening;
+      const distance = Math.abs(neighborIndex - index);
+      const radius = 1.4 + Math.sqrt(indentation) * 6;
+      return Math.max(
+        widening,
+        indentation * 0.2 * Math.exp(-(distance * distance) / (radius * radius))
+      );
+    }, 0);
+    return Math.min(Math.max(height - tipFlattening + lateralWidening, 0), 1);
+  });
+  const surfacePoints = deformedProfile.map((height, index) => {
     return {
       x: 28 + (index / (surfaceProfile.length - 1)) * 464,
-      y: 236 - displayedHeight * 88
+      y: 236 - height * 88
     };
   });
   const desiredY = 236 - threshold * 88;
@@ -474,8 +487,8 @@ function renderMicro2D(pressure) {
     x: point.x,
     y: compliantEnvelope[index]
   }));
-  const contactSampleIndices = surfaceProfile
-    .map((height, index) => (height >= threshold ? index : -1))
+  const contactSampleIndices = contactIndentations
+    .map((indentation, index) => (indentation > 0 ? index : -1))
     .filter((index) => index >= 0);
   const contactThirdCounts = [0, 0, 0];
   contactSampleIndices.forEach((index) => {
@@ -505,30 +518,41 @@ function renderMicro2D(pressure) {
   if (!microContactPoints) return;
   microContactPoints.replaceChildren();
   let run = [];
+  const plateauWidths = [];
   const appendContactRun = () => {
     if (!run.length) return;
+    const left = run[0];
+    const right = run[run.length - 1];
+    const runIndentation =
+      run.reduce((sum, point) => sum + contactIndentations[point.index], 0) /
+      run.length;
+    const plateauPad = 3 + Math.sqrt(Math.max(runIndentation, 0)) * 17;
+    const plateauWidth = Math.max(8, right.x - left.x + plateauPad * 2);
+    const plateauY =
+      run.reduce((sum, point) => sum + point.y, 0) / run.length - 1.2;
+    plateauWidths.push(plateauWidth);
     const contact = document.createElementNS(SVG_NS, "path");
     contact.setAttribute("class", "micro-contact-segment");
-    if (run.length === 1) {
-      const point = run[0];
-      contact.setAttribute(
-        "d",
-        `M${(point.x - 2.5).toFixed(2)} ${point.y.toFixed(2)} H${(
-          point.x + 2.5
-        ).toFixed(2)}`
-      );
-    } else {
-      contact.setAttribute("d", angularPath(run));
-    }
+    contact.setAttribute(
+      "d",
+      `M${(left.x - plateauPad).toFixed(2)} ${plateauY.toFixed(2)} H${(
+        right.x + plateauPad
+      ).toFixed(2)}`
+    );
     microContactPoints.append(contact);
     run = [];
   };
 
   surfacePoints.forEach((point, index) => {
-    if (surfaceProfile[index] >= threshold) run.push(point);
+    if (contactIndentations[index] > 0) run.push({ ...point, index });
     else appendContactRun();
   });
   appendContactRun();
+  if (microSvg) {
+    microSvg.dataset.plateauWidths = plateauWidths
+      .map((width) => width.toFixed(2))
+      .join(",");
+  }
 }
 
 function resizeCanvas() {

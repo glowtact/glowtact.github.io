@@ -410,11 +410,19 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError("signal: default camera response is not gated off")
     if page.locator(".camera-reference").count() != 1:
         raise AssertionError("signal: missing realistic camera response reference layer")
-    camera_reference_image = page.locator(".camera-reference").evaluate(
-        "element => getComputedStyle(element).backgroundImage"
+    camera_stage_box = page.locator(".camera-stage").bounding_box()
+    if camera_stage_box is None:
+        raise AssertionError("signal: camera stage has no rendered box")
+    camera_aspect = camera_stage_box["width"] / camera_stage_box["height"]
+    if abs(camera_aspect - (4 / 3)) > 0.08:
+        raise AssertionError(
+            f"signal: camera ROI aspect ratio {camera_aspect:.3f} is not close to 4:3"
+        )
+    camera_reference_style = page.locator(".camera-reference").evaluate(
+        "element => { const style = getComputedStyle(element); return { image: style.backgroundImage, size: style.backgroundSize }; }"
     )
-    if "camera-response-screw-cross.png" not in camera_reference_image:
-        raise AssertionError("signal: camera response does not use the GlowTact reference texture")
+    if "camera-response-screw-cross.png" in camera_reference_style["image"] and "cover" in camera_reference_style["size"]:
+        raise AssertionError("signal: camera response directly enlarges the tactile reference image")
     default_opacity = float(
         page.locator(".camera-contact").evaluate(
             "element => getComputedStyle(element).opacity"
@@ -517,6 +525,20 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(
             f"signal: 2D contact-third counts are incomplete: {third_counts}"
         )
+    plateau_widths_value = page.locator("#micro-svg").get_attribute(
+        "data-plateau-widths"
+    )
+    if plateau_widths_value is None:
+        raise AssertionError("signal: 2D plateau-width metrics are missing")
+    plateau_widths = [
+        float(value) for value in plateau_widths_value.split(",") if value
+    ]
+    if not plateau_widths or max(plateau_widths) < 8:
+        raise AssertionError(
+            f"signal: contact plateau is not visibly widened: {plateau_widths}"
+        )
+    if page.locator(".micro-contact-segment").count() != len(plateau_widths):
+        raise AssertionError("signal: plateau metrics do not match contact segments")
 
     micro_3d.click()
     if micro_3d.get_attribute("aria-selected") != "true":
