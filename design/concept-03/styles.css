@@ -1,10 +1,10 @@
 :root {
-  --camera-black: #080a09;
-  --nitrile: #101310;
-  --optic-surface-1: #131714;
-  --optic-surface-2: #171c18;
-  --optic-surface-3: #1d231f;
-  --optic-surface-4: #242b26;
+  --camera-black: #10130f;
+  --nitrile: #171b17;
+  --optic-surface-1: #1c211d;
+  --optic-surface-2: #222823;
+  --optic-surface-3: #2a312b;
+  --optic-surface-4: #333b34;
   --signal-amber: #e3a128;
   --signal-amber-bright: #ffc04a;
   --signal-amber-dim: #886421;
@@ -711,12 +711,16 @@ main {
   stroke-width: 1;
 }
 
-/* Neutral silhouette halo so the membrane separates from the dark backdrop. */
+/*
+ * Soft drop under the membrane. It used to be a light halo, which separated a
+ * near-black membrane from a near-black panel; now the panel is lighter and
+ * the membrane is a third as thick, so a light halo simply washed it out.
+ */
 .macro-membrane-shadow {
   fill: none;
-  stroke: rgba(188, 212, 204, 0.14);
+  stroke: rgba(8, 12, 9, 0.4);
   stroke-linecap: round;
-  stroke-width: 21;
+  stroke-width: 11;
   filter: url("#soft-glow");
 }
 
@@ -727,10 +731,10 @@ main {
  */
 .macro-membrane {
   fill: none;
-  stroke: #2a322c;
+  stroke: #1f261f;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 15;
+  stroke-width: 5;
   paint-order: stroke;
 }
 
@@ -1048,15 +1052,13 @@ main {
 }
 
 /*
- * Soft body shadow under the membrane. Deliberately neutral: an amber glow
- * along the whole lower face would read as coupling everywhere, when only the
- * flattened plateaus are optically coupled.
+ * Soft body shadow, drawn as a band strictly inside the membrane. Stroking the
+ * lower face directly spread half the width below the interface, smearing dark
+ * over every asperity plateau so the coupled marker looked detached from it.
  */
 .micro-membrane-shadow {
-  fill: none;
-  stroke: rgba(6, 9, 7, 0.55);
-  stroke-linejoin: round;
-  stroke-width: 9;
+  fill: rgba(6, 9, 7, 0.5);
+  stroke: none;
 }
 
 /* A filled band, so the drawn lower edge is the surface that makes contact. */
@@ -1072,7 +1074,7 @@ main {
   stroke: var(--signal-amber-bright);
   stroke-linecap: butt;
   stroke-width: 2.6;
-  filter: drop-shadow(0 0 5px rgba(255, 192, 74, 0.42));
+  filter: drop-shadow(0 0 4px rgba(255, 192, 74, 0.5));
 }
 
 .micro-annotation path {

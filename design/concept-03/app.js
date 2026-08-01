@@ -72,6 +72,7 @@ const MICRO_GEL_BOTTOM_Y = 320;
 const MICRO_STANDOFF = 0.05;
 const MICRO_MAX_INDENTATION = 0.38;
 const MICRO_MEMBRANE_THICKNESS = 6;
+const MICRO_CONTACT_STROKE = 2.6;
 const MICRO_SAG_MAX = 0.045;
 const MICRO_SAG_CURVATURE = 26;
 /** Reach of the Hertz edge field, in units of the contact half-width. */
@@ -80,12 +81,6 @@ const HERTZ_EDGE_REACH = 2;
 const HERTZ_EDGE_COEFFICIENT = 0.85;
 /** Shoulder length, in units of the contact half-width. */
 const SHOULDER_SPAN = 3;
-/**
- * Pile-up coefficient: the share of displaced cap area that surfaces as a
- * visible shoulder. It is below one because an axisymmetric asperity also
- * sheds material out of the section plane.
- */
-const PILE_UP_COEFFICIENT = 0.32;
 const MACRO_MIN_GAP = 1.8;
 const INDENTER_CONTACT_PRESSURE = 0.22;
 /**
@@ -95,7 +90,7 @@ const INDENTER_CONTACT_PRESSURE = 0.22;
  * view barely moved, because the gap travel alone is ~16 user units.
  */
 const MACRO_BULK_INDENT = 26;
-const MACRO_MEMBRANE_HALF_THICKNESS = 7.5;
+const MACRO_MEMBRANE_HALF_THICKNESS = 2.5;
 const MACRO_INDENTER_BASE_Y = 197;
 const MACRO_INDENTER_APPROACH_GAP = 60;
 /**
@@ -322,6 +317,8 @@ const profileApexMaximum = Math.max(
   ...profileAsperities.map((asperity) => asperity.apexHeight)
 );
 const profileFloorMinimum = Math.min(...surfaceProfile);
+const UNDEFORMED_MEAN_HEIGHT =
+  surfaceProfile.reduce((total, height) => total + height, 0) / PROFILE_SIZE;
 /**
  * Height-to-y mapping derived from the generated profile, so the relief always
  * fills the drawing band regardless of the seed. This is the only place the
@@ -483,13 +480,12 @@ function solveAsperityContacts(plane) {
       asperity,
       indentation,
       halfContact,
-      // The raised-cosine shoulder integrates to SHOULDER_SPAN * halfContact
-      // per side over both flanks, so this amplitude carries exactly the
-      // requested share of the displaced area.
+      // Nominal amplitude: the raised-cosine shoulder integrates to
+      // SHOULDER_SPAN * halfContact over both flanks. solveShoulderScale then
+      // rescales all of them together to close the section's area budget.
       shoulderAmplitude:
         halfContact > 0
-          ? (PILE_UP_COEFFICIENT * displacedArea) /
-            (SHOULDER_SPAN * halfContact)
+          ? displacedArea / (SHOULDER_SPAN * halfContact)
           : 0
     };
   });
@@ -501,7 +497,7 @@ function solveAsperityContacts(plane) {
  * decorative bar. Just outside it the surface departs with the 3/2-power Hertz
  * edge asymptote, and further out the pile-up shoulder lifts the far field.
  */
-function deformedProfileSample(x, plane, contacts) {
+function deformedProfileSample(x, plane, contacts, shoulderScale) {
   const base = undeformedProfileHeight(x);
   let ceiling = Infinity;
   let shoulder = 0;
@@ -533,12 +529,61 @@ function deformedProfileSample(x, plane, contacts) {
       const phase = (edge - HERTZ_EDGE_REACH) / SHOULDER_SPAN;
       shoulder = Math.max(
         shoulder,
-        contact.shoulderAmplitude * 0.5 * (1 - Math.cos(2 * Math.PI * phase))
+        contact.shoulderAmplitude *
+          shoulderScale *
+          0.5 *
+          (1 - Math.cos(2 * Math.PI * phase))
       );
     }
   });
 
-  return { height: Math.min(base + shoulder, ceiling), coupled };
+  const lifted = Math.min(base + shoulder, ceiling);
+  return {
+    height: coupled ? lifted : Math.min(lifted, plane - MICRO_SHOULDER_CLEARANCE),
+    coupled
+  };
+}
+
+/** Mean height of the section at a given shoulder scale. */
+function sectionMeanHeight(plane, contacts, shoulderScale) {
+  let total = 0;
+  for (let index = 0; index < PROFILE_SIZE; index += 1) {
+    total += deformedProfileSample(
+      index / (PROFILE_SIZE - 1),
+      plane,
+      contacts,
+      shoulderScale
+    ).height;
+  }
+  return total / PROFILE_SIZE;
+}
+
+/**
+ * Silicone is nearly incompressible, so material pressed out of the flattened
+ * tips has to reappear beside them. Rather than trusting a hand-tuned pile-up
+ * coefficient, the shoulders are solved: the section area is linear in the
+ * shoulder scale away from the clamps, so two probes give the scale that
+ * restores the undeformed area exactly. It is capped because once the
+ * shoulders run into the membrane plane the remaining material can only be
+ * accommodated out of the section plane.
+ */
+const SHOULDER_SCALE_CAP = 8;
+/**
+ * Pile-up may approach the membrane but not reach it: material that would be
+ * pushed past the plane is in contact, and contact is owned by the Hertz
+ * solve. Without this the solver drove the scale high enough to spike bulges
+ * through the membrane, which then ballooned over them.
+ */
+const MICRO_SHOULDER_CLEARANCE = 0.014;
+
+function solveShoulderScale(plane, contacts) {
+  const target = UNDEFORMED_MEAN_HEIGHT;
+  const withoutShoulders = sectionMeanHeight(plane, contacts, 0);
+  if (withoutShoulders >= target) return 0;
+  const withShoulders = sectionMeanHeight(plane, contacts, 1);
+  const gain = withShoulders - withoutShoulders;
+  if (gain <= 1e-9) return 0;
+  return Math.min((target - withoutShoulders) / gain, SHOULDER_SCALE_CAP);
 }
 
 /** Distance from x to the nearest contact edge, or Infinity when unloaded. */
@@ -838,11 +883,19 @@ function renderMicro2D(pressure) {
   const couplingPressure = couplingPressureFor(pressure);
   const plane = membranePlaneFor(couplingPressure);
   const contacts = solveAsperityContacts(plane);
+  const shoulderScale = solveShoulderScale(plane, contacts);
   const span = MICRO_X_END - MICRO_X_START;
+  let sectionHeightTotal = 0;
 
   const samples = Array.from({ length: PROFILE_SIZE }, (_, index) => {
     const normalizedX = index / (PROFILE_SIZE - 1);
-    const solved = deformedProfileSample(normalizedX, plane, contacts);
+    const solved = deformedProfileSample(
+      normalizedX,
+      plane,
+      contacts,
+      shoulderScale
+    );
+    sectionHeightTotal += solved.height;
     // The membrane rests on every plateau and sags between them. Taking the
     // higher of the sagging plane and the surface keeps contact conformal
     // while making penetration impossible by construction.
@@ -879,16 +932,25 @@ function renderMicro2D(pressure) {
   );
   microSurfaceLine?.setAttribute("d", surfacePath);
 
-  const membraneBottomPath = angularPath(membranePoints);
-  const membraneBandPath = `${membraneBottomPath} ${[...membranePoints]
-    .reverse()
-    .map(
-      (point) =>
-        `L${point.x.toFixed(2)} ${(point.y - MICRO_MEMBRANE_THICKNESS).toFixed(2)}`
-    )
-    .join(" ")} Z`;
-  microMembrane.setAttribute("d", membraneBandPath);
-  microMembraneShadow?.setAttribute("d", membraneBottomPath);
+  /** Closed band hanging `thickness` above the given lower edge. */
+  const bandAbove = (points, thickness) =>
+    `${angularPath(points)} ${[...points]
+      .reverse()
+      .map(
+        (point) =>
+          `L${point.x.toFixed(2)} ${(point.y - thickness).toFixed(2)}`
+      )
+      .join(" ")} Z`;
+
+  microMembrane.setAttribute(
+    "d",
+    bandAbove(membranePoints, MICRO_MEMBRANE_THICKNESS)
+  );
+  // Strictly inside the membrane, so nothing is painted below the interface.
+  microMembraneShadow?.setAttribute(
+    "d",
+    bandAbove(membranePoints, MICRO_MEMBRANE_THICKNESS * 0.45)
+  );
   microGapArea?.setAttribute("d", areaBetween(membranePoints, surfacePoints));
 
   const coupledSamples = samples.filter((sample) => sample.coupled).length;
@@ -910,13 +972,19 @@ function renderMicro2D(pressure) {
     microSvg.dataset.contactSamples = String(coupledSamples);
     microSvg.dataset.contactThirds = contactThirdCounts.join(",");
     microSvg.dataset.coupledFraction = coupledFraction.toFixed(4);
+    microSvg.dataset.areaRatio = (
+      sectionHeightTotal / PROFILE_SIZE / UNDEFORMED_MEAN_HEIGHT
+    ).toFixed(4);
     microSvg.dataset.profileSignature = profileSignature;
   }
 
   if (!microContactPoints) return;
   microContactPoints.replaceChildren();
   const plateauWidths = [];
-  const plateauY = microHeightToY(plane);
+  // Offset by half the stroke so the marker's top edge lands exactly on the
+  // plateau, reading as the coupled interface rather than a bar floating
+  // inside the membrane above it.
+  const plateauY = microHeightToY(plane) + MICRO_CONTACT_STROKE / 2;
 
   contacts.forEach((contact) => {
     if (contact.halfContact <= 0) return;
@@ -974,14 +1042,13 @@ function renderMicro2D(pressure) {
  * contrast ratio and the side-lit falloff intact while seating the frame in
  * the page's tonal range, the same way a figure sets a display window.
  */
-const CAMERA_DISPLAY_EXPOSURE = 0.66;
+const CAMERA_DISPLAY_EXPOSURE = 0.78;
 const CAMERA_PEAK_LEVEL = 236 * CAMERA_DISPLAY_EXPOSURE;
 const CAMERA_CENTRE_FALLOFF = 0.735;
 const CAMERA_EDGE_GAIN = 0.194;
 const CAMERA_CONTACT_FLOOR = 6 * CAMERA_DISPLAY_EXPOSURE;
 const CAMERA_CHANNEL_R = 0.986;
 const CAMERA_CHANNEL_B = 0.991;
-const CAMERA_GRAIN_SIGMA = 5.5 * CAMERA_DISPLAY_EXPOSURE;
 
 /**
  * Perceptual response exponent. Real contact area is a few percent even under
@@ -1008,39 +1075,27 @@ function cameraFractionFor(couplingPressure) {
   );
 }
 
-/** Static, seeded sensor grain: fixed-pattern noise, not animated sparkle. */
-const CAMERA_GRAIN = (() => {
-  const random = seededRandom(FIELD_SEED + 991);
-  return Float32Array.from({ length: 4096 }, () => random());
-})();
-
-/** Smoothly interpolated coarse lattice for unresolved contact clustering. */
-const CAMERA_LATTICE_SIZE = 44;
-const CAMERA_LATTICE = (() => {
-  const random = seededRandom(FIELD_SEED + 4127);
-  return Float32Array.from(
-    { length: CAMERA_LATTICE_SIZE * CAMERA_LATTICE_SIZE },
-    () => random()
-  );
-})();
-
-function cameraLatticeNoise(u, v) {
-  const x = u * (CAMERA_LATTICE_SIZE - 1);
-  const y = v * (CAMERA_LATTICE_SIZE - 1);
-  const x0 = Math.floor(x);
-  const y0 = Math.floor(y);
-  const fx = x - x0;
-  const fy = y - y0;
-  const sx = fx * fx * (3 - 2 * fx);
-  const sy = fy * fy * (3 - 2 * fy);
-  const at = (column, row) =>
-    CAMERA_LATTICE[
-      Math.min(row, CAMERA_LATTICE_SIZE - 1) * CAMERA_LATTICE_SIZE +
-        Math.min(column, CAMERA_LATTICE_SIZE - 1)
-    ];
-  const top = at(x0, y0) * (1 - sx) + at(x0 + 1, y0) * sx;
-  const bottom = at(x0, y0 + 1) * (1 - sx) + at(x0 + 1, y0 + 1) * sx;
-  return top * (1 - sy) + bottom * sy;
+/*
+ * Speckle field. The uncoupled window is bright and finely speckled: light
+ * scatters off individual asperity tips, and the frames measure a
+ * high-frequency sigma of ~27 grey levels with a correlation length of about
+ * one pixel. Each pixel also carries a fixed rank standing for how tall the
+ * asperities under it are, so tall ones couple and go dark first. Under load
+ * the white speckles turn black one by one and the patch fills in, which is
+ * what the real frames do.
+ */
+const CAMERA_SPECKLE_SIGMA = 27 * CAMERA_DISPLAY_EXPOSURE;
+const CAMERA_SPECKLE_SOFTNESS = 0.22;
+/**
+ * Per-pixel value hash. A small lookup table indexed by a linear combination
+ * of row and column repeats on a lattice, which showed up as a diagonal weave
+ * across the frame; hashing the coordinates directly has no period.
+ */
+function cameraHash(column, row, salt) {
+  let value = (Math.imul(column, 374761393) + Math.imul(row, 668265263) + salt) >>> 0;
+  value = (value ^ (value >>> 13)) >>> 0;
+  value = Math.imul(value, 1274126177) >>> 0;
+  return ((value ^ (value >>> 16)) >>> 0) / 4294967296;
 }
 
 function renderCamera(couplingPressure) {
@@ -1052,42 +1107,50 @@ function renderCamera(couplingPressure) {
   const data = image.data;
   const halfWidth = width / 2;
   const halfHeight = height / 2;
+  const aspect = height / width;
   // The ROI spans the camera's footprint on the interface, in macro units.
   const roiHalfSpan = MACRO_FOV_SLOPE * (MACRO_FOV_APEX_Y - 286);
 
   for (let row = 0; row < height; row += 1) {
     for (let column = 0; column < width; column += 1) {
       const u = (column - halfWidth) / halfWidth;
-      const v = ((row - halfHeight) / halfHeight) * (height / width);
-      const radius = Math.hypot(u, v) * roiHalfSpan;
+      const v = ((row - halfHeight) / halfHeight) * aspect;
+      const radius2 = u * u + v * v;
+      const radius = Math.sqrt(radius2) * roiHalfSpan;
 
       const localCoupling =
         couplingPressure * macroIndentationWeight(MACRO_FOV_APEX_X + radius);
-      const localFraction = cameraFractionFor(localCoupling);
-      // Two octaves: fine sensor noise plus a smooth coarser scale standing in
-      // for clusters of asperity contacts the camera cannot resolve.
-      const fineGrain =
-        CAMERA_GRAIN[((row * 67 + column * 31) >>> 0) % CAMERA_GRAIN.length];
-      const coarseGrain = cameraLatticeNoise(column / width, row / height);
-      const grain = fineGrain * 0.34 + coarseGrain * 0.66;
+      const drive = Math.pow(
+        Math.min(
+          cameraFractionFor(localCoupling) / MAX_FIELD_CONTACT_FRACTION,
+          1
+        ),
+        CAMERA_RESPONSE_GAMMA
+      );
 
-      // Unresolved individual asperity contacts show up as grain in the
-      // darkened area, so the patch reads as texture rather than a soft blob.
-      const signal = Math.min(
-        Math.pow(
-          Math.min(localFraction / MAX_FIELD_CONTACT_FRACTION, 1),
-          CAMERA_RESPONSE_GAMMA
-        ) * (0.82 + grain * 0.36),
+      const speckle = cameraHash(column, row, 0x9e3779b9);
+      const rank = cameraHash(column, row, 0x85ebca6b);
+
+      // A speckle flips once the local drive passes its rank. Smoothing the
+      // step keeps the patch edge from aliasing into hard dots.
+      const flipped = Math.min(
+        Math.max(
+          (drive - rank + CAMERA_SPECKLE_SOFTNESS) /
+            (2 * CAMERA_SPECKLE_SOFTNESS),
+          0
+        ),
         1
       );
 
       // Side-lit window: brightest at the edges, dimmest at the centre.
-      const radius2 = u * u + v * v;
       const illumination = CAMERA_CENTRE_FALLOFF + CAMERA_EDGE_GAIN * radius2;
-      const unloaded =
-        CAMERA_PEAK_LEVEL * illumination + (grain - 0.5) * CAMERA_GRAIN_SIGMA * 2;
-      const level =
-        unloaded + (CAMERA_CONTACT_FLOOR - unloaded) * signal;
+      const bright =
+        CAMERA_PEAK_LEVEL * illumination +
+        (speckle - 0.5) * CAMERA_SPECKLE_SIGMA;
+      // Coupled speckles keep a little of their own variation, so the dark
+      // patch reads as texture rather than a flat fill.
+      const dark = CAMERA_CONTACT_FLOOR + speckle * CAMERA_SPECKLE_SIGMA * 0.7;
+      const level = bright + (dark - bright) * flipped;
 
       const offset = (row * width + column) * 4;
       data[offset] = Math.max(level * CAMERA_CHANNEL_R, 0);

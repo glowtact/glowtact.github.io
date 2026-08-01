@@ -516,6 +516,17 @@ def check_signal_interactions(browser) -> None:
             }"""
         )
         camera_levels.append((pressure_value, round(centre_level, 2)))
+        area_ratio = page.locator("#micro-svg").get_attribute("data-area-ratio")
+        if area_ratio is None:
+            raise AssertionError("signal: section area-ratio metric is missing")
+        # Silicone is near-incompressible, so flattened material must reappear
+        # beside the contacts. Some escapes out of the section plane at heavy
+        # load, but the section may never gain area or lose most of it.
+        if not 0.82 <= float(area_ratio) <= 1.001:
+            raise AssertionError(
+                f"signal: section area not conserved ({area_ratio}) "
+                f"at {pressure_value}% pressure"
+            )
         signature = page.locator("#micro-svg").get_attribute(
             "data-profile-signature"
         )
