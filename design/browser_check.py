@@ -461,6 +461,7 @@ def check_signal_interactions(browser) -> None:
     representative_pressures = (0, 25, 55, 75, 100)
     dense_pressures = sorted(set(range(0, 101, 5)) | {2, 15, 16})
     contact_samples = []
+    coupled_fractions: list[tuple[int, float]] = []
     profile_signature = None
     for pressure_value in dense_pressures:
         pressure.fill(str(pressure_value))
@@ -470,11 +471,32 @@ def check_signal_interactions(browser) -> None:
         )
         if minimum_clearance is None:
             raise AssertionError("signal: 2D minimum-clearance metric is missing")
-        if float(minimum_clearance) < 2.5 - 1e-6:
+        # The membrane may rest on a flattened asperity, so zero clearance is
+        # the expected coupled state. What must never happen is penetration.
+        if float(minimum_clearance) < -1e-3:
             raise AssertionError(
-                f"signal: 2D clearance {minimum_clearance} is below 2.5 "
+                f"signal: membrane penetrates the gel ({minimum_clearance}) "
                 f"at {pressure_value}% pressure"
             )
+        coupled_fraction_value = page.locator("#micro-svg").get_attribute(
+            "data-coupled-fraction"
+        )
+        if coupled_fraction_value is None:
+            raise AssertionError("signal: 2D coupled-fraction metric is missing")
+        coupled_fraction = float(coupled_fraction_value)
+        if coupled_fraction <= 0:
+            # Unloaded or pre-contact: an open air gap must still be visible.
+            if float(minimum_clearance) <= 2.0:
+                raise AssertionError(
+                    f"signal: no visible air gap ({minimum_clearance}) while "
+                    f"uncoupled at {pressure_value}% pressure"
+                )
+        elif float(minimum_clearance) > 0.5:
+            raise AssertionError(
+                f"signal: contact is not conformal; clearance "
+                f"{minimum_clearance} at {pressure_value}% pressure"
+            )
+        coupled_fractions.append((pressure_value, coupled_fraction))
         signature = page.locator("#micro-svg").get_attribute(
             "data-profile-signature"
         )
@@ -507,6 +529,15 @@ def check_signal_interactions(browser) -> None:
     if contact_samples != sorted(contact_samples):
         raise AssertionError(
             f"signal: 2D contact samples are not monotonic: {contact_samples}"
+        )
+    fractions = [value for _, value in coupled_fractions]
+    if fractions != sorted(fractions):
+        raise AssertionError(
+            f"signal: coupled fraction is not monotonic: {coupled_fractions}"
+        )
+    if fractions[-1] <= 0.2:
+        raise AssertionError(
+            f"signal: coupled fraction stays negligible at full load: {fractions[-1]}"
         )
 
     pressure.fill("55")

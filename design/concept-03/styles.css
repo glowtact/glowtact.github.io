@@ -27,6 +27,7 @@
   --camera-darkness: 0.18;
   --camera-response-opacity: 0;
   --indenter-y: 34px;
+  --interface-shift: 0px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
   background: var(--camera-black);
@@ -540,10 +541,36 @@ main {
   color: var(--signal-amber-bright);
 }
 
+/*
+ * The device-scale diagram is a 1.70-aspect drawing, so squeezing it into a
+ * double-height side column left a large dead band and shrank every label.
+ * Giving it a full-width row lets it fill its own space, and puts the
+ * microscope and the camera side by side as equally weighted consequences.
+ */
 .mechanism-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.78fr) minmax(330px, 0.92fr);
-  grid-template-rows: minmax(360px, auto) minmax(280px, auto);
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 1fr);
+  grid-template-areas:
+    "macro macro"
+    "micro camera";
+}
+
+.macro-view {
+  grid-area: macro;
+}
+
+/* Both consequence panels let their render surface absorb the spare height,
+   so neither ends in an empty band below its content. */
+.microscope-view {
+  grid-area: micro;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.output-view {
+  grid-area: camera;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .instrument-view {
@@ -554,8 +581,41 @@ main {
     inset 1px 1px var(--optic-ring-soft);
 }
 
+/*
+ * The stage takes the slack so the column has no dead band under the diagram,
+ * and the readout footer makes the three views structurally parallel: each one
+ * ends in its own derived measurement strip.
+ */
 .macro-view {
-  grid-row: 1 / span 2;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.macro-readout {
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  color: var(--readout-dim);
+  background: rgba(8, 10, 9, 0.35);
+  box-shadow: inset 0 1px var(--optic-ring);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+}
+
+.macro-readout div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.macro-readout output {
+  color: var(--signal-amber);
+  font-size: 8px;
 }
 
 .view-header {
@@ -599,7 +659,7 @@ main {
 
 .macro-stage {
   position: relative;
-  min-height: 680px;
+  min-height: 420px;
   display: grid;
   align-items: center;
   padding: 22px 24px 58px;
@@ -653,31 +713,39 @@ main {
   stroke-width: 1;
 }
 
+/* Neutral silhouette halo so the membrane separates from the dark backdrop. */
 .macro-membrane-shadow {
   fill: none;
-  stroke: rgba(227, 161, 40, 0.1);
+  stroke: rgba(188, 212, 204, 0.14);
   stroke-linecap: round;
-  stroke-width: 14;
+  stroke-width: 21;
   filter: url("#soft-glow");
 }
 
+/*
+ * Dark but never black: at #1a201b on this panel the membrane disappeared
+ * entirely, which erased the subject of the view. The rim keeps its lower
+ * face legible as it closes onto the gel.
+ */
 .macro-membrane {
   fill: none;
-  stroke: #1a201b;
+  stroke: #2a322c;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 15;
+  paint-order: stroke;
 }
 
 .macro-gel {
   fill: url("#gel-gradient");
 }
 
+/* Demoted: the gel surface is context, the membrane is the subject. */
 .macro-texture-line {
   fill: none;
-  stroke: rgba(226, 240, 235, 0.92);
+  stroke: rgba(198, 216, 210, 0.5);
   stroke-linecap: round;
-  stroke-width: 7;
+  stroke-width: 3.5;
 }
 
 .macro-acrylic {
@@ -691,7 +759,7 @@ main {
   opacity: calc(0.2 + var(--pressure) * 0.8);
   transform-box: fill-box;
   transform-origin: center;
-  transform: scaleX(calc(0.25 + var(--pressure) * 1.05));
+  transform: translateY(var(--interface-shift));
 }
 
 .macro-coupling-line {
@@ -736,6 +804,12 @@ main {
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 9px;
   letter-spacing: 0.08em;
+}
+
+/* Rides the interface down so the window keeps bracketing the contact zone. */
+.macro-scale-marker {
+  transform: translateY(var(--interface-shift));
+  transition: transform 100ms linear;
 }
 
 .macro-scale-marker path,
@@ -788,10 +862,12 @@ main {
   pointer-events: none;
 }
 
+/* Kept quiet: it is the viewing geometry, not a light path. */
 .macro-field-of-view {
-  fill: rgba(227, 161, 40, 0.07);
+  fill: rgba(227, 161, 40, 0.045);
   stroke: currentColor;
-  stroke-width: 1.5;
+  stroke-opacity: 0.5;
+  stroke-width: 1;
 }
 
 .macro-fov-axis {
@@ -945,6 +1021,8 @@ main {
 .micro-panel {
   position: relative;
   min-height: 316px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 48%, rgba(157, 179, 173, 0.05), transparent 55%),
@@ -954,17 +1032,19 @@ main {
 .micro-panel svg,
 .micro-panel canvas {
   width: 100%;
-  height: 276px;
+  height: 100%;
+  min-height: 276px;
 }
 
 .micro-panel canvas {
   background: transparent;
 }
 
+/* Open air between the membrane and the gel: the uncoupled, reflecting state. */
 .micro-gap-area {
-  fill: rgba(160, 193, 184, 0.1);
-  stroke: rgba(160, 193, 184, 0.12);
-  stroke-width: 1;
+  fill: rgba(150, 187, 205, 0.16);
+  stroke: rgba(176, 208, 220, 0.2);
+  stroke-width: 0.8;
 }
 
 .micro-surface-fill {
@@ -978,29 +1058,32 @@ main {
   stroke-width: 2;
 }
 
+/*
+ * Soft body shadow under the membrane. Deliberately neutral: an amber glow
+ * along the whole lower face would read as coupling everywhere, when only the
+ * flattened plateaus are optically coupled.
+ */
 .micro-membrane-shadow {
   fill: none;
-  stroke: rgba(227, 161, 40, 0.18);
-  stroke-linecap: round;
+  stroke: rgba(6, 9, 7, 0.55);
   stroke-linejoin: round;
-  stroke-width: 11;
+  stroke-width: 9;
 }
 
+/* A filled band, so the drawn lower edge is the surface that makes contact. */
 .micro-membrane {
-  fill: none;
-  stroke: #030403;
-  stroke-linecap: round;
+  fill: #1c221d;
+  stroke: rgba(206, 224, 216, 0.42);
   stroke-linejoin: round;
-  stroke-width: 7;
+  stroke-width: 1.1;
 }
 
 .micro-contact-segment {
   fill: none;
   stroke: var(--signal-amber-bright);
   stroke-linecap: butt;
-  stroke-linejoin: round;
-  stroke-width: 3.25;
-  filter: drop-shadow(0 0 4px rgba(255, 192, 74, 0.34));
+  stroke-width: 2.6;
+  filter: drop-shadow(0 0 5px rgba(255, 192, 74, 0.42));
 }
 
 .micro-annotation path {
@@ -1018,6 +1101,20 @@ main {
 
 .micro-annotation--surface path {
   stroke: rgba(10, 18, 15, 0.42);
+}
+
+/* Only meaningful once at least one asperity has flattened into contact. */
+.micro-annotation--coupling {
+  opacity: min(1, calc(var(--camera-response-opacity) * 3));
+  transition: opacity 140ms linear;
+}
+
+.micro-annotation--coupling path {
+  stroke: rgba(255, 192, 74, 0.45);
+}
+
+.micro-annotation--coupling text {
+  fill: var(--signal-amber);
 }
 
 .micro-annotation--surface text {
@@ -1092,79 +1189,69 @@ main {
   aspect-ratio: 4 / 3;
   min-height: 0;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 48% 46%, rgba(238, 242, 232, 0.34), transparent 44%),
-    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px) 0 0 / 22px 22px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px) 0 0 / 22px 22px,
-    #aeb6ad;
+  background: #8d968b;
 }
 
 .camera-vignette,
-.camera-noise,
 .camera-contact,
 .camera-reticle {
   position: absolute;
   inset: 0;
 }
 
+/* The rendered sensor frame; see renderCamera() for how it is derived. */
+.camera-field {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .camera-vignette {
-  background: radial-gradient(circle, transparent 28%, rgba(10, 18, 14, 0.7) 100%);
+  background: radial-gradient(circle at 50% 48%, transparent 46%, rgba(12, 20, 16, 0.42) 100%);
+  pointer-events: none;
 }
 
-.camera-noise {
-  opacity: 0.18;
-  background:
-    repeating-linear-gradient(0deg, rgba(18, 25, 21, 0.09) 0 1px, transparent 1px 6px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 10px);
-  mix-blend-mode: multiply;
-}
-
+/*
+ * A soft bloom around the darkened region. The darkening itself lives on the
+ * canvas; this only carries the gating so the response stays invisible until
+ * the interface actually couples.
+ */
 .camera-contact {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: clamp(42px, var(--coupling-width), 190px);
-  height: calc(clamp(42px, var(--coupling-width), 190px) * 0.58);
-  display: grid;
-  place-items: center;
-  border-radius: 48% 50% 46% 52% / 42% 45% 48% 44%;
-  background:
-    radial-gradient(ellipse at 38% 42%, rgba(22, 28, 24, calc(var(--camera-darkness) * 0.54)) 0 9%, transparent 24%),
-    radial-gradient(ellipse at 58% 56%, rgba(16, 21, 18, calc(var(--camera-darkness) * 0.62)) 0 7%, transparent 22%),
-    radial-gradient(ellipse at 49% 48%, rgba(31, 38, 33, calc(var(--camera-darkness) * 0.52)), transparent 62%),
-    rgba(82, 93, 85, calc(var(--camera-darkness) * 0.18));
-  box-shadow:
-    0 0 34px 14px rgba(12, 17, 14, calc(var(--camera-response-opacity) * 0.16)),
-    0 0 0 1px rgba(255, 255, 255, calc(var(--camera-response-opacity) * 0.08));
+  width: clamp(42px, var(--coupling-width), 210px);
+  height: calc(clamp(42px, var(--coupling-width), 210px) * 0.75);
+  border-radius: 50%;
+  /* Gradient rather than a box-shadow: a shadow spread leaves a visible ring
+     at its edge, which read as a hard artefact over the rendered frame. */
+  background: radial-gradient(
+    circle,
+    rgba(10, 16, 12, 0.14) 0%,
+    rgba(10, 16, 12, 0.05) 52%,
+    transparent 74%
+  );
   opacity: var(--camera-response-opacity);
   transform: translate(-50%, -50%);
-  transition: background-color 100ms linear, box-shadow 100ms linear, opacity 120ms linear;
+  transition: opacity 120ms linear;
 }
 
+/*
+ * Statistical reference only: a low-contrast, heavily scaled-down sample of a
+ * real frame supplying grain and tint. It is never enlarged to stand in for
+ * the response itself.
+ */
 .camera-reference {
   position: absolute;
-  inset: -8%;
-  border-radius: inherit;
-  background:
-    linear-gradient(rgba(175, 187, 176, calc(0.04 + var(--camera-response-opacity) * 0.04)), rgba(175, 187, 176, 0)),
-    url("./assets/camera-response-screw-cross.png") center / 86px 86px repeat;
-  filter: grayscale(0.34) contrast(calc(0.7 + var(--camera-response-opacity) * 0.2)) brightness(1.08);
-  mix-blend-mode: multiply;
-  opacity: calc(var(--camera-response-opacity) * 0.34);
+  inset: 0;
+  background: url("./assets/camera-response-screw-cross.png") center / 62px 62px repeat;
+  filter: grayscale(0.86) contrast(0.42) brightness(1.12);
+  mix-blend-mode: overlay;
+  opacity: 0.16;
+  pointer-events: none;
 }
-
-.camera-contact i {
-  position: absolute;
-  width: 28%;
-  height: 1px;
-  border-radius: 999px;
-  background: rgba(36, 44, 39, calc(var(--camera-response-opacity) * 0.16));
-}
-
-.camera-contact i:nth-child(1) { transform: translateY(-24px); }
-.camera-contact i:nth-child(2) { transform: translateY(-12px); }
-.camera-contact i:nth-child(4) { transform: translateY(12px); }
-.camera-contact i:nth-child(5) { transform: translateY(24px); }
 
 .camera-reticle--x {
   top: 50%;

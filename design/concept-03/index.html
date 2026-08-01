@@ -182,10 +182,6 @@
                     <text x="460" y="92" text-anchor="middle">INDENTER</text>
                   </g>
 
-                  <path id="macro-air-gap" class="macro-air-gap"></path>
-                  <path id="macro-membrane-shadow" class="macro-membrane-shadow"></path>
-                  <path id="macro-membrane" class="macro-membrane"></path>
-
                   <g id="macro-rays" class="macro-rays" aria-hidden="true">
                     <path class="ray ray--incident" d="M126 444L268 292"></path>
                     <path class="ray ray--reflected ray--left" d="M274 294L428 438" marker-end="url(#ray-arrow)"></path>
@@ -216,6 +212,14 @@
                     class="macro-texture-line"
                     d="M70 286 C260 284 660 288 850 286"
                   ></path>
+                  <!--
+                    Painted after the gel so the membrane is never occluded by
+                    it: the descending black membrane is the subject of this
+                    view, not the gel surface it closes onto.
+                  -->
+                  <path id="macro-air-gap" class="macro-air-gap"></path>
+                  <path id="macro-membrane-shadow" class="macro-membrane-shadow"></path>
+                  <path id="macro-membrane" class="macro-membrane"></path>
                   <rect class="macro-acrylic" x="70" y="448" width="780" height="52"></rect>
                   <ellipse id="macro-coupling-glow" class="macro-coupling-glow" cx="460" cy="290" rx="80" ry="28"></ellipse>
                   <path id="macro-coupling-line" class="macro-coupling-line"></path>
@@ -238,21 +242,31 @@
                     <text x="120" y="322">~9 UM TEXTURE / EXAGGERATED</text>
                   </g>
 
+                  <!--
+                    The sampled window brackets the indented, coupling region
+                    at x=460. Placing it off to one side implied that View B
+                    magnified a patch outside the contact zone.
+                  -->
                   <g class="macro-scale-marker">
-                    <path class="macro-sample-window" d="M560 272H648L662 286L648 300H560L546 286Z"></path>
-                    <path class="macro-sample-crosshair" d="M604 270V302M544 286H664"></path>
-                    <path class="macro-sample-leader" d="M654 276L704 198H840"></path>
-                    <text x="840" y="182" text-anchor="end">SAMPLED ~100 UM WINDOW</text>
+                    <path class="macro-sample-window" d="M416 272H504L518 286L504 300H416L402 286Z"></path>
+                    <path class="macro-sample-crosshair" d="M460 268V304M398 286H522"></path>
+                    <path class="macro-sample-leader" d="M516 277L600 166H840"></path>
+                    <text x="840" y="150" text-anchor="end">SAMPLED ~100 UM WINDOW</text>
                   </g>
 
+                  <!--
+                    The cone apexes at the lens and widens up to the interface
+                    plane it images. Drawn the other way round it read as light
+                    converging away from the surface.
+                  -->
                   <g class="macro-fov" aria-label="Camera field of view">
                     <path
                       id="macro-field-of-view"
                       class="macro-field-of-view"
-                      d="M402 448L460 346L518 448Z"
+                      d="M460 492L300 288L620 288Z"
                     ></path>
-                    <path class="macro-fov-axis" d="M460 448V348"></path>
-                    <text x="528" y="410">FIELD OF VIEW</text>
+                    <path id="macro-fov-axis" class="macro-fov-axis" d="M460 492V288"></path>
+                    <text x="628" y="386">FIELD OF VIEW</text>
                   </g>
                   <g class="macro-camera">
                     <path class="macro-camera-mount" d="M438 448H482L490 468H430Z"></path>
@@ -280,6 +294,21 @@
                   <span><i class="legend-coupling"></i>Optical coupling</span>
                 </div>
               </div>
+
+              <footer class="macro-readout">
+                <div>
+                  <span>CENTRE GAP / OF INITIAL</span>
+                  <output id="macro-gap-readout">100%</output>
+                </div>
+                <div>
+                  <span>COUPLED SPAN / OF FIELD OF VIEW</span>
+                  <output id="macro-span-readout">0%</output>
+                </div>
+                <div>
+                  <span>INDENTER</span>
+                  <output id="macro-indenter-readout">Approaching</output>
+                </div>
+              </footer>
             </article>
 
             <article class="instrument-view microscope-view" aria-labelledby="microscope-title">
@@ -348,16 +377,20 @@
                   <g id="micro-contact-points" class="micro-contact-points"></g>
 
                   <g class="micro-annotation micro-annotation--membrane">
-                    <path d="M34 46H132L158 75"></path>
-                    <text x="34" y="36">NITRILE MEMBRANE</text>
+                    <path d="M34 42H132L158 102"></path>
+                    <text x="34" y="32">NITRILE MEMBRANE</text>
                   </g>
                   <g class="micro-annotation micro-annotation--gap">
-                    <path d="M486 82H412L388 112"></path>
-                    <text x="486" y="72" text-anchor="end">AIR GAP</text>
+                    <path d="M486 66H408L376 128"></path>
+                    <text x="486" y="56" text-anchor="end">AIR GAP</text>
+                  </g>
+                  <g class="micro-annotation micro-annotation--coupling">
+                    <path d="M126 82H236L262 114"></path>
+                    <text x="126" y="72">COUPLED PLATEAU</text>
                   </g>
                   <g class="micro-annotation micro-annotation--surface">
-                    <path d="M486 242H414L386 220"></path>
-                    <text x="486" y="232" text-anchor="end">P2500-MOLDED TEXTURE</text>
+                    <path d="M486 258H414L386 238"></path>
+                    <text x="486" y="248" text-anchor="end">P2500-MOLDED TEXTURE</text>
                   </g>
                 </svg>
                 <div class="micro-scale">
@@ -378,7 +411,7 @@
                   width="640"
                   height="400"
                   role="img"
-                  aria-label="3D contact field, Local coupling. Qualitative coupled fraction 0 percent."
+                  aria-label="3D contact field, Air gap. Qualitative real contact area 0.0 percent."
                 ></canvas>
                 <p class="canvas-fallback">
                   A fixed oblique projection shows contact islands expanding
@@ -391,8 +424,8 @@
               </div>
 
               <footer class="microscope-readout">
-                <span class="micro-window-label">LOCAL WINDOW / ~100 UM / QUALITATIVE</span>
-                <output id="contact-fraction">24%</output>
+                <span class="micro-window-label">LOCAL WINDOW / ~100 UM / REAL CONTACT AREA</span>
+                <output id="contact-fraction">0.0%</output>
               </footer>
             </article>
 
@@ -405,12 +438,20 @@
                 <span class="view-badge">SIMULATED</span>
               </header>
               <div class="camera-stage" aria-hidden="true">
+                <!--
+                  The frame is rendered from the same contact solve as View B:
+                  local darkening is the local real contact area, so where the
+                  interface couples is where the image goes dark.
+                -->
+                <canvas
+                  class="camera-field"
+                  id="camera-canvas"
+                  width="264"
+                  height="198"
+                ></canvas>
+                <span class="camera-reference"></span>
                 <span class="camera-vignette"></span>
-                <span class="camera-noise"></span>
-                <span class="camera-contact">
-                  <span class="camera-reference"></span>
-                  <i></i><i></i><i></i><i></i><i></i>
-                </span>
+                <span class="camera-contact"></span>
                 <span class="camera-reticle camera-reticle--x"></span>
                 <span class="camera-reticle camera-reticle--y"></span>
                 <span class="camera-coordinate">ROI / 320 × 240</span>
