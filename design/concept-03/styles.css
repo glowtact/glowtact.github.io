@@ -26,6 +26,10 @@
   --reflection-opacity: 0.76;
   --camera-darkness: 0.18;
   --camera-response-opacity: 0;
+  --camera-contact-width: 42px;
+  --camera-contact-height: 24px;
+  --camera-blob-x: 50%;
+  --camera-blob-y: 50%;
   --indenter-y: 34px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
@@ -1123,15 +1127,15 @@ main {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: clamp(42px, var(--coupling-width), 190px);
-  height: calc(clamp(42px, var(--coupling-width), 190px) * 0.58);
+  width: clamp(42px, var(--camera-contact-width), 210px);
+  height: clamp(24px, var(--camera-contact-height), 128px);
   display: grid;
   place-items: center;
   border-radius: 48% 50% 46% 52% / 42% 45% 48% 44%;
   background:
-    radial-gradient(ellipse at 38% 42%, rgba(22, 28, 24, calc(var(--camera-darkness) * 0.54)) 0 9%, transparent 24%),
-    radial-gradient(ellipse at 58% 56%, rgba(16, 21, 18, calc(var(--camera-darkness) * 0.62)) 0 7%, transparent 22%),
-    radial-gradient(ellipse at 49% 48%, rgba(31, 38, 33, calc(var(--camera-darkness) * 0.52)), transparent 62%),
+    radial-gradient(ellipse at calc(var(--camera-blob-x) - 12%) calc(var(--camera-blob-y) - 7%), rgba(12, 16, 14, calc(var(--camera-darkness) * 0.58)) 0 10%, transparent 27%),
+    radial-gradient(ellipse at calc(var(--camera-blob-x) + 12%) calc(var(--camera-blob-y) + 8%), rgba(8, 12, 10, calc(var(--camera-darkness) * 0.68)) 0 8%, transparent 24%),
+    radial-gradient(ellipse at var(--camera-blob-x) var(--camera-blob-y), rgba(28, 34, 30, calc(var(--camera-darkness) * 0.56)), transparent 64%),
     rgba(82, 93, 85, calc(var(--camera-darkness) * 0.18));
   box-shadow:
     0 0 34px 14px rgba(12, 17, 14, calc(var(--camera-response-opacity) * 0.16)),
@@ -1155,7 +1159,7 @@ main {
 
 .camera-contact i {
   position: absolute;
-  width: 28%;
+  width: 34%;
   height: 1px;
   border-radius: 999px;
   background: rgba(36, 44, 39, calc(var(--camera-response-opacity) * 0.16));

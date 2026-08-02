@@ -539,6 +539,34 @@ def check_signal_interactions(browser) -> None:
         )
     if page.locator(".micro-contact-segment").count() != len(plateau_widths):
         raise AssertionError("signal: plateau metrics do not match contact segments")
+    shared_mask_signature = page.locator("#micro-svg").get_attribute(
+        "data-contact-mask-signature"
+    )
+    if not shared_mask_signature:
+        raise AssertionError("signal: shared contact-mask signature is missing")
+    camera_mask_signature = page.locator(".camera-contact").get_attribute(
+        "data-contact-mask-signature"
+    )
+    if camera_mask_signature != shared_mask_signature:
+        raise AssertionError(
+            "signal: camera response is not driven by the shared contact mask; "
+            f"camera={camera_mask_signature}, microscope={shared_mask_signature}"
+        )
+    camera_contact_area = page.locator(".camera-contact").get_attribute(
+        "data-contact-area"
+    )
+    if camera_contact_area is None or float(camera_contact_area) <= 0:
+        raise AssertionError("signal: camera contact area metric is missing")
+    camera_shape = page.locator(".camera-contact").get_attribute(
+        "data-contact-shape"
+    )
+    if camera_shape is None:
+        raise AssertionError("signal: camera contact-shape metric is missing")
+    camera_rx, camera_ry = [float(value) for value in camera_shape.split(",")]
+    if camera_rx <= camera_ry:
+        raise AssertionError(
+            f"signal: camera response shape does not reflect widened contact: {camera_shape}"
+        )
 
     micro_3d.click()
     if micro_3d.get_attribute("aria-selected") != "true":
@@ -600,6 +628,19 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(
             f"signal: 3D contact quadrants are incomplete: {quadrant_counts}"
         )
+    canvas_mask_signature = page.locator("#micro-canvas").get_attribute(
+        "data-contact-mask-signature"
+    )
+    if canvas_mask_signature != shared_mask_signature:
+        raise AssertionError(
+            "signal: 3D microscope is not using the shared contact mask; "
+            f"canvas={canvas_mask_signature}, microscope={shared_mask_signature}"
+        )
+    flattened_cells = page.locator("#micro-canvas").get_attribute(
+        "data-flattened-cells"
+    )
+    if flattened_cells is None or int(flattened_cells) <= 0:
+        raise AssertionError("signal: 3D contact islands are not visibly flattened")
 
     micro_3d.focus()
     page.keyboard.press("ArrowRight")

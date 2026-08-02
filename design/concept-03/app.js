@@ -11,6 +11,7 @@ const stateCopy = document.querySelector("#state-copy");
 const stateItems = [...document.querySelectorAll(".state-rail li")];
 const contactFraction = document.querySelector("#contact-fraction");
 const cameraIntensity = document.querySelector("#camera-intensity");
+const cameraContact = document.querySelector(".camera-contact");
 
 const microTabs = [...document.querySelectorAll('[role="tab"][aria-controls]')];
 const microPanels = [...document.querySelectorAll('[role="tabpanel"]')];
@@ -278,6 +279,97 @@ function contactRatio(pressure) {
   return total ? count / total : 0;
 }
 
+function microContactModel(couplingPressure) {
+  const fieldThreshold = contactThreshold(couplingPressure);
+  const sectionThreshold = profileThreshold(couplingPressure);
+  const cellStrengths = [];
+  const maskBits = [];
+  const quadrants = [0, 0, 0, 0];
+  let contactCells = 0;
+  let totalStrength = 0;
+  let weightedX = 0;
+  let weightedY = 0;
+  let weightedX2 = 0;
+  let weightedY2 = 0;
+
+  for (let row = 0; row < FIELD_SIZE - 1; row += 1) {
+    const strengthRow = [];
+    for (let column = 0; column < FIELD_SIZE - 1; column += 1) {
+      const heights = [
+        surfaceField[row][column],
+        surfaceField[row][column + 1],
+        surfaceField[row + 1][column + 1],
+        surfaceField[row + 1][column]
+      ];
+      const average =
+        heights.reduce((sum, value) => sum + value, 0) / heights.length;
+      const maximum = Math.max(...heights);
+      const vertexCoverage =
+        heights.filter((surfaceHeight) => surfaceHeight >= fieldThreshold)
+          .length / 4;
+      const heightStrength = Math.min(
+        Math.max((maximum - fieldThreshold) / 0.22, 0),
+        1
+      );
+      const meanStrength = Math.min(
+        Math.max((average - fieldThreshold + 0.1) / 0.2, 0),
+        1
+      );
+      const contactStrength =
+        vertexCoverage >= 0.5
+          ? Math.min(
+              vertexCoverage * 0.46 + heightStrength * 0.38 + meanStrength * 0.16,
+              1
+            )
+          : 0;
+
+      strengthRow.push(contactStrength);
+      maskBits.push(contactStrength > 0 ? 1 : 0);
+
+      if (contactStrength > 0) {
+        contactCells += 1;
+        const x = (column + 0.5) / (FIELD_SIZE - 1);
+        const y = (row + 0.5) / (FIELD_SIZE - 1);
+        const quadrant =
+          (row >= (FIELD_SIZE - 1) / 2 ? 2 : 0) +
+          (column >= (FIELD_SIZE - 1) / 2 ? 1 : 0);
+        quadrants[quadrant] += 1;
+        totalStrength += contactStrength;
+        weightedX += x * contactStrength;
+        weightedY += y * contactStrength;
+        weightedX2 += x * x * contactStrength;
+        weightedY2 += y * y * contactStrength;
+      }
+    }
+    cellStrengths.push(strengthRow);
+  }
+
+  const centerX = totalStrength ? weightedX / totalStrength : 0.5;
+  const centerY = totalStrength ? weightedY / totalStrength : 0.5;
+  const spreadX = totalStrength
+    ? Math.sqrt(Math.max(weightedX2 / totalStrength - centerX * centerX, 0))
+    : 0;
+  const spreadY = totalStrength
+    ? Math.sqrt(Math.max(weightedY2 / totalStrength - centerY * centerY, 0))
+    : 0;
+  const area = contactCells / ((FIELD_SIZE - 1) * (FIELD_SIZE - 1));
+
+  return {
+    fieldThreshold,
+    sectionThreshold,
+    area,
+    contactCells,
+    flattenedCells: contactCells,
+    quadrants,
+    centerX,
+    centerY,
+    spreadX,
+    spreadY,
+    cellStrengths,
+    maskSignature: numericSignature(maskBits)
+  };
+}
+
 function couplingPressureFor(pressure) {
   const normalized = Math.min(
     Math.max((pressure - INDENTER_CONTACT_PRESSURE) / (1 - INDENTER_CONTACT_PRESSURE), 0),
@@ -418,11 +510,11 @@ function renderMacro(pressure) {
   macroCameraAperture?.setAttribute("opacity", (0.48 + ratio * 0.52).toFixed(3));
 }
 
-function renderMicro2D(pressure) {
+function renderMicro2D(pressure, contactModel = microContactModel(couplingPressureFor(pressure))) {
   if (!microSurfaceFill || !microMembrane) return;
 
   const couplingPressure = couplingPressureFor(pressure);
-  const threshold = profileThreshold(couplingPressure);
+  const threshold = contactModel.sectionThreshold;
   const contactIndentations = surfaceProfile.map((height) =>
     Math.max(height - threshold, 0)
   );
@@ -505,6 +597,10 @@ function renderMicro2D(pressure) {
     microSvg.dataset.contactSamples = String(contactSampleIndices.length);
     microSvg.dataset.contactThirds = contactThirdCounts.join(",");
     microSvg.dataset.profileSignature = profileSignature;
+    microSvg.dataset.contactMaskSignature = contactModel.maskSignature;
+    microSvg.dataset.contactArea = contactModel.area.toFixed(6);
+    microSvg.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
+    microSvg.dataset.contactSpread = `${contactModel.spreadX.toFixed(4)},${contactModel.spreadY.toFixed(4)}`;
   }
 
   const surfacePath = angularPath(surfacePoints);
@@ -568,7 +664,7 @@ function resizeCanvas() {
   }
 }
 
-function renderMicro3D(pressure) {
+function renderMicro3D(pressure, contactModel = microContactModel(couplingPressureFor(pressure))) {
   if (!microCanvas || !microContext || activeMicroView !== "3d") return;
   resizeCanvas();
 
@@ -582,9 +678,8 @@ function renderMicro3D(pressure) {
   const originX = width * 0.5;
   const originY = height * 0.34;
   const couplingPressure = couplingPressureFor(pressure);
-  const threshold = contactThreshold(couplingPressure);
+  const threshold = contactModel.fieldThreshold;
   let contactCellCount = 0;
-  const contactQuadrants = [0, 0, 0, 0];
 
   const project = (column, row, surfaceHeight) => ({
     x: originX + (column - row) * scaleX,
@@ -615,37 +710,27 @@ function renderMicro3D(pressure) {
         surfaceField[row + 1][column + 1],
         surfaceField[row + 1][column]
       ];
+      const contactStrength = contactModel.cellStrengths[row][column];
       const average = heights.reduce((sum, value) => sum + value, 0) / heights.length;
-      const maximum = Math.max(...heights);
-      const vertexCoverage =
-        heights.filter((surfaceHeight) => surfaceHeight >= threshold).length / 4;
-      const heightStrength = Math.min(
-        Math.max((maximum - threshold) / 0.22, 0),
-        1
-      );
-      const meanStrength = Math.min(
-        Math.max((average - threshold + 0.1) / 0.2, 0),
-        1
-      );
-      // Shade a facet as coupled only when most of it clears the membrane
-      // plane, so the amber area tracks the reported coupled fraction instead
-      // of flooding outward from every isolated peak vertex.
-      const contactStrength =
-        vertexCoverage >= 0.5
-          ? Math.min(vertexCoverage * 0.46 + heightStrength * 0.38 + meanStrength * 0.16, 1)
-          : 0;
+      const flattenedHeights = heights.map((surfaceHeight) => {
+        if (contactStrength <= 0) {
+          return surfaceHeight;
+        }
+        const plateauHeight = Math.max(
+          threshold - 0.018,
+          average - Math.min(couplingPressure * 0.085, 0.085)
+        );
+        const residualRelief = (1 - contactStrength) * 0.16;
+        return plateauHeight + (surfaceHeight - plateauHeight) * residualRelief;
+      });
       if (contactStrength > 0) {
         contactCellCount += 1;
-        const quadrant =
-          (row >= (FIELD_SIZE - 1) / 2 ? 2 : 0) +
-          (column >= (FIELD_SIZE - 1) / 2 ? 1 : 0);
-        contactQuadrants[quadrant] += 1;
       }
       const points = [
-        project(column, row, heights[0]),
-        project(column + 1, row, heights[1]),
-        project(column + 1, row + 1, heights[2]),
-        project(column, row + 1, heights[3])
+        project(column, row, flattenedHeights[0]),
+        project(column + 1, row, flattenedHeights[1]),
+        project(column + 1, row + 1, flattenedHeights[2]),
+        project(column, row + 1, flattenedHeights[3])
       ];
 
       context.beginPath();
@@ -670,7 +755,12 @@ function renderMicro3D(pressure) {
   }
 
   microCanvas.dataset.contactCells = String(contactCellCount);
-  microCanvas.dataset.contactQuadrants = contactQuadrants.join(",");
+  microCanvas.dataset.contactQuadrants = contactModel.quadrants.join(",");
+  microCanvas.dataset.flattenedCells = String(contactModel.flattenedCells);
+  microCanvas.dataset.contactMaskSignature = contactModel.maskSignature;
+  microCanvas.dataset.contactArea = contactModel.area.toFixed(6);
+  microCanvas.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
+  microCanvas.dataset.contactSpread = `${contactModel.spreadX.toFixed(4)},${contactModel.spreadY.toFixed(4)}`;
   microCanvas.dataset.fieldSignature = fieldSignature;
 
   const membraneHeight = Math.max(threshold, 0.05);
@@ -722,16 +812,31 @@ function render(value) {
   const percent = Math.round(pressure * 100);
   const state = stateFor(pressure);
   const couplingPressure = couplingPressureFor(pressure);
-  const ratio = contactRatio(couplingPressure);
+  const contactModel = microContactModel(couplingPressure);
+  const ratio = contactModel.area;
   const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
+  const cameraWidth = 42 + cameraSignal * (118 + contactModel.spreadX * 180);
+  const cameraHeight = 24 + cameraSignal * (54 + contactModel.spreadY * 132);
+  const blobX = 50 + (contactModel.centerX - 0.5) * 28;
+  const blobY = 50 + (contactModel.centerY - 0.5) * 22;
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
   root.style.setProperty("--signal-level", `${percent}%`);
   root.style.setProperty("--coupling-width", `${48 + cameraSignal * 162}px`);
+  root.style.setProperty("--camera-contact-width", `${cameraWidth.toFixed(2)}px`);
+  root.style.setProperty("--camera-contact-height", `${cameraHeight.toFixed(2)}px`);
+  root.style.setProperty("--camera-blob-x", `${blobX.toFixed(2)}%`);
+  root.style.setProperty("--camera-blob-y", `${blobY.toFixed(2)}%`);
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
   root.style.setProperty("--camera-darkness", (0.18 + cameraSignal * 0.78).toFixed(3));
   root.style.setProperty("--camera-response-opacity", cameraSignal.toFixed(3));
+  if (cameraContact) {
+    cameraContact.dataset.contactMaskSignature = contactModel.maskSignature;
+    cameraContact.dataset.contactArea = contactModel.area.toFixed(6);
+    cameraContact.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
+    cameraContact.dataset.contactShape = `${cameraWidth.toFixed(2)},${cameraHeight.toFixed(2)}`;
+  }
 
   if (pressureInput) pressureInput.value = String(percent);
   if (pressurePercent) pressurePercent.value = `${percent}%`;
@@ -755,8 +860,8 @@ function render(value) {
   });
 
   renderMacro(pressure);
-  renderMicro2D(pressure);
-  renderMicro3D(pressure);
+  renderMicro2D(pressure, contactModel);
+  renderMicro3D(pressure, contactModel);
 }
 
 function stopPlayback() {
