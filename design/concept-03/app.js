@@ -518,7 +518,7 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   const contactIndentations = surfaceProfile.map((height) =>
     Math.max(height - threshold, 0)
   );
-  const deformedProfile = surfaceProfile.map((height, index) => {
+  const preliminaryProfile = surfaceProfile.map((height, index) => {
     const localIndentation = contactIndentations[index];
     const tipFlattening =
       localIndentation > 0
@@ -535,6 +535,38 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
     }, 0);
     return Math.min(Math.max(height - tipFlattening + lateralWidening, 0), 1);
   });
+  const deformedProfile = [...preliminaryProfile];
+  let capRun = [];
+  const applyCurvedCap = () => {
+    if (!capRun.length) return;
+    const left = capRun[0];
+    const right = capRun[capRun.length - 1];
+    const center = (left + right) / 2;
+    const halfWidth = Math.max((right - left) / 2, 1);
+    const maxIndentation = capRun.reduce(
+      (maximum, index) => Math.max(maximum, contactIndentations[index]),
+      0
+    );
+    const capBase =
+      threshold + Math.min(maxIndentation * 0.18 + couplingPressure * 0.024, 0.055);
+    const capCurvature = Math.min(
+      maxIndentation * 0.075 + couplingPressure * 0.018,
+      0.04
+    );
+    capRun.forEach((index) => {
+      const normalizedDistance = (index - center) / halfWidth;
+      const curvedLift = capCurvature * (1 - normalizedDistance * normalizedDistance);
+      const target = capBase + curvedLift;
+      deformedProfile[index] =
+        target + (preliminaryProfile[index] - target) * 0.08;
+    });
+    capRun = [];
+  };
+  contactIndentations.forEach((indentation, index) => {
+    if (indentation > 0) capRun.push(index);
+    else applyCurvedCap();
+  });
+  applyCurvedCap();
   const surfacePoints = deformedProfile.map((height, index) => {
     return {
       x: 28 + (index / (surfaceProfile.length - 1)) * 464,
@@ -626,14 +658,19 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
     const plateauWidth = Math.max(8, right.x - left.x + plateauPad * 2);
     const plateauY =
       run.reduce((sum, point) => sum + point.y, 0) / run.length - 1.2;
+    const capCurvature = Math.min(1.8 + runIndentation * 8, 4.8);
+    const leftX = left.x - plateauPad;
+    const rightX = right.x + plateauPad;
+    const centerX = (leftX + rightX) / 2;
+    const edgeY = plateauY + capCurvature * 0.55;
+    const centerY = plateauY - capCurvature * 0.45;
     plateauWidths.push(plateauWidth);
     const contact = document.createElementNS(SVG_NS, "path");
     contact.setAttribute("class", "micro-contact-segment");
+    contact.dataset.capCurvature = capCurvature.toFixed(3);
     contact.setAttribute(
       "d",
-      `M${(left.x - plateauPad).toFixed(2)} ${plateauY.toFixed(2)} H${(
-        right.x + plateauPad
-      ).toFixed(2)}`
+      `M${leftX.toFixed(2)} ${edgeY.toFixed(2)} Q${centerX.toFixed(2)} ${centerY.toFixed(2)} ${rightX.toFixed(2)} ${edgeY.toFixed(2)}`
     );
     microContactPoints.append(contact);
     run = [];
@@ -680,6 +717,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   const couplingPressure = couplingPressureFor(pressure);
   const threshold = contactModel.fieldThreshold;
   let contactCellCount = 0;
+  const capCurvature = Math.min(0.012 + couplingPressure * 0.032, 0.04);
 
   const project = (column, row, surfaceHeight) => ({
     x: originX + (column - row) * scaleX,
@@ -720,8 +758,13 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
           threshold - 0.018,
           average - Math.min(couplingPressure * 0.085, 0.085)
         );
-        const residualRelief = (1 - contactStrength) * 0.16;
-        return plateauHeight + (surfaceHeight - plateauHeight) * residualRelief;
+        const residualRelief = 0.035 + (1 - contactStrength) * 0.13;
+        const curvedTip = capCurvature * Math.min(contactStrength, 1);
+        return (
+          plateauHeight +
+          curvedTip +
+          (surfaceHeight - plateauHeight) * residualRelief
+        );
       });
       if (contactStrength > 0) {
         contactCellCount += 1;
@@ -761,6 +804,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   microCanvas.dataset.contactArea = contactModel.area.toFixed(6);
   microCanvas.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
   microCanvas.dataset.contactSpread = `${contactModel.spreadX.toFixed(4)},${contactModel.spreadY.toFixed(4)}`;
+  microCanvas.dataset.capCurvature = capCurvature.toFixed(4);
   microCanvas.dataset.fieldSignature = fieldSignature;
 
   const membraneHeight = Math.max(threshold, 0.05);
@@ -815,17 +859,16 @@ function render(value) {
   const contactModel = microContactModel(couplingPressure);
   const ratio = contactModel.area;
   const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
-  const cameraWidth = 42 + cameraSignal * (118 + contactModel.spreadX * 180);
-  const cameraHeight = 24 + cameraSignal * (54 + contactModel.spreadY * 132);
-  const blobX = 50 + (contactModel.centerX - 0.5) * 28;
-  const blobY = 50 + (contactModel.centerY - 0.5) * 22;
+  const cameraDiameter = 38 + cameraSignal * (78 + Math.sqrt(ratio) * 116);
+  const blobX = 50;
+  const blobY = 50;
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
   root.style.setProperty("--signal-level", `${percent}%`);
   root.style.setProperty("--coupling-width", `${48 + cameraSignal * 162}px`);
-  root.style.setProperty("--camera-contact-width", `${cameraWidth.toFixed(2)}px`);
-  root.style.setProperty("--camera-contact-height", `${cameraHeight.toFixed(2)}px`);
+  root.style.setProperty("--camera-contact-width", `${cameraDiameter.toFixed(2)}px`);
+  root.style.setProperty("--camera-contact-height", `${cameraDiameter.toFixed(2)}px`);
   root.style.setProperty("--camera-blob-x", `${blobX.toFixed(2)}%`);
   root.style.setProperty("--camera-blob-y", `${blobY.toFixed(2)}%`);
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
@@ -835,7 +878,7 @@ function render(value) {
     cameraContact.dataset.contactMaskSignature = contactModel.maskSignature;
     cameraContact.dataset.contactArea = contactModel.area.toFixed(6);
     cameraContact.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
-    cameraContact.dataset.contactShape = `${cameraWidth.toFixed(2)},${cameraHeight.toFixed(2)}`;
+    cameraContact.dataset.contactShape = `${cameraDiameter.toFixed(2)},${cameraDiameter.toFixed(2)}`;
   }
 
   if (pressureInput) pressureInput.value = String(percent);

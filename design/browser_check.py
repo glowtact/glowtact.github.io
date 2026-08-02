@@ -316,6 +316,19 @@ def assert_horizontally_centered(
         )
 
 
+def assert_box_height_at_most(
+    page: Page, selector: str, maximum: float, label: str
+) -> None:
+    box = page.locator(selector).bounding_box()
+    if box is None:
+        raise AssertionError(f"{label}: {selector} has no rendered bounding box")
+    if box["height"] > maximum:
+        raise AssertionError(
+            f"{label}: {selector} is too tall for desktop review; "
+            f"height={box['height']:.2f}px, maximum={maximum:.2f}px"
+        )
+
+
 def assert_scale_label(page: Page, selector: str, value: int) -> None:
     locator = page.locator(selector)
     count = locator.count()
@@ -441,6 +454,9 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(f"signal: initial macro air gap is not small: {initial_gap}")
     if page.locator("#macro-indenter").get_attribute("data-contact-state") != "approaching":
         raise AssertionError("signal: indenter should start above the membrane")
+    assert_box_height_at_most(
+        page, ".mechanism-shell", 920, "signal"
+    )
 
     pressure.fill("20")
     precontact_opacity = float(
@@ -563,9 +579,24 @@ def check_signal_interactions(browser) -> None:
     if camera_shape is None:
         raise AssertionError("signal: camera contact-shape metric is missing")
     camera_rx, camera_ry = [float(value) for value in camera_shape.split(",")]
-    if camera_rx <= camera_ry:
+    circularity_error = abs(camera_rx - camera_ry) / max(camera_rx, camera_ry)
+    if circularity_error > 0.12:
         raise AssertionError(
-            f"signal: camera response shape does not reflect widened contact: {camera_shape}"
+            f"signal: cylinder-indenter camera response should be circular; "
+            f"shape={camera_shape}, circularity_error={circularity_error:.3f}"
+        )
+    curved_caps = page.locator(".micro-contact-segment[data-cap-curvature]")
+    if curved_caps.count() != len(plateau_widths):
+        raise AssertionError("signal: 2D contact marks do not expose curved cap metrics")
+    cap_curvatures = [
+        float(value)
+        for value in curved_caps.evaluate_all(
+            "elements => elements.map(element => element.dataset.capCurvature || '0')"
+        )
+    ]
+    if any(value <= 0 for value in cap_curvatures):
+        raise AssertionError(
+            f"signal: 2D contact caps should retain slight curvature: {cap_curvatures}"
         )
 
     micro_3d.click()
@@ -641,6 +672,11 @@ def check_signal_interactions(browser) -> None:
     )
     if flattened_cells is None or int(flattened_cells) <= 0:
         raise AssertionError("signal: 3D contact islands are not visibly flattened")
+    cap_curvature_3d = page.locator("#micro-canvas").get_attribute(
+        "data-cap-curvature"
+    )
+    if cap_curvature_3d is None or float(cap_curvature_3d) <= 0:
+        raise AssertionError("signal: 3D contact caps do not retain slight curvature")
 
     micro_3d.focus()
     page.keyboard.press("ArrowRight")
