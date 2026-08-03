@@ -329,6 +329,13 @@ def assert_box_height_at_most(
         )
 
 
+def parse_rgb_triplet(value: str) -> tuple[int, int, int]:
+    match = re.search(r"rgba?\((\d+),\s*(\d+),\s*(\d+)", value)
+    if match is None:
+        raise AssertionError(f"could not parse rgb color from {value!r}")
+    return tuple(int(channel) for channel in match.groups())
+
+
 def assert_scale_label(page: Page, selector: str, value: int) -> None:
     locator = page.locator(selector)
     count = locator.count()
@@ -457,6 +464,28 @@ def check_signal_interactions(browser) -> None:
     assert_box_height_at_most(
         page, ".mechanism-shell", 920, "signal"
     )
+    font_families = page.evaluate(
+        """() => [...document.querySelectorAll('body *')]
+            .filter(element => element.getBoundingClientRect().width > 0)
+            .map(element => getComputedStyle(element).fontFamily.split(',')[0].replaceAll('"', '').trim())
+            .filter(Boolean)"""
+    )
+    primary_families = {
+        family for family in font_families
+        if not family.lower().startswith(("sans", "monospace"))
+    }
+    if len(primary_families) > 2:
+        raise AssertionError(
+            f"signal: expected at most two primary font families, found {sorted(primary_families)}"
+        )
+    fov_style = page.locator("#macro-field-of-view").evaluate(
+        "element => ({ stroke: getComputedStyle(element).stroke, fill: getComputedStyle(element).fill })"
+    )
+    fov_stroke = parse_rgb_triplet(fov_style["stroke"])
+    if fov_stroke[0] > 200 and fov_stroke[1] > 140 and fov_stroke[2] < 100:
+        raise AssertionError(
+            f"signal: camera FOV triangle still reads as amber coupling highlight: {fov_style}"
+        )
 
     pressure.fill("20")
     precontact_opacity = float(
@@ -573,6 +602,18 @@ def check_signal_interactions(browser) -> None:
     )
     if camera_contact_area is None or float(camera_contact_area) <= 0:
         raise AssertionError("signal: camera contact area metric is missing")
+    camera_mode = page.locator(".camera-contact").get_attribute(
+        "data-response-mode"
+    )
+    if camera_mode != "dark-disk-annular-dimming":
+        raise AssertionError(f"signal: camera response mode is incorrect: {camera_mode}")
+    annulus_strength = page.locator(".camera-contact").get_attribute(
+        "data-annulus-strength"
+    )
+    if annulus_strength is None or not 0 < float(annulus_strength) < 1:
+        raise AssertionError(
+            f"signal: camera annular dimming strength is missing or invalid: {annulus_strength}"
+        )
     camera_shape = page.locator(".camera-contact").get_attribute(
         "data-contact-shape"
     )
@@ -597,6 +638,27 @@ def check_signal_interactions(browser) -> None:
     if any(value <= 0 for value in cap_curvatures):
         raise AssertionError(
             f"signal: 2D contact caps should retain slight curvature: {cap_curvatures}"
+        )
+    contact_stroke_widths = [
+        float(value[:-2]) if value.endswith("px") else float(value)
+        for value in curved_caps.evaluate_all(
+            "elements => elements.map(element => getComputedStyle(element).strokeWidth)"
+        )
+    ]
+    if any(width > 2.3 for width in contact_stroke_widths):
+        raise AssertionError(
+            f"signal: 2D coupling highlights are too wide: {contact_stroke_widths}"
+        )
+    macro_line_width = page.locator("#macro-coupling-line").evaluate(
+        "element => getComputedStyle(element).strokeWidth"
+    )
+    macro_line_width_value = (
+        float(macro_line_width[:-2]) if macro_line_width.endswith("px")
+        else float(macro_line_width)
+    )
+    if macro_line_width_value > 2.4:
+        raise AssertionError(
+            f"signal: macro coupling highlight is too wide: {macro_line_width}"
         )
 
     micro_3d.click()

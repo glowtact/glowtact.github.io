@@ -1,31 +1,36 @@
 :root {
-  --camera-black: #080a09;
-  --nitrile: #101310;
-  --optic-surface-1: #131714;
-  --optic-surface-2: #171c18;
-  --optic-surface-3: #1d231f;
-  --optic-surface-4: #242b26;
-  --signal-amber: #e3a128;
-  --signal-amber-bright: #ffc04a;
+  --font-ui: "Bahnschrift", sans-serif;
+  --font-mono: "Cascadia Mono", monospace;
+  --camera-black: #070908;
+  --nitrile: #121713;
+  --optic-surface-1: #111612;
+  --optic-surface-2: #171d18;
+  --optic-surface-3: #202820;
+  --optic-surface-4: #2a342c;
+  --signal-amber: #d89122;
+  --signal-amber-bright: #f4b840;
   --signal-amber-dim: #886421;
   --signal-wash: rgba(227, 161, 40, 0.14);
   --gel: #9db3ad;
   --gel-deep: #4f645d;
   --air-gap: rgba(177, 204, 198, 0.15);
-  --readout: #e2e6df;
-  --readout-secondary: #9aa29a;
-  --readout-tertiary: #727a72;
-  --readout-dim: #545c55;
-  --optic-ring: rgba(255, 255, 255, 0.085);
-  --optic-ring-soft: rgba(255, 255, 255, 0.048);
-  --optic-grid: rgba(255, 255, 255, 0.036);
+  --readout: #edf1ea;
+  --readout-secondary: #b4beb4;
+  --readout-tertiary: #879187;
+  --readout-dim: #687268;
+  --optic-ring: rgba(255, 255, 255, 0.12);
+  --optic-ring-soft: rgba(255, 255, 255, 0.066);
+  --optic-grid: rgba(255, 255, 255, 0.052);
+  --fov-guide: #8ea29a;
   --focus: #ffc04a;
   --pressure: 0;
   --signal-level: 0%;
   --coupling-width: 0%;
+  --coupling-strength: 0;
   --reflection-opacity: 0.76;
   --camera-darkness: 0.18;
   --camera-response-opacity: 0;
+  --annulus-strength: 0.12;
   --camera-contact-width: 42px;
   --camera-contact-height: 24px;
   --camera-blob-x: 50%;
@@ -34,7 +39,7 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
   background: var(--camera-black);
-  font-family: "Bahnschrift", "Aptos", "Segoe UI Variable", sans-serif;
+  font-family: var(--font-ui);
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }
@@ -138,7 +143,7 @@ main {
 
 .instrument-brand > span:last-child {
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.14em;
 }
@@ -163,7 +168,7 @@ main {
   display: inline-flex;
   align-items: center;
   color: var(--readout-secondary);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.09em;
   text-decoration: none;
   text-transform: uppercase;
@@ -182,7 +187,7 @@ main {
 
 .concept-channel span {
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
 }
 
@@ -206,7 +211,7 @@ main {
   gap: 12px;
   margin: 0 0 28px;
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -227,7 +232,7 @@ main {
 .hero-copy h1,
 .section-header h2,
 .research-heading h2 {
-  font-family: "Bahnschrift SemiCondensed", "Aptos Display", sans-serif;
+  font-family: var(--font-ui);
   font-stretch: condensed;
   text-transform: uppercase;
   text-wrap: balance;
@@ -236,7 +241,7 @@ main {
 .hero-copy h1 {
   max-width: 680px;
   margin: 0;
-  font-size: clamp(68px, 7.35vw, 126px);
+  font-size: clamp(58px, 6.5vw, 108px);
   font-weight: 650;
   letter-spacing: -0.065em;
   line-height: 0.82;
@@ -266,8 +271,8 @@ main {
   gap: 18px;
   padding: 0 18px;
   border: 1px solid transparent;
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 9px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-decoration: none;
@@ -329,8 +334,8 @@ main {
 
 .hero-capabilities dt {
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-family: var(--font-mono);
+  font-size: 8px;
   letter-spacing: 0.12em;
 }
 
@@ -404,8 +409,8 @@ main {
 
 .hero-figure figcaption span {
   color: var(--signal-amber);
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-family: var(--font-mono);
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -427,8 +432,8 @@ main {
   min-height: 48px;
   color: var(--readout-dim);
   box-shadow: inset 0 1px var(--optic-ring);
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-family: var(--font-mono);
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -475,7 +480,7 @@ main {
 .section-header h2 {
   max-width: 940px;
   margin: 0;
-  font-size: clamp(50px, 6.2vw, 104px);
+  font-size: clamp(44px, 5.4vw, 88px);
   font-weight: 640;
   letter-spacing: -0.058em;
   line-height: 0.84;
@@ -531,8 +536,8 @@ main {
 .toolbar-identity div > span,
 .toolbar-status > span {
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 7px;
+  font-family: var(--font-mono);
+  font-size: 8px;
   letter-spacing: 0.11em;
 }
 
@@ -581,7 +586,7 @@ main {
 .view-header span,
 .view-badge {
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.11em;
 }
@@ -645,7 +650,7 @@ main {
 
 #macro-indenter text {
   fill: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.12em;
 }
@@ -659,18 +664,18 @@ main {
 
 .macro-membrane-shadow {
   fill: none;
-  stroke: rgba(227, 161, 40, 0.1);
+  stroke: rgba(215, 231, 222, 0.15);
   stroke-linecap: round;
-  stroke-width: 14;
+  stroke-width: 17;
   filter: url("#soft-glow");
 }
 
 .macro-membrane {
   fill: none;
-  stroke: #1a201b;
+  stroke: #263029;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 15;
+  stroke-width: 13;
 }
 
 .macro-gel {
@@ -692,7 +697,7 @@ main {
 
 .macro-coupling-glow {
   fill: url("#coupling-gradient");
-  opacity: calc(0.2 + var(--pressure) * 0.8);
+  opacity: calc(0.08 + var(--coupling-strength) * 0.32);
   transform-box: fill-box;
   transform-origin: center;
   transform: scaleX(calc(0.25 + var(--pressure) * 1.05));
@@ -702,8 +707,9 @@ main {
   fill: none;
   stroke: var(--signal-amber-bright);
   stroke-linecap: round;
-  stroke-width: 4;
-  filter: url("#soft-glow");
+  stroke-width: 1.9;
+  opacity: calc(0.24 + var(--coupling-strength) * 0.76);
+  filter: drop-shadow(0 0 3px rgba(244, 184, 64, calc(var(--coupling-strength) * 0.42)));
 }
 
 .macro-rays {
@@ -737,7 +743,7 @@ main {
 
 .macro-label text {
   fill: var(--readout-tertiary);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.08em;
 }
@@ -765,7 +771,7 @@ main {
 
 .macro-scale-marker text {
   fill: var(--signal-amber-bright);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.06em;
   paint-order: stroke;
@@ -782,20 +788,20 @@ main {
 
 .macro-interface-note text {
   fill: rgba(9, 16, 13, 0.82);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.06em;
 }
 
 .macro-fov {
-  color: var(--signal-amber-bright);
+  color: var(--fov-guide);
   pointer-events: none;
 }
 
 .macro-field-of-view {
-  fill: rgba(227, 161, 40, 0.07);
+  fill: rgba(142, 162, 154, 0.035);
   stroke: currentColor;
-  stroke-width: 1.5;
+  stroke-width: 1.15;
 }
 
 .macro-fov-axis {
@@ -807,8 +813,8 @@ main {
 }
 
 .macro-fov text {
-  fill: rgba(255, 192, 74, 0.62);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  fill: rgba(163, 181, 174, 0.62);
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.08em;
 }
@@ -816,7 +822,7 @@ main {
 .macro-camera-body,
 .macro-camera-mount {
   fill: #0b0e0c;
-  stroke: rgba(215, 228, 222, 0.3);
+  stroke: rgba(215, 228, 222, 0.42);
   stroke-width: 1.5;
 }
 
@@ -851,7 +857,7 @@ main {
 
 .macro-camera text {
   fill: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
 }
 
@@ -876,7 +882,7 @@ main {
   flex-wrap: wrap;
   gap: 20px;
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.08em;
 }
@@ -927,7 +933,7 @@ main {
   border-left: 1px solid var(--optic-ring);
   color: var(--readout-dim);
   background: transparent;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1003,8 +1009,9 @@ main {
   stroke: var(--signal-amber-bright);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 3.25;
-  filter: drop-shadow(0 0 4px rgba(255, 192, 74, 0.34));
+  stroke-width: 1.8;
+  opacity: calc(0.32 + var(--coupling-strength) * 0.68);
+  filter: drop-shadow(0 0 2px rgba(244, 184, 64, calc(var(--coupling-strength) * 0.32)));
 }
 
 .micro-annotation path {
@@ -1015,7 +1022,7 @@ main {
 
 .micro-annotation text {
   fill: var(--readout-tertiary);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.08em;
 }
@@ -1037,7 +1044,7 @@ main {
   justify-content: space-between;
   gap: 20px;
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.08em;
 }
@@ -1080,7 +1087,7 @@ main {
   color: var(--readout-dim);
   background: rgba(8, 10, 9, 0.35);
   box-shadow: inset 0 1px var(--optic-ring);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.08em;
 }
@@ -1097,7 +1104,7 @@ main {
   min-height: 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 48% 46%, rgba(238, 242, 232, 0.34), transparent 44%),
+    radial-gradient(circle at 50% 50%, rgba(239, 243, 233, 0.26), transparent 42%),
     linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px) 0 0 / 22px 22px,
     linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px) 0 0 / 22px 22px,
     #aeb6ad;
@@ -1112,11 +1119,11 @@ main {
 }
 
 .camera-vignette {
-  background: radial-gradient(circle, transparent 28%, rgba(10, 18, 14, 0.7) 100%);
+  background: radial-gradient(circle, transparent 34%, rgba(10, 18, 14, 0.62) 100%);
 }
 
 .camera-noise {
-  opacity: 0.18;
+  opacity: 0.12;
   background:
     repeating-linear-gradient(0deg, rgba(18, 25, 21, 0.09) 0 1px, transparent 1px 6px),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 10px);
@@ -1133,11 +1140,11 @@ main {
   place-items: center;
   border-radius: 50%;
   background:
-    radial-gradient(circle at var(--camera-blob-x) var(--camera-blob-y), rgba(6, 9, 8, calc(var(--camera-darkness) * 0.78)) 0 21%, rgba(18, 24, 21, calc(var(--camera-darkness) * 0.58)) 34%, rgba(80, 92, 84, calc(var(--camera-darkness) * 0.22)) 64%, transparent 75%),
-    radial-gradient(circle at 48% 46%, rgba(20, 25, 22, calc(var(--camera-darkness) * 0.28)), transparent 72%),
+    radial-gradient(circle at 50% 50%, rgba(4, 6, 5, calc(var(--camera-darkness) * 0.92)) 0 34%, rgba(9, 13, 11, calc(var(--camera-darkness) * 0.78)) 45%, rgba(34, 43, 37, calc(var(--annulus-strength) * 0.56)) 58%, rgba(84, 96, 88, calc(var(--annulus-strength) * 0.18)) 70%, transparent 78%),
+    radial-gradient(circle at 50% 50%, transparent 40%, rgba(30, 39, 33, calc(var(--annulus-strength) * 0.28)) 53%, transparent 67%),
     rgba(82, 93, 85, calc(var(--camera-darkness) * 0.18));
   box-shadow:
-    0 0 34px 14px rgba(12, 17, 14, calc(var(--camera-response-opacity) * 0.16)),
+    0 0 18px 6px rgba(12, 17, 14, calc(var(--camera-response-opacity) * 0.14)),
     0 0 0 1px rgba(255, 255, 255, calc(var(--camera-response-opacity) * 0.08));
   opacity: var(--camera-response-opacity);
   transform: translate(-50%, -50%);
@@ -1151,23 +1158,23 @@ main {
   background:
     linear-gradient(rgba(175, 187, 176, calc(0.04 + var(--camera-response-opacity) * 0.04)), rgba(175, 187, 176, 0)),
     url("./assets/camera-response-screw-cross.png") center / 86px 86px repeat;
-  filter: grayscale(0.34) contrast(calc(0.7 + var(--camera-response-opacity) * 0.2)) brightness(1.08);
+  filter: grayscale(0.5) contrast(calc(0.62 + var(--camera-response-opacity) * 0.16)) brightness(1.08);
   mix-blend-mode: multiply;
-  opacity: calc(var(--camera-response-opacity) * 0.34);
+  opacity: calc(var(--camera-response-opacity) * 0.18);
 }
 
 .camera-contact i {
   position: absolute;
-  width: 46%;
+  width: 34%;
   height: 1px;
   border-radius: 999px;
-  background: rgba(36, 44, 39, calc(var(--camera-response-opacity) * 0.16));
+  background: rgba(36, 44, 39, calc(var(--camera-response-opacity) * 0.055));
 }
 
-.camera-contact i:nth-child(1) { transform: translateY(-18px); }
-.camera-contact i:nth-child(2) { transform: translateY(-9px); }
-.camera-contact i:nth-child(4) { transform: translateY(9px); }
-.camera-contact i:nth-child(5) { transform: translateY(18px); }
+.camera-contact i:nth-child(1) { transform: translateY(-14px); }
+.camera-contact i:nth-child(2) { transform: translateY(-7px); }
+.camera-contact i:nth-child(4) { transform: translateY(7px); }
+.camera-contact i:nth-child(5) { transform: translateY(14px); }
 
 .camera-reticle--x {
   top: 50%;
@@ -1186,7 +1193,7 @@ main {
   right: 12px;
   bottom: 10px;
   color: rgba(18, 25, 21, 0.62);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.08em;
 }
@@ -1217,7 +1224,7 @@ main {
 .pressure-control label > span {
   display: block;
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.1em;
 }
@@ -1233,7 +1240,7 @@ main {
   border: 0;
   color: var(--camera-black);
   background: var(--signal-amber-bright);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1280,7 +1287,7 @@ main {
 
 .pressure-control output {
   color: var(--signal-amber-bright);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -1366,7 +1373,7 @@ main {
 }
 
 .state-rail span {
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
 }
 
@@ -1400,7 +1407,7 @@ main {
 .state-explanation span {
   padding-left: 18px;
   color: var(--signal-amber);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.08em;
 }
@@ -1421,7 +1428,7 @@ main {
   color: var(--readout-dim);
   background: #0b0d0b;
   box-shadow: inset 0 1px var(--optic-ring);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.02em;
   line-height: 1.55;
@@ -1458,7 +1465,7 @@ main {
   justify-content: space-between;
   gap: 18px;
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.08em;
 }
@@ -1503,7 +1510,7 @@ main {
 
 .capability-stack span {
   color: var(--signal-amber);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.1em;
 }
@@ -1537,6 +1544,7 @@ main {
   grid-template-rows: auto 1fr;
   gap: 22px 28px;
   padding: clamp(28px, 3.5vw, 58px);
+  overflow: hidden;
   box-shadow: inset -1px 0 var(--optic-ring);
 }
 
@@ -1547,7 +1555,7 @@ main {
 .form-index {
   grid-column: 1 / -1;
   color: var(--signal-amber);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.1em;
 }
@@ -1604,11 +1612,12 @@ main {
 
 .form-comparison h3 {
   margin: 0;
-  font-family: "Bahnschrift SemiCondensed", "Aptos Display", sans-serif;
+  font-family: var(--font-ui);
   font-size: clamp(30px, 3.15vw, 52px);
   font-weight: 640;
   letter-spacing: -0.045em;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .form-comparison p {
@@ -1742,7 +1751,7 @@ main {
 
 .research-meta dt {
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.1em;
 }
@@ -1761,7 +1770,7 @@ main {
   color: var(--readout-tertiary);
   background: var(--nitrile);
   box-shadow: inset 0 0 0 1px var(--optic-ring);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.65;
 }
@@ -1783,7 +1792,7 @@ main {
   gap: 10px;
   margin: 0;
   color: var(--readout-dim);
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.09em;
   text-decoration: none;
@@ -2158,7 +2167,7 @@ main {
   }
 
   .form-comparison h3 {
-    font-size: 34px;
+    font-size: 30px;
   }
 
   .evidence-secondary {

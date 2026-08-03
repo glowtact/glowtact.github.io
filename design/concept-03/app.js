@@ -860,6 +860,7 @@ function render(value) {
   const ratio = contactModel.area;
   const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
   const cameraDiameter = 38 + cameraSignal * (78 + Math.sqrt(ratio) * 116);
+  const annulusStrength = 0.12 + cameraSignal * 0.42;
   const blobX = 50;
   const blobY = 50;
 
@@ -874,7 +875,11 @@ function render(value) {
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
   root.style.setProperty("--camera-darkness", (0.18 + cameraSignal * 0.78).toFixed(3));
   root.style.setProperty("--camera-response-opacity", cameraSignal.toFixed(3));
+  root.style.setProperty("--coupling-strength", cameraSignal.toFixed(3));
+  root.style.setProperty("--annulus-strength", annulusStrength.toFixed(3));
   if (cameraContact) {
+    cameraContact.dataset.responseMode = "dark-disk-annular-dimming";
+    cameraContact.dataset.annulusStrength = annulusStrength.toFixed(3);
     cameraContact.dataset.contactMaskSignature = contactModel.maskSignature;
     cameraContact.dataset.contactArea = contactModel.area.toFixed(6);
     cameraContact.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
