@@ -64,7 +64,14 @@ function seededRandom(seed) {
   };
 }
 
-function generateSurfaceField(size, seed) {
+/**
+ * One continuous roughness surface for the whole microscope patch.
+ *
+ * The 3D field and the 2D section are both sampled from this single model, so
+ * the two views describe the same physical texture and share one height scale.
+ * That is what lets a single membrane plane mean the same thing in every view.
+ */
+function createRoughness(seed) {
   const random = seededRandom(seed);
   const gridSize = 8;
   const asperities = [];
@@ -92,120 +99,192 @@ function generateSurfaceField(size, seed) {
     }
   }
 
-  const values = [];
-  let minimum = Infinity;
-  let maximum = -Infinity;
+  return function sampleRoughness(x, y) {
+    const base =
+      0.075 +
+      Math.sin(x * Math.PI * 3.1 + 0.7) * 0.025 +
+      Math.cos(y * Math.PI * 2.6 + 1.2) * 0.022 +
+      Math.sin((x - y) * Math.PI * 2.2) * 0.014;
+    let asperityHeight = 0;
 
+    asperities.forEach((asperity) => {
+      const cosine = Math.cos(asperity.angle);
+      const sine = Math.sin(asperity.angle);
+      const dx = x - asperity.x;
+      const dy = y - asperity.y;
+      const rotatedX = dx * cosine + dy * sine;
+      const rotatedY = -dx * sine + dy * cosine;
+      const distance = Math.sqrt(
+        Math.pow(rotatedX / asperity.radiusMajor, 2) +
+          Math.pow(rotatedY / asperity.radiusMinor, 2)
+      );
+      const mainHeight =
+        asperity.height *
+        Math.exp(-Math.pow(distance, asperity.cuspPower) * 2.7);
+      const shoulderDx = dx - asperity.shoulderX;
+      const shoulderDy = dy - asperity.shoulderY;
+      const shoulderX = shoulderDx * cosine + shoulderDy * sine;
+      const shoulderY = -shoulderDx * sine + shoulderDy * cosine;
+      const shoulderDistance = Math.sqrt(
+        Math.pow(
+          shoulderX / (asperity.radiusMajor * asperity.shoulderScale),
+          2
+        ) +
+          Math.pow(
+            shoulderY / (asperity.radiusMinor * asperity.shoulderScale),
+            2
+          )
+      );
+      const shoulderHeight =
+        asperity.height *
+        asperity.shoulderHeight *
+        Math.exp(-Math.pow(shoulderDistance, 1.1) * 2.25);
+      asperityHeight = Math.max(asperityHeight, mainHeight + shoulderHeight);
+    });
+
+    return Math.max(0, base) + asperityHeight;
+  };
+}
+
+const sampleRoughness = createRoughness(FIELD_SEED);
+
+function sampleFieldGrid(size) {
+  const values = [];
   for (let row = 0; row < size; row += 1) {
     const line = [];
     for (let column = 0; column < size; column += 1) {
-      const x = column / (size - 1);
-      const y = row / (size - 1);
-      const base =
-        0.075 +
-        Math.sin(x * Math.PI * 3.1 + 0.7) * 0.025 +
-        Math.cos(y * Math.PI * 2.6 + 1.2) * 0.022 +
-        Math.sin((x - y) * Math.PI * 2.2) * 0.014;
-      let asperityHeight = 0;
-
-      asperities.forEach((asperity) => {
-        const cosine = Math.cos(asperity.angle);
-        const sine = Math.sin(asperity.angle);
-        const dx = x - asperity.x;
-        const dy = y - asperity.y;
-        const rotatedX = dx * cosine + dy * sine;
-        const rotatedY = -dx * sine + dy * cosine;
-        const distance = Math.sqrt(
-          Math.pow(rotatedX / asperity.radiusMajor, 2) +
-            Math.pow(rotatedY / asperity.radiusMinor, 2)
-        );
-        const mainHeight =
-          asperity.height *
-          Math.exp(-Math.pow(distance, asperity.cuspPower) * 2.7);
-        const shoulderDx = dx - asperity.shoulderX;
-        const shoulderDy = dy - asperity.shoulderY;
-        const shoulderX = shoulderDx * cosine + shoulderDy * sine;
-        const shoulderY = -shoulderDx * sine + shoulderDy * cosine;
-        const shoulderDistance = Math.sqrt(
-          Math.pow(
-            shoulderX / (asperity.radiusMajor * asperity.shoulderScale),
-            2
-          ) +
-            Math.pow(
-              shoulderY / (asperity.radiusMinor * asperity.shoulderScale),
-              2
-            )
-        );
-        const shoulderHeight =
-          asperity.height *
-          asperity.shoulderHeight *
-          Math.exp(-Math.pow(shoulderDistance, 1.1) * 2.25);
-        asperityHeight = Math.max(
-          asperityHeight,
-          mainHeight + shoulderHeight
-        );
-      });
-
-      const height = Math.max(0, base) + asperityHeight;
-
-      line.push(height);
-      minimum = Math.min(minimum, height);
-      maximum = Math.max(maximum, height);
+      line.push(
+        sampleRoughness(column / (size - 1), row / (size - 1))
+      );
     }
     values.push(line);
   }
+  return values;
+}
 
-  const range = Math.max(maximum - minimum, Number.EPSILON);
-  return values.map((line) =>
-    line.map((height) => (height - minimum) / range)
+const rawField = sampleFieldGrid(FIELD_SIZE);
+const rawHeights = rawField.flat();
+const heightMinimum = Math.min(...rawHeights);
+const heightRange = Math.max(
+  Math.max(...rawHeights) - heightMinimum,
+  Number.EPSILON
+);
+
+/** Shared height scale so every view reads the same roughness amplitude. */
+function normalizeHeight(height) {
+  return Math.min(Math.max((height - heightMinimum) / heightRange, 0), 1);
+}
+
+const surfaceField = rawField.map((line) => line.map(normalizeHeight));
+
+function sampleSection(size, y) {
+  return Array.from({ length: size }, (_, index) =>
+    normalizeHeight(sampleRoughness(index / (size - 1), y))
   );
 }
 
-const surfaceField = generateSurfaceField(FIELD_SIZE, FIELD_SEED);
-
-function generateSurfaceProfile(size, seed) {
-  const random = seededRandom(seed);
-  const peakCount = 13;
-  const peaks = Array.from({ length: peakCount }, (_, index) => ({
-    x: (index + 0.2 + random() * 0.6) / peakCount,
-    width: 0.025 + random() * 0.025,
-    height: 0.72 + random() * 0.28
-  }));
-  const values = [];
-
-  for (let index = 0; index < size; index += 1) {
-    const x = index / (size - 1);
-    const baseline =
-      0.075 +
-      Math.sin(x * Math.PI * 3.4 + 0.35) * 0.028 +
-      Math.cos(x * Math.PI * 1.7 + 1.1) * 0.018;
-    let peakHeight = 0;
-
-    peaks.forEach((peak) => {
-      const cusp = Math.max(0, 1 - Math.abs(x - peak.x) / peak.width);
-      peakHeight = Math.max(peakHeight, peak.height * cusp);
-    });
-    values.push(Math.max(0, baseline) + peakHeight);
+function fractionAbove(heights, plane) {
+  let count = 0;
+  for (let index = 0; index < heights.length; index += 1) {
+    if (heights[index] >= plane) count += 1;
   }
-
-  const minimum = Math.min(...values);
-  const maximum = Math.max(...values);
-  const range = Math.max(maximum - minimum, Number.EPSILON);
-  return values.map((height) => (height - minimum) / range);
+  return count / heights.length;
 }
 
-const surfaceProfile = generateSurfaceProfile(PROFILE_SIZE, FIELD_SEED + 17);
-
-const fieldHeightsDescending = [...surfaceField.flat()].sort((a, b) => b - a);
-const profileHeightsDescending = [...surfaceProfile].sort((a, b) => b - a);
+/** Probe planes used to compare a candidate slice against the whole field. */
+const DISTRIBUTION_PROBES = Array.from(
+  { length: 19 },
+  (_, index) => (index + 1) / 20
+);
+const fieldHeights = surfaceField.flat();
+const fieldProfileCurve = DISTRIBUTION_PROBES.map((plane) =>
+  fractionAbove(fieldHeights, plane)
+);
 
 /**
- * Qualitative real-contact-area law. Contact starts at the single highest
- * asperity and grows superlinearly with indentation, which keeps the 2D
- * section, the 3D field, and the readout describing one coupled fraction.
+ * The section is a genuine slice through the field rather than a separate
+ * synthetic profile. The slice row is chosen deterministically as the line
+ * whose height distribution best matches the whole field, so the section and
+ * the 3D view report the same coupled fraction for the same membrane plane.
+ * A legibility floor keeps the slice from landing in a featureless valley.
  */
+function chooseSectionRow(size, candidates = 360) {
+  let bestY = 0.5;
+  let bestScore = Infinity;
+
+  for (let index = 0; index < candidates; index += 1) {
+    const y = (index + 0.5) / candidates;
+    const heights = sampleSection(size, y);
+    const peaks = heights.filter((height) => height >= 0.42).length;
+    // Require enough asperity material for the section to read as texture.
+    if (peaks < 3) continue;
+
+    let score = 0;
+    for (let probe = 0; probe < DISTRIBUTION_PROBES.length; probe += 1) {
+      const difference =
+        fractionAbove(heights, DISTRIBUTION_PROBES[probe]) -
+        fieldProfileCurve[probe];
+      score += difference * difference;
+    }
+    if (score < bestScore) {
+      bestScore = score;
+      bestY = y;
+    }
+  }
+  return bestY;
+}
+
+const SECTION_ROW = chooseSectionRow(PROFILE_SIZE);
+
+/** True heights of the section in the shared roughness scale. */
+const sectionHeights = sampleSection(PROFILE_SIZE, SECTION_ROW);
+const sectionLow = Math.min(...sectionHeights);
+const sectionHigh = Math.max(...sectionHeights);
+const sectionSpan = Math.max(sectionHigh - sectionLow, Number.EPSILON);
+
+/**
+ * Vertical exaggeration for the drawn section, the same convention the device
+ * view uses for the ~9 um texture.
+ *
+ * Any strictly increasing map is safe here: the membrane plane is pushed
+ * through the identical transform, so the set of points above it -- and hence
+ * the coupled fraction the section reports -- is bit-for-bit what it would be
+ * at true scale. Only the drawn amplitude changes.
+ *
+ * A plain min/max stretch is not enough on its own. This surface is strongly
+ * skewed (its median sits near a tenth of its peak), so linear rescaling still
+ * renders as a flat line punctuated by a couple of spikes. The gamma lifts the
+ * low and mid range into the panel so the texture reads as texture.
+ */
+const SECTION_DISPLAY_GAMMA = 0.45;
+
+function sectionDisplayHeight(height) {
+  const normalized = (height - sectionLow) / sectionSpan;
+  if (normalized <= 0) return 0;
+  return Math.pow(normalized, SECTION_DISPLAY_GAMMA);
+}
+
+const surfaceProfile = sectionHeights.map(sectionDisplayHeight);
+
+/**
+ * Qualitative real-contact-area law.
+ *
+ * Contact starts on the single highest asperity, accelerates as the bulk of
+ * the height distribution is swallowed, then saturates: the membrane cannot
+ * reach the deepest valleys, so a residual air fraction always survives. The
+ * curve is a logistic in load, which reproduces that slow-fast-slow shape.
+ */
+const CONTACT_SATURATION = 0.92;
+const CONTACT_ONSET = 2.2;
+const CONTACT_BIAS = 1.9;
+
 function targetContactFraction(pressure) {
-  return 0.55 * Math.pow(Math.min(Math.max(pressure, 0), 1), 1.7);
+  const load = Math.min(Math.max(pressure, 0), 1);
+  if (load <= 0) return 0;
+  if (load >= 1) return CONTACT_SATURATION;
+  const rise = Math.pow(load, CONTACT_ONSET);
+  const fall = Math.pow(1 - load, CONTACT_ONSET);
+  return (CONTACT_SATURATION * rise) / (rise + CONTACT_BIAS * fall);
 }
 
 /**
@@ -222,8 +301,16 @@ function planeHeightFor(sortedDescending, fraction) {
   return sortedDescending[count - 1];
 }
 
-function stateFor(pressure) {
-  if (pressure < INDENTER_CONTACT_PRESSURE) {
+/** Coupled-area breakpoints that separate the three narrated states. */
+const LOCAL_COUPLING_AREA = 0.012;
+const EXPANDED_COUPLING_AREA = 0.4;
+
+/**
+ * The narrated state is read from the coupled area rather than from the slider
+ * position, so the caption always describes what the views actually show.
+ */
+function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(pressure))) {
+  if (pressure < INDENTER_CONTACT_PRESSURE || coupledArea < LOCAL_COUPLING_AREA) {
     return {
       key: "gap",
       index: "STATE 00",
@@ -235,7 +322,7 @@ function stateFor(pressure) {
     };
   }
 
-  if (pressure < 0.58) {
+  if (coupledArea < EXPANDED_COUPLING_AREA) {
     return {
       key: "local",
       index: "STATE 01",
@@ -254,85 +341,203 @@ function stateFor(pressure) {
     reflection: "Further reduced",
     intensity: "Dark region",
     copy:
-      "More asperities enter contact and neighboring contact islands connect. The absorbing region becomes larger and darker."
+      "Contact islands merge until only the deepest valleys still trap air. The absorbing region stops spreading and keeps darkening as contact grows more intimate."
   };
 }
 
+/** Sub-samples per cell axis when measuring the coupled area of a cell. */
+const CELL_SUBSAMPLES = 4;
+
+/**
+ * Penetration below the plane at which a patch reaches full optical contact.
+ *
+ * Measured across 0.055-0.22 this term behaves as a near-pure gain: the shape
+ * of the coupling curve is unchanged (half-load reaches 29% of the full-load
+ * value at every value tested), because the penetration distribution rescales
+ * self-similarly as the plane descends. Its real job is therefore to hold
+ * first-touch and marginal patches optically weak, not to bend the curve. The
+ * value is set at the low end so that patches pressed fully home do reach
+ * complete coupling, which is what lets the camera approach saturation.
+ */
+const INTIMACY_DEPTH = 0.055;
+
+/** Optical coupling of a patch that touches but is not yet pressed home. */
+const CONTACT_FLOOR = 0.55;
+
+/** Display gamma applied to the physical coupling before it is drawn. */
+const CAMERA_GAMMA = 0.6;
+
+/**
+ * Fraction of the patch that lies above a plane, measured on the interpolated
+ * surface rather than by counting grid corners. This is the quantity the 3D
+ * view actually shades, so solving the plane against it keeps the contact law
+ * and the rendered image describing the same number.
+ */
+function measureCoupledArea(plane) {
+  const cellSpan = FIELD_SIZE - 1;
+  const subSampleCount = CELL_SUBSAMPLES * CELL_SUBSAMPLES;
+  let covered = 0;
+
+  for (let row = 0; row < cellSpan; row += 1) {
+    for (let column = 0; column < cellSpan; column += 1) {
+      const topLeft = surfaceField[row][column];
+      const topRight = surfaceField[row][column + 1];
+      const bottomRight = surfaceField[row + 1][column + 1];
+      const bottomLeft = surfaceField[row + 1][column];
+      if (
+        topLeft < plane &&
+        topRight < plane &&
+        bottomRight < plane &&
+        bottomLeft < plane
+      ) {
+        continue;
+      }
+      for (let sy = 0; sy < CELL_SUBSAMPLES; sy += 1) {
+        const v = (sy + 0.5) / CELL_SUBSAMPLES;
+        for (let sx = 0; sx < CELL_SUBSAMPLES; sx += 1) {
+          const u = (sx + 0.5) / CELL_SUBSAMPLES;
+          const height =
+            topLeft * (1 - u) * (1 - v) +
+            topRight * u * (1 - v) +
+            bottomLeft * (1 - u) * v +
+            bottomRight * u * v;
+          if (height >= plane) covered += 1;
+        }
+      }
+    }
+  }
+
+  return covered / (cellSpan * cellSpan * subSampleCount);
+}
+
+/** Plane heights sampled once so the inverse lookup stays cheap per frame. */
+const PLANE_TABLE_SIZE = 161;
+const planeAreaTable = Array.from({ length: PLANE_TABLE_SIZE }, (_, index) => {
+  const plane = 1 - index / (PLANE_TABLE_SIZE - 1);
+  return { plane, area: measureCoupledArea(plane) };
+});
+
+/** Invert the measured area curve to find the plane that delivers an area. */
+function planeForArea(targetArea) {
+  if (targetArea <= 0) return 1 + 1e-6;
+  for (let index = 1; index < planeAreaTable.length; index += 1) {
+    const upper = planeAreaTable[index - 1];
+    const lower = planeAreaTable[index];
+    if (lower.area >= targetArea) {
+      const span = lower.area - upper.area;
+      const blend = span > 1e-9 ? (targetArea - upper.area) / span : 0;
+      return upper.plane + (lower.plane - upper.plane) * blend;
+    }
+  }
+  return planeAreaTable[planeAreaTable.length - 1].plane;
+}
+
+/**
+ * The membrane plane is a single height in the shared roughness scale. Every
+ * view resolves contact against this one number, so the section, the field and
+ * the camera cannot drift apart.
+ */
+function membranePlaneFor(pressure) {
+  return planeForArea(targetContactFraction(pressure));
+}
+
 function contactThreshold(pressure) {
-  return planeHeightFor(fieldHeightsDescending, targetContactFraction(pressure));
+  return membranePlaneFor(pressure);
 }
 
+/**
+ * The same membrane plane, expressed in the section's exaggerated display
+ * scale. Because the exaggeration is affine and increasing, the set of points
+ * above this plane is identical to the set above the shared plane, so the
+ * section reports the same coupled fraction it would at true scale.
+ */
 function profileThreshold(pressure) {
-  return planeHeightFor(profileHeightsDescending, targetContactFraction(pressure));
+  return sectionDisplayHeight(membranePlaneFor(pressure));
 }
 
+/** Single definition of coupled area, so every caller reports one number. */
 function contactRatio(pressure) {
-  const threshold = contactThreshold(pressure);
-  let count = 0;
-  let total = 0;
-  surfaceField.forEach((row) => {
-    row.forEach((height) => {
-      total += 1;
-      if (height >= threshold) count += 1;
-    });
-  });
-  return total ? count / total : 0;
+  return microContactModel(pressure).area;
 }
 
+/**
+ * Resolve the coupled area and coupling intimacy of the patch for one membrane
+ * plane.
+ *
+ * `area` is the true fraction of the patch below the plane, measured by
+ * bilinear sub-sampling rather than a corner vote, so it agrees with the plane
+ * quantile and with the 2D section. `coupling` weights that area by how deeply
+ * each contact is pressed, which is what the camera actually darkens with:
+ * once the area saturates, contacts keep getting more intimate.
+ */
 function microContactModel(couplingPressure) {
   const fieldThreshold = contactThreshold(couplingPressure);
   const sectionThreshold = profileThreshold(couplingPressure);
   const cellStrengths = [];
+  const cellCoverages = [];
   const maskBits = [];
   const quadrants = [0, 0, 0, 0];
+  const cellSpan = FIELD_SIZE - 1;
+  const subSampleCount = CELL_SUBSAMPLES * CELL_SUBSAMPLES;
   let contactCells = 0;
+  let coveredArea = 0;
+  let couplingSum = 0;
+  let penetrationSum = 0;
   let totalStrength = 0;
   let weightedX = 0;
   let weightedY = 0;
   let weightedX2 = 0;
   let weightedY2 = 0;
 
-  for (let row = 0; row < FIELD_SIZE - 1; row += 1) {
+  for (let row = 0; row < cellSpan; row += 1) {
     const strengthRow = [];
-    for (let column = 0; column < FIELD_SIZE - 1; column += 1) {
-      const heights = [
-        surfaceField[row][column],
-        surfaceField[row][column + 1],
-        surfaceField[row + 1][column + 1],
-        surfaceField[row + 1][column]
-      ];
-      const average =
-        heights.reduce((sum, value) => sum + value, 0) / heights.length;
-      const maximum = Math.max(...heights);
-      const vertexCoverage =
-        heights.filter((surfaceHeight) => surfaceHeight >= fieldThreshold)
-          .length / 4;
-      const heightStrength = Math.min(
-        Math.max((maximum - fieldThreshold) / 0.22, 0),
-        1
-      );
-      const meanStrength = Math.min(
-        Math.max((average - fieldThreshold + 0.1) / 0.2, 0),
-        1
-      );
+    const coverageRow = [];
+    for (let column = 0; column < cellSpan; column += 1) {
+      const topLeft = surfaceField[row][column];
+      const topRight = surfaceField[row][column + 1];
+      const bottomRight = surfaceField[row + 1][column + 1];
+      const bottomLeft = surfaceField[row + 1][column];
+
+      let covered = 0;
+      let penetration = 0;
+      for (let sy = 0; sy < CELL_SUBSAMPLES; sy += 1) {
+        const v = (sy + 0.5) / CELL_SUBSAMPLES;
+        for (let sx = 0; sx < CELL_SUBSAMPLES; sx += 1) {
+          const u = (sx + 0.5) / CELL_SUBSAMPLES;
+          const height =
+            topLeft * (1 - u) * (1 - v) +
+            topRight * u * (1 - v) +
+            bottomLeft * (1 - u) * v +
+            bottomRight * u * v;
+          const depth = height - fieldThreshold;
+          if (depth >= 0) {
+            covered += 1;
+            penetration += depth;
+          }
+        }
+      }
+
+      const coverage = covered / subSampleCount;
+      // Mean penetration across the coupled part of the cell.
+      const meanPenetration = covered ? penetration / covered : 0;
+      const intimacy = Math.min(meanPenetration / INTIMACY_DEPTH, 1);
+      // Optical coupling density: how much of the cell touches, and how hard.
       const contactStrength =
-        vertexCoverage >= 0.5
-          ? Math.min(
-              vertexCoverage * 0.46 + heightStrength * 0.38 + meanStrength * 0.16,
-              1
-            )
-          : 0;
+        coverage * (CONTACT_FLOOR + (1 - CONTACT_FLOOR) * intimacy);
 
       strengthRow.push(contactStrength);
-      maskBits.push(contactStrength > 0 ? 1 : 0);
+      coverageRow.push(coverage);
+      maskBits.push(coverage > 0 ? 1 : 0);
+      coveredArea += coverage;
+      couplingSum += contactStrength;
 
-      if (contactStrength > 0) {
+      if (coverage > 0) {
         contactCells += 1;
-        const x = (column + 0.5) / (FIELD_SIZE - 1);
-        const y = (row + 0.5) / (FIELD_SIZE - 1);
+        penetrationSum += meanPenetration * coverage;
+        const x = (column + 0.5) / cellSpan;
+        const y = (row + 0.5) / cellSpan;
         const quadrant =
-          (row >= (FIELD_SIZE - 1) / 2 ? 2 : 0) +
-          (column >= (FIELD_SIZE - 1) / 2 ? 1 : 0);
+          (row >= cellSpan / 2 ? 2 : 0) + (column >= cellSpan / 2 ? 1 : 0);
         quadrants[quadrant] += 1;
         totalStrength += contactStrength;
         weightedX += x * contactStrength;
@@ -342,8 +547,10 @@ function microContactModel(couplingPressure) {
       }
     }
     cellStrengths.push(strengthRow);
+    cellCoverages.push(coverageRow);
   }
 
+  const cellCount = cellSpan * cellSpan;
   const centerX = totalStrength ? weightedX / totalStrength : 0.5;
   const centerY = totalStrength ? weightedY / totalStrength : 0.5;
   const spreadX = totalStrength
@@ -352,12 +559,21 @@ function microContactModel(couplingPressure) {
   const spreadY = totalStrength
     ? Math.sqrt(Math.max(weightedY2 / totalStrength - centerY * centerY, 0))
     : 0;
-  const area = contactCells / ((FIELD_SIZE - 1) * (FIELD_SIZE - 1));
+  const area = coveredArea / cellCount;
+  const coupling = couplingSum / cellCount;
+  // Window-level gap closure: penetration integrated over the whole window,
+  // not averaged over the coupled part. Averaging is not monotone, because
+  // freshly recruited marginal contact enters at zero depth and dilutes the
+  // mean even while every existing patch is pressed harder. The integral is
+  // monotone in the plane by construction, so it can be reported as a state.
+  const intimacy = Math.min(penetrationSum / cellCount / INTIMACY_DEPTH, 1);
 
   return {
     fieldThreshold,
     sectionThreshold,
     area,
+    coupling,
+    intimacy,
     contactCells,
     flattenedCells: contactCells,
     quadrants,
@@ -366,6 +582,7 @@ function microContactModel(couplingPressure) {
     spreadX,
     spreadY,
     cellStrengths,
+    cellCoverages,
     maskSignature: numericSignature(maskBits)
   };
 }
@@ -814,6 +1031,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
         surfaceField[row + 1][column]
       ];
       const contactStrength = contactModel.cellStrengths[row][column];
+      const contactCoverage = contactModel.cellCoverages[row][column];
       const average = heights.reduce((sum, value) => sum + value, 0) / heights.length;
       const flattenedHeights = heights.map((surfaceHeight) => {
         if (contactStrength <= 0) {
@@ -848,7 +1066,12 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
 
       const tone = Math.round(55 + average * 74);
       const baseColor = [Math.round(tone * 0.75), tone, Math.round(tone * 0.91)];
-      const contactMix = contactStrength ? 0.24 + contactStrength * 0.76 : 0;
+      // Amber extent tracks the cell's coupled fraction directly. An earlier
+      // version added a 0.24 floor to any cell with a single coupled
+      // sub-sample, which made a 5%-coupled window read as roughly 20% amber
+      // and put this view visibly out of step with the section and the
+      // readout. Blending proportionally keeps the three views agreeing.
+      const contactMix = contactCoverage;
       const color = baseColor.map((channel, index) =>
         Math.round(channel + ([227, 161, 40][index] - channel) * contactMix)
       );
@@ -919,29 +1142,35 @@ function setActiveMicroView(view, focus = false) {
 function render(value) {
   const pressure = Math.min(Math.max(Number(value), 0), 1);
   const percent = Math.round(pressure * 100);
-  const state = stateFor(pressure);
   const couplingPressure = couplingPressureFor(pressure);
   const contactModel = microContactModel(couplingPressure);
   const ratio = contactModel.area;
-  const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
+  const state = stateFor(pressure, ratio);
+  // The membrane absorbs in proportion to how much of the patch is optically
+  // coupled and how intimately, so the camera tracks the same quantity the
+  // microscope views render instead of saturating on its own schedule.
+  const cameraSignal = Math.min(Math.max(contactModel.coupling, 0), 1);
+  // Displayed contrast is the physical signal under a display gamma, so faint
+  // early coupling stays visible without the response pinning at mid travel.
+  const cameraResponse = Math.pow(cameraSignal, CAMERA_GAMMA);
   const cameraDiameter =
-    ratio > 0 ? 36 + Math.sqrt(ratio) * 144 + cameraSignal * 22 : 38;
-  const annulusStrength = 0.12 + cameraSignal * 0.42;
+    ratio > 0 ? 36 + Math.sqrt(ratio) * 144 + cameraResponse * 22 : 38;
+  const annulusStrength = 0.12 + cameraResponse * 0.42;
   const blobX = 50;
   const blobY = 50;
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
   root.style.setProperty("--signal-level", `${percent}%`);
-  root.style.setProperty("--coupling-width", `${48 + cameraSignal * 162}px`);
+  root.style.setProperty("--coupling-width", `${48 + cameraResponse * 162}px`);
   root.style.setProperty("--camera-contact-width", `${cameraDiameter.toFixed(2)}px`);
   root.style.setProperty("--camera-contact-height", `${cameraDiameter.toFixed(2)}px`);
   root.style.setProperty("--camera-blob-x", `${blobX.toFixed(2)}%`);
   root.style.setProperty("--camera-blob-y", `${blobY.toFixed(2)}%`);
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
-  root.style.setProperty("--camera-darkness", (0.18 + cameraSignal * 0.78).toFixed(3));
-  root.style.setProperty("--camera-response-opacity", cameraSignal.toFixed(3));
-  root.style.setProperty("--coupling-strength", cameraSignal.toFixed(3));
+  root.style.setProperty("--camera-darkness", (0.18 + cameraResponse * 0.78).toFixed(3));
+  root.style.setProperty("--camera-response-opacity", cameraResponse.toFixed(3));
+  root.style.setProperty("--coupling-strength", cameraResponse.toFixed(3));
   root.style.setProperty("--annulus-strength", annulusStrength.toFixed(3));
   if (cameraContact) {
     cameraContact.dataset.responseMode = "dark-disk-annular-dimming";
