@@ -598,6 +598,36 @@ def check_signal_interactions(browser) -> None:
         )
     if page.locator(".micro-contact-segment").count() != len(plateau_widths):
         raise AssertionError("signal: plateau metrics do not match contact segments")
+    contact_cap_widths_value = page.locator("#micro-svg").get_attribute(
+        "data-contact-cap-widths"
+    )
+    if contact_cap_widths_value is None:
+        raise AssertionError("signal: 2D contact-cap width metrics are missing")
+    contact_cap_widths = [
+        float(value) for value in contact_cap_widths_value.split(",") if value
+    ]
+    if len(contact_cap_widths) != len(plateau_widths):
+        raise AssertionError(
+            "signal: 2D contact-cap metrics do not match contact segments"
+        )
+    if any(width > 28 for width in contact_cap_widths):
+        raise AssertionError(
+            f"signal: 2D coupling caps are too wide for peak-top contact: {contact_cap_widths}"
+        )
+    footprint_widths_value = page.locator("#micro-svg").get_attribute(
+        "data-contact-footprint-widths"
+    )
+    if footprint_widths_value is None:
+        raise AssertionError("signal: 2D contact-footprint metrics are missing")
+    footprint_widths = [
+        float(value) for value in footprint_widths_value.split(",") if value
+    ]
+    for cap_width, footprint_width in zip(contact_cap_widths, footprint_widths):
+        if footprint_width > 0 and cap_width > footprint_width * 0.68:
+            raise AssertionError(
+                "signal: 2D yellow cap covers too much of the asperity footprint; "
+                f"cap={cap_width:.2f}, footprint={footprint_width:.2f}"
+            )
     shared_mask_signature = page.locator("#micro-svg").get_attribute(
         "data-contact-mask-signature"
     )
@@ -673,6 +703,65 @@ def check_signal_interactions(browser) -> None:
     if macro_line_width_value > 2.4:
         raise AssertionError(
             f"signal: macro coupling highlight is too wide: {macro_line_width}"
+        )
+    macro_mask_signature = page.locator("#macro-coupling-line").get_attribute(
+        "data-contact-mask-signature"
+    )
+    if macro_mask_signature != shared_mask_signature:
+        raise AssertionError(
+            "signal: macro coupling line is not using the shared contact mask; "
+            f"macro={macro_mask_signature}, microscope={shared_mask_signature}"
+        )
+    macro_chord_width = page.locator("#macro-coupling-line").get_attribute(
+        "data-coupling-chord-width"
+    )
+    macro_deformation_span = page.locator("#macro-coupling-line").get_attribute(
+        "data-membrane-deformation-span"
+    )
+    if macro_chord_width is None or macro_deformation_span is None:
+        raise AssertionError("signal: macro coupling geometry metrics are missing")
+    macro_chord = float(macro_chord_width)
+    deformation_span = float(macro_deformation_span)
+    if macro_chord <= 0:
+        raise AssertionError("signal: macro coupling chord should be visible at 55%")
+    if deformation_span > 0 and macro_chord > deformation_span * 0.42:
+        raise AssertionError(
+            "signal: macro coupling highlight is too wide relative to membrane "
+            f"deformation; chord={macro_chord:.2f}, deformation={deformation_span:.2f}"
+        )
+
+    pressure.fill("100")
+    high_pressure_cap_widths_value = page.locator("#micro-svg").get_attribute(
+        "data-contact-cap-widths"
+    )
+    if high_pressure_cap_widths_value is None:
+        raise AssertionError("signal: high-pressure 2D cap metrics are missing")
+    high_pressure_cap_widths = [
+        float(value) for value in high_pressure_cap_widths_value.split(",") if value
+    ]
+    if any(width > 28 for width in high_pressure_cap_widths):
+        raise AssertionError(
+            "signal: high-pressure microscope coupling caps are too wide: "
+            f"{high_pressure_cap_widths}"
+        )
+    high_pressure_macro_chord = page.locator("#macro-coupling-line").get_attribute(
+        "data-coupling-chord-width"
+    )
+    high_pressure_deformation_span = page.locator("#macro-coupling-line").get_attribute(
+        "data-membrane-deformation-span"
+    )
+    if high_pressure_macro_chord is None or high_pressure_deformation_span is None:
+        raise AssertionError("signal: high-pressure macro metrics are missing")
+    high_pressure_chord = float(high_pressure_macro_chord)
+    high_pressure_deformation = float(high_pressure_deformation_span)
+    if high_pressure_chord > 100:
+        raise AssertionError(
+            f"signal: high-pressure macro contact chord is too wide: {high_pressure_chord:.2f}"
+        )
+    if high_pressure_deformation > 0 and high_pressure_chord > high_pressure_deformation * 0.42:
+        raise AssertionError(
+            "signal: high-pressure macro highlight exceeds deformation span; "
+            f"chord={high_pressure_chord:.2f}, deformation={high_pressure_deformation:.2f}"
         )
 
     micro_3d.click()

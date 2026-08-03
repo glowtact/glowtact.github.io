@@ -443,7 +443,7 @@ function macroIndentationWeight(x) {
   return Math.exp(-Math.pow((x - 460) / 180, 4));
 }
 
-function renderMacro(pressure) {
+function renderMacro(pressure, contactModel = microContactModel(couplingPressureFor(pressure))) {
   if (!macroMembrane || !macroGel) return;
 
   const couplingPressure = couplingPressureFor(pressure);
@@ -490,22 +490,58 @@ function renderMacro(pressure) {
     root.style.setProperty("--indenter-y", `${indenterY.toFixed(2)}px`);
   }
 
-  let coupledStart = centerIndex;
-  let coupledEnd = centerIndex;
-  const isCoupled = (index) =>
-    surfacePoints[index].y - membranePoints[index].y <= 5.2;
-  if (isCoupled(centerIndex)) {
-    while (coupledStart > 0 && isCoupled(coupledStart - 1)) coupledStart -= 1;
-    while (coupledEnd < samples - 1 && isCoupled(coupledEnd + 1)) coupledEnd += 1;
+  const ratio = contactModel.area;
+  const centerX = start + contactModel.centerX * (end - start);
+  const contactChordWidth =
+    ratio > 0 ? Math.min(92, Math.max(10, 14 + Math.sqrt(ratio) * 104)) : 0;
+  const halfChord = contactChordWidth / 2;
+  const contactChord =
+    contactChordWidth > 0
+      ? surfacePoints.filter(
+          (point) => Math.abs(point.x - centerX) <= halfChord
+        )
+      : [];
+  if (contactChord.length === 1) {
+    const point = contactChord[0];
+    contactChord.unshift({
+      x: point.x - halfChord,
+      y: macroSurfaceY(point.x - halfChord)
+    });
+    contactChord.push({
+      x: point.x + halfChord,
+      y: macroSurfaceY(point.x + halfChord)
+    });
   }
-  const coupled = isCoupled(centerIndex)
-    ? surfacePoints.slice(coupledStart, coupledEnd + 1)
-    : [];
-  macroCouplingLine?.setAttribute("d", coupled.length > 1 ? smoothPath(coupled) : "");
+  macroCouplingLine?.setAttribute(
+    "d",
+    contactChord.length > 1 ? smoothPath(contactChord) : ""
+  );
+  if (macroCouplingLine) {
+    const deformationSpan = surfacePoints
+      .filter((point, index) => {
+        const gap = point.y - membranePoints[index].y;
+        return MACRO_INITIAL_GAP - gap > 1.4;
+      })
+      .reduce(
+        (span, point) => ({
+          minimum: Math.min(span.minimum, point.x),
+          maximum: Math.max(span.maximum, point.x)
+        }),
+        { minimum: Infinity, maximum: -Infinity }
+      );
+    const membraneDeformationSpan =
+      deformationSpan.minimum === Infinity
+        ? 0
+        : deformationSpan.maximum - deformationSpan.minimum;
+    macroCouplingLine.dataset.contactMaskSignature = contactModel.maskSignature;
+    macroCouplingLine.dataset.contactArea = ratio.toFixed(6);
+    macroCouplingLine.dataset.couplingChordWidth = contactChordWidth.toFixed(2);
+    macroCouplingLine.dataset.membraneDeformationSpan =
+      membraneDeformationSpan.toFixed(2);
+  }
 
-  const ratio = contactRatio(couplingPressure);
-  macroCouplingGlow?.setAttribute("rx", String(12 + ratio * 250));
-  macroCouplingGlow?.setAttribute("ry", String(14 + ratio * 36));
+  macroCouplingGlow?.setAttribute("rx", String(8 + contactChordWidth * 0.46));
+  macroCouplingGlow?.setAttribute("ry", String(10 + Math.sqrt(ratio) * 18));
   macroFieldOfView?.setAttribute("opacity", (0.18 + ratio * 0.72).toFixed(3));
   macroCameraAperture?.setAttribute("opacity", (0.48 + ratio * 0.52).toFixed(3));
 }
@@ -647,32 +683,55 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   microContactPoints.replaceChildren();
   let run = [];
   const plateauWidths = [];
+  const contactCapWidths = [];
+  const contactFootprintWidths = [];
   const appendContactRun = () => {
     if (!run.length) return;
-    const left = run[0];
-    const right = run[run.length - 1];
-    const runIndentation =
-      run.reduce((sum, point) => sum + contactIndentations[point.index], 0) /
-      run.length;
-    const plateauPad = 3 + Math.sqrt(Math.max(runIndentation, 0)) * 17;
-    const plateauWidth = Math.max(8, right.x - left.x + plateauPad * 2);
-    const plateauY =
-      run.reduce((sum, point) => sum + point.y, 0) / run.length - 1.2;
-    const capCurvature = Math.min(1.8 + runIndentation * 8, 4.8);
-    const leftX = left.x - plateauPad;
-    const rightX = right.x + plateauPad;
-    const centerX = (leftX + rightX) / 2;
-    const edgeY = plateauY + capCurvature * 0.55;
-    const centerY = plateauY - capCurvature * 0.45;
-    plateauWidths.push(plateauWidth);
-    const contact = document.createElementNS(SVG_NS, "path");
-    contact.setAttribute("class", "micro-contact-segment");
-    contact.dataset.capCurvature = capCurvature.toFixed(3);
-    contact.setAttribute(
-      "d",
-      `M${leftX.toFixed(2)} ${edgeY.toFixed(2)} Q${centerX.toFixed(2)} ${centerY.toFixed(2)} ${rightX.toFixed(2)} ${edgeY.toFixed(2)}`
-    );
-    microContactPoints.append(contact);
+    const peakPoints = run.filter((point) => {
+      const previous = surfaceProfile[Math.max(point.index - 1, 0)];
+      const next = surfaceProfile[Math.min(point.index + 1, surfaceProfile.length - 1)];
+      return surfaceProfile[point.index] >= previous && surfaceProfile[point.index] >= next;
+    });
+    const peaks = peakPoints.length
+      ? peakPoints
+      : [
+          run.reduce((highest, point) =>
+            surfaceProfile[point.index] > surfaceProfile[highest.index]
+              ? point
+              : highest
+          )
+        ];
+
+    peaks.forEach((peak) => {
+      const localIndentation = contactIndentations[peak.index];
+      const capWidth = Math.min(
+        24,
+        Math.max(7.5, 5.5 + Math.sqrt(Math.max(localIndentation, 0)) * 18)
+      );
+      const footprintWidth = Math.max(
+        capWidth / 0.54,
+        22 + Math.sqrt(Math.max(localIndentation, 0)) * 46
+      );
+      const capCurvature = Math.min(1.1 + localIndentation * 6.2, 3.4);
+      const centerX = peak.x;
+      const leftX = centerX - capWidth / 2;
+      const rightX = centerX + capWidth / 2;
+      const edgeY = peak.y + capCurvature * 0.35 - 1.1;
+      const centerY = peak.y - capCurvature * 0.48 - 1.1;
+      plateauWidths.push(capWidth);
+      contactCapWidths.push(capWidth);
+      contactFootprintWidths.push(footprintWidth);
+      const contact = document.createElementNS(SVG_NS, "path");
+      contact.setAttribute("class", "micro-contact-segment");
+      contact.dataset.capCurvature = capCurvature.toFixed(3);
+      contact.dataset.capWidth = capWidth.toFixed(2);
+      contact.dataset.footprintWidth = footprintWidth.toFixed(2);
+      contact.setAttribute(
+        "d",
+        `M${leftX.toFixed(2)} ${edgeY.toFixed(2)} Q${centerX.toFixed(2)} ${centerY.toFixed(2)} ${rightX.toFixed(2)} ${edgeY.toFixed(2)}`
+      );
+      microContactPoints.append(contact);
+    });
     run = [];
   };
 
@@ -683,6 +742,12 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   appendContactRun();
   if (microSvg) {
     microSvg.dataset.plateauWidths = plateauWidths
+      .map((width) => width.toFixed(2))
+      .join(",");
+    microSvg.dataset.contactCapWidths = contactCapWidths
+      .map((width) => width.toFixed(2))
+      .join(",");
+    microSvg.dataset.contactFootprintWidths = contactFootprintWidths
       .map((width) => width.toFixed(2))
       .join(",");
   }
@@ -859,7 +924,8 @@ function render(value) {
   const contactModel = microContactModel(couplingPressure);
   const ratio = contactModel.area;
   const cameraSignal = Math.min(Math.max(ratio / 0.16, 0), 1);
-  const cameraDiameter = 38 + cameraSignal * (78 + Math.sqrt(ratio) * 116);
+  const cameraDiameter =
+    ratio > 0 ? 36 + Math.sqrt(ratio) * 144 + cameraSignal * 22 : 38;
   const annulusStrength = 0.12 + cameraSignal * 0.42;
   const blobX = 50;
   const blobY = 50;
@@ -907,7 +973,7 @@ function render(value) {
     else item.removeAttribute("aria-current");
   });
 
-  renderMacro(pressure);
+  renderMacro(pressure, contactModel);
   renderMicro2D(pressure, contactModel);
   renderMicro3D(pressure, contactModel);
 }
