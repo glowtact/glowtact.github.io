@@ -45,6 +45,30 @@ const MICRO_CLEARANCE = 2.5;
 const MACRO_INITIAL_GAP = 18;
 const MACRO_MIN_GAP = 1.8;
 const INDENTER_CONTACT_PRESSURE = 0.22;
+
+/**
+ * Post-contact travel of the indenter, in device-view units.
+ *
+ * Everything under the indenter has to absorb this travel. The air gap can
+ * only surrender MACRO_INITIAL_GAP - MACRO_MIN_GAP of it, so whatever remains
+ * has to come from the gel itself yielding. Deriving the gel depression from
+ * that balance is what keeps the indenter tip resting on the membrane rather
+ * than sinking through a surface that never moves.
+ */
+const MACRO_INDENTER_TRAVEL = 34;
+const MACRO_GEL_DEPTH = MACRO_INDENTER_TRAVEL - (MACRO_INITIAL_GAP - MACRO_MIN_GAP);
+
+/** Centre and half-width of the indented region of the gel. */
+const MACRO_INDENT_CENTER = 460;
+const MACRO_GEL_WIDTH = 150;
+
+/**
+ * Shoulder lobes flanking the indent. XP-565 is effectively incompressible at
+ * this scale, so material driven out of the well has to reappear beside it.
+ */
+const MACRO_SHOULDER_GAIN = 0.16;
+const MACRO_SHOULDER_OFFSET = 1.75;
+const MACRO_SHOULDER_WIDTH = 0.62;
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 let activeMicroView = "2d";
@@ -599,7 +623,7 @@ function couplingPressureFor(pressure) {
 function indenterYFor(pressure) {
   const approach = Math.min(pressure / INDENTER_CONTACT_PRESSURE, 1);
   const coupling = couplingPressureFor(pressure);
-  return 34 + approach * 29 + coupling * 24;
+  return 34 + approach * 29 + coupling * MACRO_INDENTER_TRAVEL;
 }
 
 function smoothPath(points) {
@@ -653,8 +677,21 @@ function areaBetween(topPoints, bottomPoints) {
     .join(" ")} Z`;
 }
 
-function macroSurfaceY(x) {
-  return 286 + Math.sin(x * 0.061) * 0.9 + Math.sin(x * 0.127 + 0.8) * 0.45;
+/**
+ * Gel surface displacement, positive downward, normalised to 1 at the centre
+ * of the indent. The negative lobes either side are the displaced material
+ * welling back up.
+ */
+function macroGelDisplacement(x) {
+  const t = (x - MACRO_INDENT_CENTER) / MACRO_GEL_WIDTH;
+  const well = Math.exp(-t * t);
+  const flank = (Math.abs(t) - MACRO_SHOULDER_OFFSET) / MACRO_SHOULDER_WIDTH;
+  return well - MACRO_SHOULDER_GAIN * Math.exp(-flank * flank);
+}
+
+function macroSurfaceY(x, couplingPressure = 0) {
+  const rest = 286 + Math.sin(x * 0.061) * 0.9 + Math.sin(x * 0.127 + 0.8) * 0.45;
+  return rest + macroGelDisplacement(x) * MACRO_GEL_DEPTH * couplingPressure;
 }
 
 function macroIndentationWeight(x) {
@@ -675,7 +712,7 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
   for (let index = 0; index < samples; index += 1) {
     const x = start + (index / (samples - 1)) * (end - start);
     const indentation = macroIndentationWeight(x);
-    const surfaceY = macroSurfaceY(x);
+    const surfaceY = macroSurfaceY(x, couplingPressure);
     const localGap =
       MACRO_INITIAL_GAP -
       indentation * couplingPressure * (MACRO_INITIAL_GAP - MACRO_MIN_GAP);
@@ -723,11 +760,11 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
     const point = contactChord[0];
     contactChord.unshift({
       x: point.x - halfChord,
-      y: macroSurfaceY(point.x - halfChord)
+      y: macroSurfaceY(point.x - halfChord, couplingPressure)
     });
     contactChord.push({
       x: point.x + halfChord,
-      y: macroSurfaceY(point.x + halfChord)
+      y: macroSurfaceY(point.x + halfChord, couplingPressure)
     });
   }
   macroCouplingLine?.setAttribute(
