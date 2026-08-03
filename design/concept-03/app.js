@@ -52,6 +52,7 @@ let currentPressure = Number(pressureInput?.value ?? 0) / 100;
 let isPlaying = false;
 let startedAt = 0;
 let frame = 0;
+let stepTimer = 0;
 
 function seededRandom(seed) {
   let state = seed >>> 0;
@@ -1211,8 +1212,33 @@ function stopPlayback() {
   isPlaying = false;
   startedAt = 0;
   cancelAnimationFrame(frame);
+  clearTimeout(stepTimer);
+  stepTimer = 0;
   playButton?.setAttribute("aria-pressed", "false");
   if (playLabel) playLabel.textContent = "Run once";
+}
+
+/**
+ * Reduced-motion playback: the three interface states in sequence, held
+ * briefly, instead of a continuous sweep.
+ *
+ * Jumping straight to full compression is wrong here. It leaves the button a
+ * silent no-op whenever the control is already at full travel, which is the
+ * common case right after someone drags the slider to inspect saturation, and
+ * even from a lower setting it gives no sign the sequence ran. Discrete steps
+ * still avoid the continuous motion this media query is asking us to drop.
+ */
+const REDUCED_MOTION_STEPS = [0, 0.35, 0.6, 1];
+const REDUCED_MOTION_DWELL = 420;
+
+function stepSequence(index) {
+  if (!isPlaying) return;
+  render(REDUCED_MOTION_STEPS[index]);
+  if (index >= REDUCED_MOTION_STEPS.length - 1) {
+    stopPlayback();
+    return;
+  }
+  stepTimer = setTimeout(() => stepSequence(index + 1), REDUCED_MOTION_DWELL);
 }
 
 function tick(now) {
@@ -1229,16 +1255,16 @@ function tick(now) {
 }
 
 function startPlayback() {
-  if (reduceMotion.matches) {
-    render(1);
-    stopPlayback();
-    return;
-  }
-
   isPlaying = true;
   startedAt = 0;
   playButton?.setAttribute("aria-pressed", "true");
   if (playLabel) playLabel.textContent = "Pause";
+
+  if (reduceMotion.matches) {
+    stepSequence(0);
+    return;
+  }
+
   render(0);
   frame = requestAnimationFrame(tick);
 }
