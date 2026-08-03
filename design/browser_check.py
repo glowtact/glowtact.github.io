@@ -452,6 +452,15 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(
             f"signal: camera contact should be hidden at 0%, opacity {default_opacity}"
         )
+    camera_stage_color = parse_rgb_triplet(
+        page.locator(".camera-stage").evaluate(
+            "element => getComputedStyle(element).backgroundColor"
+        )
+    )
+    if sum(camera_stage_color) / 3 > 150:
+        raise AssertionError(
+            f"signal: no-contact camera field is too bright: {camera_stage_color}"
+        )
     initial_gap = page.locator("#macro-air-gap").get_attribute(
         "data-center-clearance"
     )
@@ -481,6 +490,11 @@ def check_signal_interactions(browser) -> None:
     fov_style = page.locator("#macro-field-of-view").evaluate(
         "element => ({ stroke: getComputedStyle(element).stroke, fill: getComputedStyle(element).fill })"
     )
+    fov_label = " ".join(
+        (page.locator(".macro-fov text").text_content() or "").split()
+    )
+    if fov_label != "CAMERA FOV GUIDE":
+        raise AssertionError(f"signal: unclear FOV label {fov_label!r}")
     fov_stroke = parse_rgb_triplet(fov_style["stroke"])
     if fov_stroke[0] > 200 and fov_stroke[1] > 140 and fov_stroke[2] < 100:
         raise AssertionError(
