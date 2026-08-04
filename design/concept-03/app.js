@@ -746,7 +746,13 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
   }
 
   const ratio = contactModel.area;
-  const centerX = start + contactModel.centerX * (end - start);
+  // The device-scale contact patch is centred under the indenter, so it is
+  // symmetric about it. contactModel.centerX is the centroid of the ~100 um
+  // sampled window -- a micro-scale detail of where asperities happen to
+  // cluster, which must not translate the macro patch. Driving the chord from
+  // it slid the highlight up to 19 units off the indenter and made it wander
+  // non-monotonically with pressure.
+  const centerX = MACRO_INDENT_CENTER;
   const contactChordWidth =
     ratio > 0 ? Math.min(92, Math.max(10, 14 + Math.sqrt(ratio) * 104)) : 0;
   const halfChord = contactChordWidth / 2;
@@ -795,6 +801,13 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
       membraneDeformationSpan.toFixed(2);
   }
 
+  // The glow marks the coupled interface, so it has to ride the membrane down
+  // as the gel yields rather than staying at its rest height.
+  macroCouplingGlow?.setAttribute("cx", String(MACRO_INDENT_CENTER));
+  macroCouplingGlow?.setAttribute(
+    "cy",
+    membranePoints[centerIndex].y.toFixed(2)
+  );
   macroCouplingGlow?.setAttribute("rx", String(8 + contactChordWidth * 0.46));
   macroCouplingGlow?.setAttribute("ry", String(10 + Math.sqrt(ratio) * 18));
   macroFieldOfView?.setAttribute("opacity", (0.18 + ratio * 0.72).toFixed(3));
@@ -1194,8 +1207,6 @@ function render(value) {
   const cameraDiameter =
     ratio > 0 ? 36 + Math.sqrt(ratio) * 144 + cameraResponse * 22 : 38;
   const annulusStrength = 0.12 + cameraResponse * 0.42;
-  const blobX = 50;
-  const blobY = 50;
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
@@ -1203,8 +1214,6 @@ function render(value) {
   root.style.setProperty("--coupling-width", `${48 + cameraResponse * 162}px`);
   root.style.setProperty("--camera-contact-width", `${cameraDiameter.toFixed(2)}px`);
   root.style.setProperty("--camera-contact-height", `${cameraDiameter.toFixed(2)}px`);
-  root.style.setProperty("--camera-blob-x", `${blobX.toFixed(2)}%`);
-  root.style.setProperty("--camera-blob-y", `${blobY.toFixed(2)}%`);
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
   root.style.setProperty("--camera-darkness", (0.18 + cameraResponse * 0.78).toFixed(3));
   root.style.setProperty("--camera-response-opacity", cameraResponse.toFixed(3));

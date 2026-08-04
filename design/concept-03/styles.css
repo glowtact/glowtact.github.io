@@ -33,8 +33,6 @@
   --annulus-strength: 0.12;
   --camera-contact-width: 42px;
   --camera-contact-height: 24px;
-  --camera-blob-x: 50%;
-  --camera-blob-y: 50%;
   --indenter-y: 34px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
@@ -1177,15 +1175,23 @@ main {
 .camera-contact i:nth-child(4) { transform: translateY(7px); }
 .camera-contact i:nth-child(5) { transform: translateY(14px); }
 
+/*
+ * A 1px rule placed at 50% has its leading edge, not its centre, on the
+ * midline, so the crosshair landed half a pixel below and right of the
+ * response blob it is meant to register against. Pull each line back by half
+ * its own thickness.
+ */
 .camera-reticle--x {
   top: 50%;
   height: 1px;
+  transform: translateY(-50%);
   background: rgba(34, 44, 38, 0.28);
 }
 
 .camera-reticle--y {
   left: 50%;
   width: 1px;
+  transform: translateX(-50%);
   background: rgba(34, 44, 38, 0.28);
 }
 
