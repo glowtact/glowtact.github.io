@@ -662,6 +662,17 @@ function couplingPressureFor(pressure) {
   return Math.pow(normalized, 0.75);
 }
 
+/**
+ * Device-scale contact chord, in device-view SVG units, for a given micro
+ * coupled-area fraction. This is THE single source for how wide the contact
+ * region is at device scale: the device view draws its coupling highlight
+ * with it, and the camera view sizes its dark patch from it against
+ * CAMERA_VIEW_SPAN. One law, three consistent views.
+ */
+function contactChordUnits(ratio) {
+  return ratio > 0 ? Math.max(10, 14 + Math.sqrt(ratio) * 104) : 0;
+}
+
 /** Lowest edge of the #macro-indenter outline in SVG coordinates. */
 const MACRO_INDENTER_TIP_Y = 197;
 
@@ -840,8 +851,10 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
   // it slid the highlight up to 19 units off the indenter and made it wander
   // non-monotonically with pressure.
   const centerX = MACRO_INDENT_CENTER;
-  const contactChordWidth =
-    ratio > 0 ? Math.min(92, Math.max(10, 14 + Math.sqrt(ratio) * 104)) : 0;
+  // The 92-unit cap that used to sit here made the device view stop growing
+  // while the camera patch (same law, uncapped) kept widening -- the two
+  // views disagreed above ~60% pressure.
+  const contactChordWidth = contactChordUnits(ratio);
   const halfChord = contactChordWidth / 2;
   const contactChord =
     contactChordWidth > 0
@@ -1364,7 +1377,7 @@ function render(value) {
   const CAMERA_VIEW_SPAN = 180;
   const cameraSpan =
     ratio > 0
-      ? Math.max(8, ((14 + Math.sqrt(ratio) * 104) / CAMERA_VIEW_SPAN) * 100)
+      ? Math.max(8, (contactChordUnits(ratio) / CAMERA_VIEW_SPAN) * 100)
       : 7;
   const annulusStrength = 0.12 + cameraResponse * 0.42;
 

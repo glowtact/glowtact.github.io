@@ -765,7 +765,11 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError("signal: high-pressure macro metrics are missing")
     high_pressure_chord = float(high_pressure_macro_chord)
     high_pressure_deformation = float(high_pressure_deformation_span)
-    if high_pressure_chord > 100:
+    # The chord may not exceed the 140-unit indenter footprint: contact
+    # wider than the body pressing it would be unphysical. (The old bound of
+    # 100 guarded a since-removed 92-unit clamp that made the device view
+    # disagree with the camera at high pressure.)
+    if high_pressure_chord > 140:
         raise AssertionError(
             f"signal: high-pressure macro contact chord is too wide: {high_pressure_chord:.2f}"
         )
@@ -1182,18 +1186,40 @@ def check_coupling_readability(browser) -> None:
             f"signal: camera response is off-centre by "
             f"({geo['dx']:.1f}, {geo['dy']:.1f})px"
         )
-    # The camera images the device view: its dark patch must match the
-    # contact chord under the indenter, sharing the macro view's law
-    # (14 + sqrt(area) * 104 units over the ~180-unit imaged span).
-    expected = page.evaluate(
-        "(14 + Math.sqrt(contactRatio(couplingPressureFor(1))) * 104) / 180"
-    )
-    if abs(geo["cover"] - expected) > 0.07:
-        raise AssertionError(
-            f"signal: camera patch spans {geo['cover']:.0%} of the frame but "
-            f"the device-view chord implies {expected:.0%}; the tactile image "
-            f"is out of proportion with the mechanism view"
+    # The three views share one contact-chord law. Verify the chain at both
+    # a mid and a full pressure: the device view's drawn chord must equal
+    # contactChordUnits(area), and the camera patch must span that chord
+    # against its 180-unit imaged field.
+    for pct in (60, 100):
+        page.locator("#signal-pressure").fill(str(pct))
+        page.wait_for_timeout(350)
+        chord = float(
+            page.locator("#macro-coupling-line").get_attribute(
+                "data-coupling-chord-width"
+            )
         )
+        law = page.evaluate(
+            f"contactChordUnits(contactRatio(couplingPressureFor({pct / 100})))"
+        )
+        if abs(chord - law) > 0.5:
+            raise AssertionError(
+                f"signal@{pct}%: device-view chord {chord:.1f} deviates from "
+                f"the shared law {law:.1f}"
+            )
+        cam = page.evaluate(
+            """() => {
+              const s = document.querySelector('.camera-stage').getBoundingClientRect();
+              const b = document.querySelector('.camera-contact').getBoundingClientRect();
+              return b.width / s.width;
+            }"""
+        )
+        expected = law / 180
+        if abs(cam - expected) > 0.07:
+            raise AssertionError(
+                f"signal@{pct}%: camera patch spans {cam:.0%} of the frame "
+                f"but the shared chord law implies {expected:.0%}; the "
+                f"tactile image is out of proportion with the mechanism view"
+            )
     page.close()
 
 
