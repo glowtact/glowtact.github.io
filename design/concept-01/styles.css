@@ -145,8 +145,11 @@ main {
 .site-header nav a,
 .concept-switcher {
   min-height: 44px;
+  /* Short labels ("Paper") measured 32px wide -- under the 44px target. */
+  min-width: 44px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   color: var(--secondary-ink);
   font-size: var(--t-label);
   text-decoration: none;

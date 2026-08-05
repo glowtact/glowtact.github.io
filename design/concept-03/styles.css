@@ -190,6 +190,14 @@ main {
 .concept-channel {
   justify-self: end;
   gap: 10px;
+  /*
+   * At 375px the header grid squeezed this link to 15px wide -- the label
+   * wrapped to two lines and the tap area collapsed. Keeping it on one line
+   * and reserving a minimum width restores a usable target.
+   */
+  min-width: 44px;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .concept-channel span {
@@ -1350,8 +1358,15 @@ main {
 
 .pressure-control input {
   width: 100%;
-  height: 32px;
-  margin-top: 10px;
+  /*
+   * This slider drives the whole mechanism animation, so it is the single
+   * most important touch target on the page -- and at 32px it was under the
+   * 44px minimum on phones and tablets. The track and thumb are unchanged;
+   * only the hit area grows, with the extra height taken out of the margin
+   * so the layout does not shift.
+   */
+  height: 44px;
+  margin-top: 4px;
   appearance: none;
   background: transparent;
   cursor: pointer;

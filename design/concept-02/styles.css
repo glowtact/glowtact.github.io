@@ -141,8 +141,11 @@ main {
 .atlas-header nav a,
 .concept-mark {
   min-height: 44px;
+  /* Short labels ("Ledger") measured 38px wide -- under the 44px target. */
+  min-width: 44px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   color: var(--graphite-soft);
   font-size: var(--t-label);
   text-decoration: none;
