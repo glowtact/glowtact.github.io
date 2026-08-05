@@ -558,7 +558,8 @@ main {
 
 .mechanism-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.92fr) minmax(330px, 0.72fr);
+  /* Was 1.92 / 0.72 -- the microscope column held 27% of the width. */
+  grid-template-columns: minmax(0, 1.72fr) minmax(360px, 0.88fr);
   grid-template-rows: minmax(300px, auto) minmax(250px, auto);
 }
 
@@ -572,6 +573,15 @@ main {
 
 .macro-view {
   grid-row: 1 / span 2;
+  /*
+   * The device view spans both rows, so the microscope + camera column sets
+   * its height. Its header and stage did not absorb that extra height, which
+   * left ~130px of empty panel below the legend. Letting the stage take the
+   * free space keeps the schematic optically centred in whatever height the
+   * neighbouring column dictates.
+   */
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 
 .view-header {
@@ -967,10 +977,19 @@ main {
     var(--optic-surface-1);
 }
 
+/*
+ * Scale the microscope drawing by its own aspect ratio rather than pinning a
+ * pixel height. At 1920 the fixed 210px box letterboxed the 520x320 artwork,
+ * wasting the column's width on empty margin while the mechanism animation --
+ * the analytical centre of the page -- rendered smaller than any other panel.
+ * The max-height keeps the right column from outgrowing the device view.
+ */
 .micro-panel svg,
 .micro-panel canvas {
   width: 100%;
-  height: 210px;
+  height: auto;
+  max-height: 300px;
+  aspect-ratio: 520 / 320;
 }
 
 .micro-panel canvas {
@@ -1121,6 +1140,14 @@ main {
 .camera-stage {
   position: relative;
   aspect-ratio: 4 / 3;
+  /*
+   * Widening the microscope column also widened this 4:3 stage, which grew
+   * it from 249px to 309px tall and pushed the whole mechanism shell past
+   * the 920px desktop budget. The cap decouples the sensor readout's height
+   * from the column width; the response is a centred disc, so losing the
+   * strict 4:3 costs nothing.
+   */
+  max-height: 220px;
   min-height: 0;
   overflow: hidden;
   background:
@@ -1892,6 +1919,8 @@ main {
   .micro-panel svg,
   .micro-panel canvas {
     height: auto;
+    /* Stacked layouts get the full column; the desktop cap would letterbox. */
+    max-height: none;
     aspect-ratio: 520 / 320;
   }
 
@@ -2128,6 +2157,8 @@ main {
   .micro-panel svg,
   .micro-panel canvas {
     height: auto;
+    /* Stacked layouts get the full column; the desktop cap would letterbox. */
+    max-height: none;
     aspect-ratio: 520 / 320;
   }
 
