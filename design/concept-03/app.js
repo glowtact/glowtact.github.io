@@ -24,6 +24,7 @@ const macroTextureLine = document.querySelector(".macro-texture-line");
 const macroMembrane = document.querySelector("#macro-membrane");
 const macroMembraneShadow = document.querySelector("#macro-membrane-shadow");
 const macroMembraneBody = document.querySelector("#macro-membrane-body");
+const macroScaleMarker = document.querySelector("#macro-scale-marker");
 const macroAirGap = document.querySelector("#macro-air-gap");
 const macroCouplingLine = document.querySelector("#macro-coupling-line");
 const macroCouplingGlow = document.querySelector("#macro-coupling-glow");
@@ -307,7 +308,7 @@ function sectionDisplayHeight(height) {
  * reach the deepest valleys, so a residual air fraction always survives. The
  * curve is a logistic in load, which reproduces that slow-fast-slow shape.
  */
-const CONTACT_SATURATION = 0.975;
+const CONTACT_SATURATION = 0.985;
 const CONTACT_ONSET = 2.2;
 const CONTACT_BIAS = 1.9;
 
@@ -789,6 +790,19 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
   const membranePath = smoothPath(membranePoints);
   const gapPath = areaBetween(membranePoints, surfacePoints);
 
+  // The sampled-window chip marks the interface the microscope watches, so
+  // it rides the membrane: centred between the membrane underside and the
+  // gel surface at the contact centre, descending with them as the indenter
+  // presses in. Its rest centre in the markup is y=286.
+  if (macroScaleMarker) {
+    const interfaceCenterY =
+      (membranePoints[centerIndex].y + surfacePoints[centerIndex].y) / 2;
+    macroScaleMarker.setAttribute(
+      "transform",
+      `translate(0 ${(interfaceCenterY - 286).toFixed(2)})`
+    );
+  }
+
   macroGel.setAttribute("d", gelPath);
   macroTextureLine?.setAttribute("d", surfacePath);
   // The membrane band: membranePoints trace the underside (the air-gap
@@ -1177,7 +1191,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
       // gamma widens partially-covered rims a touch without the hard 0.24
       // floor that once lit barely-touched cells.
       const flattenBlend =
-        contactCoverage > 0 ? Math.pow(contactCoverage, 0.8) : 0;
+        contactCoverage > 0 ? Math.pow(contactCoverage, 0.7) : 0;
       const flattenedHeights = heights.map((surfaceHeight) => {
         if (contactStrength <= 0) {
           return surfaceHeight;
@@ -1189,11 +1203,12 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
         // field still read as spikes even at >90% coupled area.
         const plateauHeight = threshold - 0.006;
         const residualRelief = 0.03 + (1 - contactStrength) * 0.12;
-        const curvedTip = capCurvature * Math.min(contactStrength, 1);
+        // No upward cap lift here: the old +capCurvature term pushed pressed
+        // facets up to 0.034 ABOVE the membrane plane, so the membrane grid
+        // sliced through the gold sheet as misaligned stripes. Pressed
+        // material stays at or below the plane the membrane occupies.
         const pressed =
-          plateauHeight +
-          curvedTip +
-          (surfaceHeight - plateauHeight) * residualRelief;
+          plateauHeight + (surfaceHeight - plateauHeight) * residualRelief;
         // Partially-covered cells keep part of their relief: only the covered
         // fraction of the cell has been pressed home.
         return surfaceHeight + (pressed - surfaceHeight) * flattenBlend;
