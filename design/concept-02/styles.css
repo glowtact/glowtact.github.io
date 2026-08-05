@@ -20,10 +20,10 @@
   --paper-deep: #ddd0ba;
   --graphite: #302c26;
   --graphite-soft: #5e574d;
-  --graphite-faint: #837a6d;
+  --graphite-faint: #6c645a;
   --registration: rgba(48, 44, 38, 0.18);
   --registration-faint: rgba(48, 44, 38, 0.075);
-  --measure-amber: #b66d0b;
+  --measure-amber: #935808;
   --measure-wash: #e1bc76;
   --control-inset: #e3d8c5;
   --focus: #8c4f00;
@@ -959,6 +959,16 @@ input[type="range"]::-moz-range-thumb {
   color: var(--graphite-faint);
   font-size: var(--t-micro);
   font-style: normal;
+}
+
+/*
+ * The selected and hovered states invert to a dark background, but this
+ * nested caption kept its light-background colour and measured 2.38:1 --
+ * the worst contrast left on the site. It has to invert with its parent.
+ */
+.specimen-tabs button:hover i,
+.specimen-tabs button[aria-pressed="true"] i {
+  color: var(--paper-deep);
 }
 
 .geometry-figure {

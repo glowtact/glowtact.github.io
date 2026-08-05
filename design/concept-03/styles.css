@@ -17,7 +17,7 @@
   --readout: #edf1ea;
   --readout-secondary: #b4beb4;
   --readout-tertiary: #94a094;
-  --readout-dim: #748076;
+  --readout-dim: #8b978c;
   --optic-ring: rgba(255, 255, 255, 0.12);
   --optic-ring-soft: rgba(255, 255, 255, 0.066);
   --optic-grid: rgba(255, 255, 255, 0.052);
@@ -1220,7 +1220,8 @@ main {
   position: absolute;
   right: 12px;
   bottom: 10px;
-  color: rgba(18, 25, 21, 0.62);
+  /* Sits on the light camera stage; 0.62 alpha measured 2.82:1. */
+  color: rgba(12, 17, 14, 0.86);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
   letter-spacing: 0.08em;

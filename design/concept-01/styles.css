@@ -22,8 +22,11 @@
   --nitrile: #191918;
   --tactile-ink: #252420;
   --secondary-ink: #67655e;
-  --tertiary-ink: #8b8980;
-  --muted-ink: #aaa79c;
+  --tertiary-ink: #62615b;
+  --muted-ink: #62615b;
+  /* Muted text on the dark inverted panels; the light-background muted ink
+     measured 2.83:1 there because it was tuned for the opposite polarity. */
+  --muted-ink-on-dark: #8b8980;
   --led-amber: #e49a12;
   --coupling-amber: #f0b23e;
   --amber-wash: #f9e6bd;
@@ -407,7 +410,13 @@ fieldset legend {
   display: block;
   width: 100%;
   min-height: 520px;
-  color: rgba(37, 36, 32, 0.24);
+  /*
+   * Diagram annotations inherit this. At 0.24 alpha they measured 1.63:1 --
+   * effectively invisible, and the lowest contrast anywhere on the site.
+   * 0.62 brings the labels to AA while keeping them subordinate to the
+   * geometry they annotate.
+   */
+  color: rgba(37, 36, 32, 0.7);
 }
 
 .probe-shape {
@@ -890,7 +899,7 @@ fieldset legend {
 
 .evidence-statement p {
   margin: 0;
-  color: var(--muted-ink);
+  color: var(--muted-ink-on-dark);
   font-size: var(--t-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -905,7 +914,7 @@ fieldset legend {
 
 .evidence-statement span {
   max-width: 360px;
-  color: var(--muted-ink);
+  color: var(--muted-ink-on-dark);
   font-size: var(--t-label);
   line-height: 1.5;
 }
