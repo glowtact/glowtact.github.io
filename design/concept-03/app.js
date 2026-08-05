@@ -307,7 +307,7 @@ function sectionDisplayHeight(height) {
  * reach the deepest valleys, so a residual air fraction always survives. The
  * curve is a logistic in load, which reproduces that slow-fast-slow shape.
  */
-const CONTACT_SATURATION = 0.96;
+const CONTACT_SATURATION = 0.975;
 const CONTACT_ONSET = 2.2;
 const CONTACT_BIAS = 1.9;
 
@@ -1168,6 +1168,16 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
       const contactStrength = contactModel.cellStrengths[row][column];
       const contactCoverage = contactModel.cellCoverages[row][column];
       const average = heights.reduce((sum, value) => sum + value, 0) / heights.length;
+      // One blend drives BOTH the flattening and the amber. When the two
+      // channels disagreed -- geometry pressing a whole cell flat while the
+      // colour tinted it fractionally -- the field read as "flattened but
+      // not coupled", which understated the coupling exactly where the
+      // pressing is most visible. A flattened facet IS the contact patch, so
+      // wherever the mesh looks pressed it must also read amber. The mild
+      // gamma widens partially-covered rims a touch without the hard 0.24
+      // floor that once lit barely-touched cells.
+      const flattenBlend =
+        contactCoverage > 0 ? Math.pow(contactCoverage, 0.8) : 0;
       const flattenedHeights = heights.map((surfaceHeight) => {
         if (contactStrength <= 0) {
           return surfaceHeight;
@@ -1180,11 +1190,13 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
         const plateauHeight = threshold - 0.006;
         const residualRelief = 0.03 + (1 - contactStrength) * 0.12;
         const curvedTip = capCurvature * Math.min(contactStrength, 1);
-        return (
+        const pressed =
           plateauHeight +
           curvedTip +
-          (surfaceHeight - plateauHeight) * residualRelief
-        );
+          (surfaceHeight - plateauHeight) * residualRelief;
+        // Partially-covered cells keep part of their relief: only the covered
+        // fraction of the cell has been pressed home.
+        return surfaceHeight + (pressed - surfaceHeight) * flattenBlend;
       });
       if (contactStrength > 0) {
         contactCellCount += 1;
@@ -1203,12 +1215,8 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
 
       const tone = Math.round(55 + average * 74);
       const baseColor = [Math.round(tone * 0.75), tone, Math.round(tone * 0.91)];
-      // Amber extent tracks the cell's coupled fraction directly. An earlier
-      // version added a 0.24 floor to any cell with a single coupled
-      // sub-sample, which made a 5%-coupled window read as roughly 20% amber
-      // and put this view visibly out of step with the section and the
-      // readout. Blending proportionally keeps the three views agreeing.
-      const contactMix = contactCoverage;
+      // Same blend as the geometry: flattened extent and amber extent agree.
+      const contactMix = flattenBlend;
       const color = baseColor.map((channel, index) =>
         Math.round(channel + ([227, 161, 40][index] - channel) * contactMix)
       );
