@@ -1259,7 +1259,18 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   // peaks floated it over grains that are now drawn pressed flat.
   const membraneHeight = Math.max(threshold + 0.006, 0.03);
   context.lineWidth = Math.max(pixelRatio, 1);
-  context.strokeStyle = "rgba(4, 6, 5, 0.48)";
+  /*
+   * Fade the membrane grid out as coupling completes. These dark rules are
+   * drawn across the whole field, so at high coupling they sat on top of the
+   * gold sheet and ate into it: with the model reporting 98.5% coupled area
+   * the rendered amber measured only 90.9%, which is exactly the mismatch
+   * between the picture and the stated percentage. Physically the grid marks
+   * a membrane plane hovering above the texture -- once the membrane is
+   * pressed home almost everywhere there is no gap left for it to hover in,
+   * so it should disappear rather than overlay the contact it has made.
+   */
+  const membraneVisibility = Math.max(0, 1 - contactModel.area * 1.05);
+  context.strokeStyle = `rgba(4, 6, 5, ${(0.48 * membraneVisibility).toFixed(3)})`;
   for (let row = 0; row < FIELD_SIZE; row += 4) {
     context.beginPath();
     for (let column = 0; column < FIELD_SIZE; column += 1) {
@@ -1313,16 +1324,22 @@ function render(value) {
   // Displayed contrast is the physical signal under a display gamma, so faint
   // early coupling stays visible without the response pinning at mid travel.
   const cameraResponse = Math.pow(cameraSignal, CAMERA_GAMMA);
-  const cameraDiameter =
-    ratio > 0 ? 36 + Math.sqrt(ratio) * 144 + cameraResponse * 22 : 38;
+  /*
+   * Size the contact region as a PERCENTAGE of the sensor frame, not in
+   * pixels. The old pixel value was tuned for one panel size and then
+   * clamped at 180px, so at full compression the disc covered barely half
+   * the frame while the readout claimed 99% coupled. A share of the frame
+   * scales with the layout and lets the region reach the edges when the
+   * whole window is in contact. sqrt(area) maps coupled AREA to a diameter.
+   */
+  const cameraSpan = ratio > 0 ? 16 + Math.sqrt(ratio) * 104 : 14;
   const annulusStrength = 0.12 + cameraResponse * 0.42;
 
   currentPressure = pressure;
   root.style.setProperty("--pressure", pressure.toFixed(3));
   root.style.setProperty("--signal-level", `${percent}%`);
   root.style.setProperty("--coupling-width", `${48 + cameraResponse * 162}px`);
-  root.style.setProperty("--camera-contact-width", `${cameraDiameter.toFixed(2)}px`);
-  root.style.setProperty("--camera-contact-height", `${cameraDiameter.toFixed(2)}px`);
+  root.style.setProperty("--camera-contact-span", `${cameraSpan.toFixed(2)}%`);
   root.style.setProperty("--reflection-opacity", (0.76 - pressure * 0.62).toFixed(3));
   root.style.setProperty("--camera-darkness", (0.18 + cameraResponse * 0.78).toFixed(3));
   root.style.setProperty("--camera-response-opacity", cameraResponse.toFixed(3));
@@ -1334,7 +1351,7 @@ function render(value) {
     cameraContact.dataset.contactMaskSignature = contactModel.maskSignature;
     cameraContact.dataset.contactArea = contactModel.area.toFixed(6);
     cameraContact.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
-    cameraContact.dataset.contactShape = `${cameraDiameter.toFixed(2)},${cameraDiameter.toFixed(2)}`;
+    cameraContact.dataset.contactShape = `${cameraSpan.toFixed(2)},${cameraSpan.toFixed(2)}`;
   }
 
   if (pressureInput) pressureInput.value = String(percent);

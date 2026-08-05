@@ -1111,6 +1111,67 @@ def check_media_scaling(browser) -> None:
         page.close()
 
 
+def check_coupling_readability(browser) -> None:
+    """The two views that state a coupled percentage must look like it.
+
+    Both drifted from their own readouts: the 3D field rendered 90.9% amber
+    while reporting 98.5%, because the membrane grid was drawn over the gold
+    sheet; and the camera disc covered half the frame at 99% coupled, because
+    a pixel size clamped at 180px could not fill a panel of any other size.
+    """
+    page = browser.new_page(viewport={"width": 1440, "height": 1000},
+                            device_scale_factor=2)
+    navigate(page, ROUTES["signal"])
+
+    page.locator("#micro-tab-3d").click()
+    page.wait_for_timeout(400)
+    page.locator("#signal-pressure").fill("100")
+    page.wait_for_timeout(450)
+
+    amber = page.evaluate(
+        """() => {
+          const c = document.querySelector('#micro-canvas');
+          const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+          let mesh = 0, weighted = 0;
+          for (let i = 0; i < d.length; i += 4) {
+            if (d[i + 3] < 200) continue;
+            const r = d[i], g = d[i + 1], b = d[i + 2];
+            if (r + g + b < 90) continue;
+            mesh += 1;
+            weighted += Math.max(0, Math.min(1, (r - b) / 150));
+          }
+          return weighted / Math.max(mesh, 1);
+        }"""
+    )
+    model = page.evaluate("contactRatio(couplingPressureFor(1))")
+    if amber < model - 0.08:
+        raise AssertionError(
+            f"signal: 3D field draws {amber:.1%} amber but reports "
+            f"{model:.1%} coupled; the picture contradicts the readout"
+        )
+
+    geo = page.evaluate(
+        """() => {
+          const s = document.querySelector('.camera-stage').getBoundingClientRect();
+          const b = document.querySelector('.camera-contact').getBoundingClientRect();
+          return { cover: Math.min(b.width / s.width, 1),
+                   dx: b.x + b.width / 2 - (s.x + s.width / 2),
+                   dy: b.y + b.height / 2 - (s.y + s.height / 2) };
+        }"""
+    )
+    if abs(geo["dx"]) > 1 or abs(geo["dy"]) > 1:
+        raise AssertionError(
+            f"signal: camera response is off-centre by "
+            f"({geo['dx']:.1f}, {geo['dy']:.1f})px"
+        )
+    if geo["cover"] < 0.95:
+        raise AssertionError(
+            f"signal: camera response spans only {geo['cover']:.0%} of the "
+            f"sensor frame at full compression"
+        )
+    page.close()
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
@@ -1130,13 +1191,17 @@ def main() -> int:
         if MODE in {"all", "design"}:
             check_design_system(browser)
             check_media_scaling(browser)
+            check_coupling_readability(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
     if MODE in {"all", "behavior"}:
         print("PASS: interactions, keyboard focus, reduced motion, console, network")
     if MODE in {"all", "design"}:
-        print("PASS: contrast, touch targets, type scale, overflow, media scaling")
+        print(
+            "PASS: contrast, touch targets, type scale, overflow, "
+            "media scaling, coupling readability"
+        )
     return 0
 
 

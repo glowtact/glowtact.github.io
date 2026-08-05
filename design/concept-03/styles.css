@@ -1201,14 +1201,15 @@ main {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: clamp(38px, var(--camera-contact-width), 180px);
-  height: clamp(38px, var(--camera-contact-height), 180px);
+  width: clamp(13%, var(--camera-contact-span), 128%);
+  height: auto;
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 50%, rgba(4, 6, 5, calc(var(--camera-darkness) * 0.92)) 0 34%, rgba(9, 13, 11, calc(var(--camera-darkness) * 0.78)) 45%, rgba(34, 43, 37, calc(var(--annulus-strength) * 0.56)) 58%, rgba(84, 96, 88, calc(var(--annulus-strength) * 0.18)) 70%, transparent 78%),
-    radial-gradient(circle at 50% 50%, transparent 40%, rgba(30, 39, 33, calc(var(--annulus-strength) * 0.28)) 53%, transparent 67%),
+    radial-gradient(circle closest-side at 50% 50%, rgba(4, 6, 5, calc(var(--camera-darkness) * 0.94)) 0 62%, rgba(9, 13, 11, calc(var(--camera-darkness) * 0.82)) 76%, rgba(34, 43, 37, calc(var(--annulus-strength) * 0.56)) 87%, rgba(84, 96, 88, calc(var(--annulus-strength) * 0.18)) 95%, transparent 100%),
+    radial-gradient(circle closest-side at 50% 50%, transparent 58%, rgba(30, 39, 33, calc(var(--annulus-strength) * 0.28)) 74%, transparent 90%),
     rgba(82, 93, 85, calc(var(--camera-darkness) * 0.18));
   box-shadow:
     0 0 18px 6px rgba(12, 17, 14, calc(var(--camera-response-opacity) * 0.14)),
@@ -1267,8 +1268,13 @@ main {
   position: absolute;
   right: 12px;
   bottom: 10px;
-  /* Sits on the light camera stage; 0.62 alpha measured 2.82:1. */
+  /*
+   * The stage swings from light to almost black as coupling completes, so no
+   * single ink works at both ends. Dark text carries the light state; the
+   * pale halo carries the dark one, where it would otherwise vanish.
+   */
   color: rgba(12, 17, 14, 0.86);
+  text-shadow: 0 0 5px rgba(226, 233, 224, 0.85);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
   letter-spacing: 0.08em;
