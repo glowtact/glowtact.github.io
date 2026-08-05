@@ -1201,7 +1201,7 @@ main {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: clamp(13%, var(--camera-contact-span), 128%);
+  width: clamp(13%, var(--camera-contact-span), 165%);
   height: auto;
   aspect-ratio: 1;
   display: grid;

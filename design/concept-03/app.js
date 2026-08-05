@@ -1149,6 +1149,12 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   const threshold = contactModel.fieldThreshold;
   let contactCellCount = 0;
   const capCurvature = Math.min(0.012 + couplingPressure * 0.032, 0.04);
+  /*
+   * How present the membrane lattice is. It marks a plane hovering above the
+   * texture; as coupling completes there is no gap left to hover in, so both
+   * the grid rules and the uncoupled cell edges fade with it.
+   */
+  const membraneVisibility = Math.max(0, 1 - contactModel.area * 1.05);
 
   const project = (column, row, surfaceHeight) => ({
     x: originX + (column - row) * scaleX,
@@ -1235,9 +1241,13 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
         Math.round(channel + ([227, 161, 40][index] - channel) * contactMix)
       );
       context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+      // Coupled edges stroke in full-saturation amber; the old pale tint
+      // measurably diluted the field at high coupling. Uncoupled edges fade
+      // with the membrane grid, since at near-complete contact the lattice
+      // has nothing left to delineate.
       context.strokeStyle = contactStrength
-        ? `rgba(255, 218, 126, ${0.12 + contactStrength * 0.34})`
-        : "rgba(210, 228, 220, 0.07)";
+        ? `rgba(244, 184, 64, ${0.16 + contactStrength * 0.34})`
+        : `rgba(210, 228, 220, ${(0.07 * membraneVisibility).toFixed(3)})`;
 
       context.fill();
       context.stroke();
@@ -1269,7 +1279,6 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
    * pressed home almost everywhere there is no gap left for it to hover in,
    * so it should disappear rather than overlay the contact it has made.
    */
-  const membraneVisibility = Math.max(0, 1 - contactModel.area * 1.05);
   context.strokeStyle = `rgba(4, 6, 5, ${(0.48 * membraneVisibility).toFixed(3)})`;
   for (let row = 0; row < FIELD_SIZE; row += 4) {
     context.beginPath();
@@ -1332,7 +1341,12 @@ function render(value) {
    * scales with the layout and lets the region reach the edges when the
    * whole window is in contact. sqrt(area) maps coupled AREA to a diameter.
    */
-  const cameraSpan = ratio > 0 ? 16 + Math.sqrt(ratio) * 104 : 14;
+  // sqrt maps coupled AREA to a diameter; the coefficient is fitted so the
+  // dark footprint (core plus the transition ring the eye reads as dark)
+  // tracks the model's area across the sweep. Pure gradient geometry gives
+  // 158, but the soft ring reads as part of the region, so 146 lands the
+  // measured coverage on the model instead of overshooting it.
+  const cameraSpan = ratio > 0 ? Math.max(14, 146 * Math.sqrt(ratio)) : 14;
   const annulusStrength = 0.12 + cameraResponse * 0.42;
 
   currentPressure = pressure;

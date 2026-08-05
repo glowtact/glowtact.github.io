@@ -1130,21 +1130,28 @@ def check_coupling_readability(browser) -> None:
 
     amber = page.evaluate(
         """() => {
+          // Measure the mesh region only: the top band holds the panel's
+          // white caption text, which is not part of the rendered field and
+          // dilutes the statistic.
           const c = document.querySelector('#micro-canvas');
-          const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+          const W = c.width, H = c.height;
+          const d = c.getContext('2d').getImageData(0, 0, W, H).data;
           let mesh = 0, weighted = 0;
-          for (let i = 0; i < d.length; i += 4) {
-            if (d[i + 3] < 200) continue;
-            const r = d[i], g = d[i + 1], b = d[i + 2];
-            if (r + g + b < 90) continue;
-            mesh += 1;
-            weighted += Math.max(0, Math.min(1, (r - b) / 150));
+          for (let y = Math.floor(H * 0.24); y < H; y += 1) {
+            for (let x = 0; x < W; x += 1) {
+              const i = (y * W + x) * 4;
+              if (d[i + 3] < 200) continue;
+              const r = d[i], g = d[i + 1], b = d[i + 2];
+              if (r + g + b < 90) continue;
+              mesh += 1;
+              weighted += Math.max(0, Math.min(1, (r - b) / 150));
+            }
           }
           return weighted / Math.max(mesh, 1);
         }"""
     )
     model = page.evaluate("contactRatio(couplingPressureFor(1))")
-    if amber < model - 0.08:
+    if amber < model - 0.03:
         raise AssertionError(
             f"signal: 3D field draws {amber:.1%} amber but reports "
             f"{model:.1%} coupled; the picture contradicts the readout"
