@@ -969,6 +969,16 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   const contactConstraints = surfacePoints.filter(
     (_, index) => surfaceProfile[index] >= constraintThreshold
   );
+  /*
+   * Standoff between the drawn membrane and the surfaces it rests on.
+   * Coupling IS the membrane touching the gel, so a fixed 2.5px gap at every
+   * pressure drew a continuous air line across the section even at 99%
+   * coupled -- the picture contradicted the readout. The full standoff now
+   * survives only while coupling is scarce (it keeps the two lines legible
+   * at first touch) and closes to a hairline as the coupled fraction grows.
+   */
+  const contactStandoff =
+    MICRO_CLEARANCE * (1 - contactModel.area) + 0.5 * contactModel.area;
   const compliancePenalty = 0.004 + pressure * 0.016;
   const envelope = surfacePoints.map((point, index) => {
     const xNormal = index / (surfacePoints.length - 1);
@@ -976,12 +986,12 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
     return contactConstraints.reduce((membraneY, constraint) => {
       const distance = point.x - constraint.x;
       const constraintY =
-        constraint.y - MICRO_CLEARANCE + distance * distance * compliancePenalty;
+        constraint.y - contactStandoff + distance * distance * compliancePenalty;
       return Math.min(membraneY, constraintY);
     }, planeY);
   });
   const clearanceLimits = surfacePoints.map(
-    (point) => point.y - MICRO_CLEARANCE
+    (point) => point.y - contactStandoff
   );
   const projectClearance = (values) =>
     values.map((height, index) => Math.min(height, clearanceLimits[index]));
@@ -1009,14 +1019,20 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   contactSampleIndices.forEach((index) => {
     contactThirdCounts[Math.min(Math.floor((index * 3) / PROFILE_SIZE), 2)] += 1;
   });
-  const minimumClearance = Math.min(
-    ...surfacePoints.map(
-      (point, index) => point.y - membranePoints[index].y
-    )
-  );
+  // Clearance is only meaningful where the membrane has NOT coupled: over
+  // contact the two surfaces coincide by definition. Report the minimum over
+  // uncoupled samples so the legibility guarantee applies to the air gap the
+  // section actually claims to show.
+  const minimumClearance = surfacePoints.reduce((minimum, point, index) => {
+    if (contactIndentations[index] > 0) return minimum;
+    return Math.min(minimum, point.y - membranePoints[index].y);
+  }, Infinity);
+  const reportedClearance = Number.isFinite(minimumClearance)
+    ? minimumClearance
+    : MICRO_CLEARANCE;
 
   if (microSvg) {
-    microSvg.dataset.minimumClearance = minimumClearance.toFixed(6);
+    microSvg.dataset.minimumClearance = reportedClearance.toFixed(6);
     microSvg.dataset.contactSamples = String(contactSampleIndices.length);
     microSvg.dataset.contactThirds = contactThirdCounts.join(",");
     microSvg.dataset.profileSignature = profileSignature;
@@ -1201,22 +1217,15 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
         if (contactStrength <= 0) {
           return surfaceHeight;
         }
-        // The membrane plane is impenetrable: coupled material is pressed to
-        // the plane itself, not merely nudged down. An earlier cap limited
-        // each grain's descent to 0.085 below its own average, which left
-        // fully-coupled grains drawn nearly at rest height -- the reason the
-        // field still read as spikes even at >90% coupled area.
-        const plateauHeight = threshold - 0.006;
-        const residualRelief = 0.03 + (1 - contactStrength) * 0.12;
-        // No upward cap lift here: the old +capCurvature term pushed pressed
-        // facets up to 0.034 ABOVE the membrane plane, so the membrane grid
-        // sliced through the gold sheet as misaligned stripes. Pressed
-        // material stays at or below the plane the membrane occupies.
-        const pressed =
-          plateauHeight + (surfaceHeight - plateauHeight) * residualRelief;
-        // Partially-covered cells keep part of their relief: only the covered
-        // fraction of the cell has been pressed home.
-        return surfaceHeight + (pressed - surfaceHeight) * flattenBlend;
+        // The membrane plane is impenetrable, so deformation is TRUNCATION:
+        // whatever rises above the plane is sliced off at the plane, and the
+        // grain's flanks below it stay exactly where they were. The earlier
+        // blend shrank the whole grain toward the plane instead, which made
+        // partially coupled grains look uniformly melted rather than
+        // flat-topped. Truncation happens per vertex, so a grain whose tip
+        // crosses the plane shows a flat cap while its shoulders keep their
+        // full relief -- the classic asperity-contact picture.
+        return Math.min(surfaceHeight, threshold - 0.004);
       });
       if (contactStrength > 0) {
         contactCellCount += 1;
@@ -1341,12 +1350,22 @@ function render(value) {
    * scales with the layout and lets the region reach the edges when the
    * whole window is in contact. sqrt(area) maps coupled AREA to a diameter.
    */
-  // sqrt maps coupled AREA to a diameter; the coefficient is fitted so the
-  // dark footprint (core plus the transition ring the eye reads as dark)
-  // tracks the model's area across the sweep. Pure gradient geometry gives
-  // 158, but the soft ring reads as part of the region, so 146 lands the
-  // measured coverage on the model instead of overshooting it.
-  const cameraSpan = ratio > 0 ? Math.max(14, 146 * Math.sqrt(ratio)) : 14;
+  /*
+   * The camera images the DEVICE view, not the ~100 um microscope window:
+   * its dark region is the contact patch under the indenter as seen across
+   * the sensor's field of view. Driving the blob from the micro coupled
+   * fraction zoomed it until it swallowed the frame at full compression.
+   * It now shares the device view's contact-chord law (14 + sqrt(area)*104
+   * SVG units) against the ~180-unit membrane span the camera watches, so
+   * the tactile image and the global mechanism view stay in proportion:
+   * at full compression the patch spans ~65% of the frame, exactly like
+   * the chord under the indenter.
+   */
+  const CAMERA_VIEW_SPAN = 180;
+  const cameraSpan =
+    ratio > 0
+      ? Math.max(8, ((14 + Math.sqrt(ratio) * 104) / CAMERA_VIEW_SPAN) * 100)
+      : 7;
   const annulusStrength = 0.12 + cameraResponse * 0.42;
 
   currentPressure = pressure;
