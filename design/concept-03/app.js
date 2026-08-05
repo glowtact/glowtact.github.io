@@ -309,8 +309,8 @@ function sectionDisplayHeight(height) {
  * curve is a logistic in load, which reproduces that slow-fast-slow shape.
  */
 const CONTACT_SATURATION = 0.985;
-const CONTACT_ONSET = 2.2;
-const CONTACT_BIAS = 1.9;
+const CONTACT_ONSET = 2;
+const CONTACT_BIAS = 1.4;
 
 function targetContactFraction(pressure) {
   const load = Math.min(Math.max(pressure, 0), 1);
@@ -1182,16 +1182,15 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
       const contactStrength = contactModel.cellStrengths[row][column];
       const contactCoverage = contactModel.cellCoverages[row][column];
       const average = heights.reduce((sum, value) => sum + value, 0) / heights.length;
-      // One blend drives BOTH the flattening and the amber. When the two
-      // channels disagreed -- geometry pressing a whole cell flat while the
-      // colour tinted it fractionally -- the field read as "flattened but
-      // not coupled", which understated the coupling exactly where the
-      // pressing is most visible. A flattened facet IS the contact patch, so
-      // wherever the mesh looks pressed it must also read amber. The mild
-      // gamma widens partially-covered rims a touch without the hard 0.24
-      // floor that once lit barely-touched cells.
-      const flattenBlend =
-        contactCoverage > 0 ? Math.pow(contactCoverage, 0.7) : 0;
+      // One blend drives BOTH the flattening and the amber, and it is the
+      // cell's coupled fraction EXACTLY. A gamma was tried here to make the
+      // coupling read larger, but it made the drawn amber systematically
+      // exceed the stated percentage -- the readout said 51% while the ink
+      // covered ~60%, and the estimate read as wrong. The drawn fraction now
+      // equals the reported fraction by construction; any desire for more
+      // coupling belongs in the contact law, where the number and the
+      // picture grow together.
+      const flattenBlend = contactCoverage;
       const flattenedHeights = heights.map((surfaceHeight) => {
         if (contactStrength <= 0) {
           return surfaceHeight;
