@@ -307,7 +307,7 @@ function sectionDisplayHeight(height) {
  * reach the deepest valleys, so a residual air fraction always survives. The
  * curve is a logistic in load, which reproduces that slow-fast-slow shape.
  */
-const CONTACT_SATURATION = 0.92;
+const CONTACT_SATURATION = 0.96;
 const CONTACT_ONSET = 2.2;
 const CONTACT_BIAS = 1.9;
 
@@ -661,13 +661,29 @@ function couplingPressureFor(pressure) {
   return Math.pow(normalized, 0.75);
 }
 
+/** Lowest edge of the #macro-indenter outline in SVG coordinates. */
+const MACRO_INDENTER_TIP_Y = 197;
+
+/**
+ * Translate that puts the indenter tip exactly on the membrane's top surface
+ * at the moment of contact. Derived from the geometry rather than tuned: the
+ * old hand-picked base left a constant 8.4px air gap that the previous 13px
+ * membrane stroke happened to hide.
+ */
+const INDENTER_CONTACT_TRANSLATE =
+  macroSurfaceY(MACRO_INDENT_CENTER, 0) -
+  MACRO_INITIAL_GAP -
+  MACRO_MEMBRANE_THICKNESS -
+  MACRO_INDENTER_TIP_Y;
+
 function indenterYFor(pressure) {
   const approach = Math.min(pressure / INDENTER_CONTACT_PRESSURE, 1);
   const coupling = couplingPressureFor(pressure);
-  // The tip lands on the membrane's TOP surface, one band thickness above
-  // the underside that membranePoints trace.
+  // Approach from 29px above; from contact onward the tip tracks the top
+  // surface, whose descent rate is MACRO_INDENTER_TRAVEL by construction.
   return (
-    34 - MACRO_MEMBRANE_THICKNESS + approach * 29 +
+    INDENTER_CONTACT_TRANSLATE -
+    29 * (1 - approach) +
     coupling * MACRO_INDENTER_TRAVEL
   );
 }
@@ -1156,11 +1172,13 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
         if (contactStrength <= 0) {
           return surfaceHeight;
         }
-        const plateauHeight = Math.max(
-          threshold - 0.018,
-          average - Math.min(couplingPressure * 0.085, 0.085)
-        );
-        const residualRelief = 0.035 + (1 - contactStrength) * 0.13;
+        // The membrane plane is impenetrable: coupled material is pressed to
+        // the plane itself, not merely nudged down. An earlier cap limited
+        // each grain's descent to 0.085 below its own average, which left
+        // fully-coupled grains drawn nearly at rest height -- the reason the
+        // field still read as spikes even at >90% coupled area.
+        const plateauHeight = threshold - 0.006;
+        const residualRelief = 0.03 + (1 - contactStrength) * 0.12;
         const curvedTip = capCurvature * Math.min(contactStrength, 1);
         return (
           plateauHeight +
@@ -1214,15 +1232,16 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   microCanvas.dataset.capCurvature = capCurvature.toFixed(4);
   microCanvas.dataset.fieldSignature = fieldSignature;
 
-  const membraneHeight = Math.max(threshold, 0.05);
+  // After flattening, no drawn material rises above the membrane plane, so
+  // the membrane grid rides the plane itself. The old drape over REST-height
+  // peaks floated it over grains that are now drawn pressed flat.
+  const membraneHeight = Math.max(threshold + 0.006, 0.03);
   context.lineWidth = Math.max(pixelRatio, 1);
   context.strokeStyle = "rgba(4, 6, 5, 0.48)";
   for (let row = 0; row < FIELD_SIZE; row += 4) {
     context.beginPath();
     for (let column = 0; column < FIELD_SIZE; column += 1) {
-      const localSurface = surfaceField[row][column];
-      const membrane = Math.max(membraneHeight, localSurface + 0.025);
-      const point = project(column, row, membrane);
+      const point = project(column, row, membraneHeight);
       if (column === 0) context.moveTo(point.x, point.y);
       else context.lineTo(point.x, point.y);
     }

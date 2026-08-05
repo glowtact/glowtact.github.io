@@ -34,6 +34,15 @@
   --camera-contact-width: 42px;
   --camera-contact-height: 24px;
   --indenter-y: 34px;
+  /*
+   * Three-step type scale for all interface and diagram text. Seven distinct
+   * sizes (7-13px) previously coexisted inside the mechanism panel alone;
+   * every small-text rule now maps to fine (annotations), label (readouts and
+   * controls) or title (panel headings).
+   */
+  --text-fine: 8px;
+  --text-label: 10px;
+  --text-title: 13px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
   background: var(--camera-black);
@@ -100,7 +109,7 @@ svg {
   padding: 12px 16px;
   color: var(--camera-black);
   background: var(--signal-amber-bright);
-  font-size: 13px;
+  font-size: var(--text-title);
   font-weight: 700;
 }
 
@@ -135,14 +144,14 @@ main {
 }
 
 .instrument-brand strong {
-  font-size: 12px;
+  font-size: var(--text-title);
   letter-spacing: 0.08em;
 }
 
 .instrument-brand > span:last-child {
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.14em;
 }
 
@@ -166,7 +175,7 @@ main {
   display: inline-flex;
   align-items: center;
   color: var(--readout-secondary);
-  font-size: 10px;
+  font-size: var(--text-label);
   letter-spacing: 0.09em;
   text-decoration: none;
   text-transform: uppercase;
@@ -186,7 +195,7 @@ main {
 .concept-channel span {
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
 }
 
 .signal-hero {
@@ -210,7 +219,7 @@ main {
   margin: 0 0 28px;
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -270,7 +279,7 @@ main {
   padding: 0 18px;
   border: 1px solid transparent;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-label);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-decoration: none;
@@ -333,14 +342,14 @@ main {
 .hero-capabilities dt {
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.12em;
 }
 
 .hero-capabilities dd {
   margin-top: 8px;
   color: var(--readout-secondary);
-  font-size: 11px;
+  font-size: var(--text-label);
   line-height: 1.35;
 }
 
@@ -408,7 +417,7 @@ main {
 .hero-figure figcaption span {
   color: var(--signal-amber);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.11em;
 }
 
@@ -417,7 +426,7 @@ main {
   justify-self: end;
   margin: 0;
   color: var(--readout-tertiary);
-  font-size: 10px;
+  font-size: var(--text-label);
   line-height: 1.5;
   text-align: right;
 }
@@ -431,7 +440,7 @@ main {
   color: var(--readout-dim);
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.11em;
 }
 
@@ -489,7 +498,7 @@ main {
   justify-self: end;
   margin: 0 0 6px;
   color: var(--readout-secondary);
-  font-size: 13px;
+  font-size: var(--text-title);
   line-height: 1.58;
   text-wrap: pretty;
 }
@@ -526,7 +535,7 @@ main {
 .toolbar-identity strong,
 .toolbar-status output {
   color: var(--readout);
-  font-size: 10px;
+  font-size: var(--text-label);
   font-weight: 650;
   letter-spacing: 0.06em;
 }
@@ -535,7 +544,7 @@ main {
 .toolbar-status > span {
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.11em;
 }
 
@@ -585,14 +594,14 @@ main {
 .view-badge {
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.11em;
 }
 
 .view-header h3 {
   margin: 0;
   color: var(--readout);
-  font-size: 13px;
+  font-size: var(--text-title);
   font-weight: 580;
   letter-spacing: -0.01em;
 }
@@ -650,7 +659,7 @@ main {
 #macro-indenter text {
   fill: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-label);
   letter-spacing: 0.12em;
 }
 
@@ -755,45 +764,26 @@ main {
 .macro-label text {
   fill: var(--readout-secondary);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
 /*
- * The sampled-window marker is annotation, not signal. Amber is reserved for
- * optical coupling in this view, so the marker is drawn in the same quiet
- * gray as the other callouts and no longer competes with the physics.
+ * The sampled-window marker is annotation, not signal: a single faint dashed
+ * outline centred on the contact, no leader, no label. The micro panel header
+ * already names the window, so the schematic stays clean. It brightens
+ * slightly on hover for anyone who goes looking for it.
  */
-.macro-scale-marker path,
-.macro-scale-marker circle {
+.macro-scale-marker path {
   fill: none;
-  stroke: rgba(196, 210, 202, 0.3);
+  stroke: rgba(196, 210, 202, 0.16);
   stroke-width: 1;
-}
-
-.macro-scale-marker .macro-sample-window {
-  fill: none;
   stroke-dasharray: 4 4;
+  transition: stroke 200ms linear;
 }
 
-.macro-scale-marker .macro-sample-crosshair {
-  stroke-dasharray: 2 5;
-  stroke-opacity: 0.4;
-}
-
-.macro-scale-marker .macro-sample-leader {
-  stroke-width: 1;
-}
-
-.macro-scale-marker text {
-  fill: var(--readout-secondary);
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  letter-spacing: 0.06em;
-  paint-order: stroke;
-  stroke: rgba(8, 10, 9, 0.72);
-  stroke-linejoin: round;
-  stroke-width: 3px;
+.macro-stage:hover .macro-scale-marker path {
+  stroke: rgba(196, 210, 202, 0.4);
 }
 
 .macro-interface-note path {
@@ -805,7 +795,7 @@ main {
 .macro-interface-note text {
   fill: rgba(9, 16, 13, 0.82);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.06em;
 }
 
@@ -831,7 +821,7 @@ main {
 .macro-fov text {
   fill: rgba(188, 204, 197, 0.66);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -874,7 +864,7 @@ main {
 .macro-camera text {
   fill: var(--readout-secondary);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
 }
 
 .macro-led {
@@ -899,7 +889,7 @@ main {
   gap: 20px;
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -950,7 +940,7 @@ main {
   color: var(--readout-dim);
   background: transparent;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--text-fine);
   font-weight: 700;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -1049,7 +1039,7 @@ main {
 .micro-annotation text {
   fill: var(--readout-tertiary);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -1071,7 +1061,7 @@ main {
   gap: 20px;
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -1096,7 +1086,7 @@ main {
   max-width: 170px;
   margin: 0;
   color: var(--readout-dim);
-  font-size: 8px;
+  font-size: var(--text-fine);
   line-height: 1.45;
   text-align: right;
   pointer-events: none;
@@ -1114,14 +1104,14 @@ main {
   background: rgba(8, 10, 9, 0.35);
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
 .microscope-readout output,
 .camera-readout output {
   color: var(--signal-amber);
-  font-size: 8px;
+  font-size: var(--text-fine);
 }
 
 .camera-stage {
@@ -1228,7 +1218,7 @@ main {
   bottom: 10px;
   color: rgba(18, 25, 21, 0.62);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -1259,7 +1249,7 @@ main {
   display: block;
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.1em;
 }
 
@@ -1275,7 +1265,7 @@ main {
   color: var(--camera-black);
   background: var(--signal-amber-bright);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   font-weight: 700;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -1322,7 +1312,7 @@ main {
 .pressure-control output {
   color: var(--signal-amber-bright);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1408,12 +1398,12 @@ main {
 
 .state-rail span {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
 }
 
 .state-rail strong {
   overflow: hidden;
-  font-size: 10px;
+  font-size: var(--text-label);
   font-weight: 550;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1442,7 +1432,7 @@ main {
   padding-left: 18px;
   color: var(--signal-amber);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -1452,7 +1442,7 @@ main {
   padding: 8px 18px;
   color: var(--readout-secondary);
   box-shadow: inset 1px 0 var(--optic-ring);
-  font-size: 11px;
+  font-size: var(--text-label);
   line-height: 1.55;
 }
 
@@ -1463,7 +1453,7 @@ main {
   background: #0b0d0b;
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.02em;
   line-height: 1.55;
 }
@@ -1500,7 +1490,7 @@ main {
   gap: 18px;
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
 
@@ -1545,7 +1535,7 @@ main {
 .capability-stack span {
   color: var(--signal-amber);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.1em;
 }
 
@@ -1560,7 +1550,7 @@ main {
   max-width: 420px;
   margin: 12px 0 0;
   color: var(--readout-tertiary);
-  font-size: 10px;
+  font-size: var(--text-label);
   line-height: 1.55;
 }
 
@@ -1590,7 +1580,7 @@ main {
   grid-column: 1 / -1;
   color: var(--signal-amber);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.1em;
 }
 
@@ -1657,7 +1647,7 @@ main {
 .form-comparison p {
   margin: 12px 0 0;
   color: var(--readout-tertiary);
-  font-size: 10px;
+  font-size: var(--text-label);
   line-height: 1.55;
 }
 
@@ -1704,7 +1694,7 @@ main {
 
 .evidence-layout figcaption strong {
   color: var(--readout-secondary);
-  font-size: 9px;
+  font-size: var(--text-fine);
   font-weight: 550;
 }
 
@@ -1757,7 +1747,7 @@ main {
   max-width: 580px;
   margin: 24px 0 0;
   color: var(--readout-secondary);
-  font-size: 13px;
+  font-size: var(--text-title);
   line-height: 1.6;
 }
 
@@ -1786,14 +1776,14 @@ main {
 .research-meta dt {
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-fine);
   letter-spacing: 0.1em;
 }
 
 .research-meta dd {
   margin-top: 9px;
   color: var(--readout-secondary);
-  font-size: 10px;
+  font-size: var(--text-label);
 }
 
 .research-meta pre {
@@ -1805,7 +1795,7 @@ main {
   background: var(--nitrile);
   box-shadow: inset 0 0 0 1px var(--optic-ring);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--text-fine);
   line-height: 1.65;
 }
 
@@ -1827,7 +1817,7 @@ main {
   margin: 0;
   color: var(--readout-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-fine);
   letter-spacing: 0.09em;
   text-decoration: none;
   text-transform: uppercase;
@@ -2151,7 +2141,7 @@ main {
   }
 
   .state-rail strong {
-    font-size: 8px;
+    font-size: var(--text-fine);
   }
 
   .sequence-control {
@@ -2229,7 +2219,7 @@ main {
 
   .research-meta pre {
     padding: 16px;
-    font-size: 7px;
+    font-size: var(--text-fine);
   }
 
   .instrument-footer {
@@ -2257,7 +2247,7 @@ main {
   }
 
   .view-header h3 {
-    font-size: 11px;
+    font-size: var(--text-label);
   }
 
   .micro-tabs button {
