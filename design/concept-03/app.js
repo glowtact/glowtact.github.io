@@ -23,6 +23,7 @@ const macroGel = document.querySelector(".macro-gel");
 const macroTextureLine = document.querySelector(".macro-texture-line");
 const macroMembrane = document.querySelector("#macro-membrane");
 const macroMembraneShadow = document.querySelector("#macro-membrane-shadow");
+const macroMembraneBody = document.querySelector("#macro-membrane-body");
 const macroAirGap = document.querySelector("#macro-air-gap");
 const macroCouplingLine = document.querySelector("#macro-coupling-line");
 const macroCouplingGlow = document.querySelector("#macro-coupling-glow");
@@ -35,16 +36,29 @@ const microSvg = document.querySelector("#micro-svg");
 const microSurfaceLine = document.querySelector("#micro-surface-line");
 const microMembrane = document.querySelector("#micro-membrane");
 const microMembraneShadow = document.querySelector("#micro-membrane-shadow");
+const microMembraneBody = document.querySelector("#micro-membrane-body");
 const microGapArea = document.querySelector("#micro-gap-area");
 const microContactPoints = document.querySelector("#micro-contact-points");
 
-const FIELD_SIZE = 41;
-const PROFILE_SIZE = 65;
+// 61 samples resolve the 12x12 asperity population: feature radii of
+// 0.017-0.045 span 1-2.7 grid cells, so each grit is drawn by several quads
+// instead of aliasing in and out of the lattice as it did at 41.
+const FIELD_SIZE = 61;
+const PROFILE_SIZE = 97;
 const FIELD_SEED = 2500;
 const MICRO_CLEARANCE = 2.5;
 const MACRO_INITIAL_GAP = 18;
 const MACRO_MIN_GAP = 1.8;
 const INDENTER_CONTACT_PRESSURE = 0.22;
+
+/**
+ * Drawn thickness of the 3 mil (~76 um) nitrile membrane in the device view.
+ * The schematic exaggerates the ~9 um texture, so no single scale is exact;
+ * what must read correctly is the ordering: at 76 um the membrane is thicker
+ * than the rest air gap it drapes over, so the band is drawn deeper than
+ * MACRO_INITIAL_GAP. The indenter rests on the band's top surface.
+ */
+const MACRO_MEMBRANE_THICKNESS = 22;
 
 /**
  * Post-contact travel of the indenter, in device-view units.
@@ -98,13 +112,18 @@ function seededRandom(seed) {
  */
 function createRoughness(seed) {
   const random = seededRandom(seed);
-  const gridSize = 8;
+  // P2500 grit averages ~8.4 um across, so a ~100 um window holds roughly a
+  // dozen asperities per axis. The earlier 8x8 population read as sparse:
+  // isolated peaks with empty basins between them, which is not what a molded
+  // P2500 texture looks like. Radii shrink with the tighter pitch so
+  // neighbours abut without merging into one blob.
+  const gridSize = 12;
   const asperities = [];
 
   for (let row = 0; row < gridSize; row += 1) {
     for (let column = 0; column < gridSize; column += 1) {
-      const radiusMajor = 0.024 + random() * 0.04;
-      const radiusMinor = 0.016 + random() * 0.03;
+      const radiusMajor = 0.017 + random() * 0.028;
+      const radiusMinor = 0.012 + random() * 0.021;
       const angle = random() * Math.PI;
       const shoulderAngle = random() * Math.PI * 2;
       const shoulderDistance = radiusMajor * (0.35 + random() * 0.65);
@@ -216,24 +235,17 @@ function fractionAbove(heights, plane) {
   return count / heights.length;
 }
 
-/** Probe planes used to compare a candidate slice against the whole field. */
-const DISTRIBUTION_PROBES = Array.from(
-  { length: 19 },
-  (_, index) => (index + 1) / 20
-);
 const fieldHeights = surfaceField.flat();
-const fieldProfileCurve = DISTRIBUTION_PROBES.map((plane) =>
-  fractionAbove(fieldHeights, plane)
-);
 
 /**
  * The section is a genuine slice through the field rather than a separate
  * synthetic profile. The slice row is chosen deterministically as the line
- * whose height distribution best matches the whole field, so the section and
- * the 3D view report the same coupled fraction for the same membrane plane.
- * A legibility floor keeps the slice from landing in a featureless valley.
+ * whose fraction-above-plane curve best matches the whole field's, scored at
+ * the given probe planes. A legibility floor keeps the slice from landing in
+ * a featureless valley.
  */
-function chooseSectionRow(size, candidates = 360) {
+function chooseSectionRow(size, probes, candidates = 360) {
+  const fieldCurve = probes.map((plane) => fractionAbove(fieldHeights, plane));
   let bestY = 0.5;
   let bestScore = Infinity;
 
@@ -245,10 +257,9 @@ function chooseSectionRow(size, candidates = 360) {
     if (peaks < 3) continue;
 
     let score = 0;
-    for (let probe = 0; probe < DISTRIBUTION_PROBES.length; probe += 1) {
+    for (let probe = 0; probe < probes.length; probe += 1) {
       const difference =
-        fractionAbove(heights, DISTRIBUTION_PROBES[probe]) -
-        fieldProfileCurve[probe];
+        fractionAbove(heights, probes[probe]) - fieldCurve[probe];
       score += difference * difference;
     }
     if (score < bestScore) {
@@ -258,14 +269,6 @@ function chooseSectionRow(size, candidates = 360) {
   }
   return bestY;
 }
-
-const SECTION_ROW = chooseSectionRow(PROFILE_SIZE);
-
-/** True heights of the section in the shared roughness scale. */
-const sectionHeights = sampleSection(PROFILE_SIZE, SECTION_ROW);
-const sectionLow = Math.min(...sectionHeights);
-const sectionHigh = Math.max(...sectionHeights);
-const sectionSpan = Math.max(sectionHigh - sectionLow, Number.EPSILON);
 
 /**
  * Vertical exaggeration for the drawn section, the same convention the device
@@ -288,8 +291,6 @@ function sectionDisplayHeight(height) {
   if (normalized <= 0) return 0;
   return Math.pow(normalized, SECTION_DISPLAY_GAMMA);
 }
-
-const surfaceProfile = sectionHeights.map(sectionDisplayHeight);
 
 /**
  * Qualitative real-contact-area law.
@@ -480,6 +481,39 @@ function profileThreshold(pressure) {
   return sectionDisplayHeight(membranePlaneFor(pressure));
 }
 
+/**
+ * Section-row selection, deferred until the plane table exists so the slice
+ * can be scored where it will actually be judged: at the membrane planes the
+ * pressure sweep visits. Uniform probes over [0,1] wasted most of their
+ * weight on planes the law never operates at, and with the denser P2500
+ * population the row they picked disagreed with the field by up to 12pp in
+ * the working range.
+ */
+const OPERATING_PLANE_PROBES = (() => {
+  const probes = [];
+  for (let step = 0; step <= 24; step += 1) {
+    const pressure =
+      INDENTER_CONTACT_PRESSURE +
+      (step / 24) * (1 - INDENTER_CONTACT_PRESSURE);
+    const plane = membranePlaneFor(couplingPressureFor(pressure));
+    if (plane <= 1) probes.push(plane);
+  }
+  return probes;
+})();
+
+// 720 candidates find the same row as 360: ~7pp worst-case disagreement is
+// the variance floor of any genuine 1-D slice through this denser field, not
+// a search failure. Keeping the slice honest is worth more than forcing the
+// number down with a synthetic profile.
+const SECTION_ROW = chooseSectionRow(PROFILE_SIZE, OPERATING_PLANE_PROBES);
+
+/** True heights of the section in the shared roughness scale. */
+const sectionHeights = sampleSection(PROFILE_SIZE, SECTION_ROW);
+const sectionLow = Math.min(...sectionHeights);
+const sectionHigh = Math.max(...sectionHeights);
+const sectionSpan = Math.max(sectionHigh - sectionLow, Number.EPSILON);
+const surfaceProfile = sectionHeights.map(sectionDisplayHeight);
+
 /** Single definition of coupled area, so every caller reports one number. */
 function contactRatio(pressure) {
   return microContactModel(pressure).area;
@@ -623,7 +657,12 @@ function couplingPressureFor(pressure) {
 function indenterYFor(pressure) {
   const approach = Math.min(pressure / INDENTER_CONTACT_PRESSURE, 1);
   const coupling = couplingPressureFor(pressure);
-  return 34 + approach * 29 + coupling * MACRO_INDENTER_TRAVEL;
+  // The tip lands on the membrane's TOP surface, one band thickness above
+  // the underside that membranePoints trace.
+  return (
+    34 - MACRO_MEMBRANE_THICKNESS + approach * 29 +
+    coupling * MACRO_INDENTER_TRAVEL
+  );
 }
 
 function smoothPath(points) {
@@ -729,8 +768,19 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
 
   macroGel.setAttribute("d", gelPath);
   macroTextureLine?.setAttribute("d", surfacePath);
+  // The membrane band: membranePoints trace the underside (the air-gap
+  // boundary the texture couples against); the top surface, which the
+  // indenter presses on, rides MACRO_MEMBRANE_THICKNESS above it.
+  const membraneTopPoints = membranePoints.map((point) => ({
+    x: point.x,
+    y: point.y - MACRO_MEMBRANE_THICKNESS
+  }));
   macroMembrane.setAttribute("d", membranePath);
-  macroMembraneShadow?.setAttribute("d", membranePath);
+  macroMembraneBody?.setAttribute(
+    "d",
+    areaBetween(membraneTopPoints, membranePoints)
+  );
+  macroMembraneShadow?.setAttribute("d", smoothPath(membraneTopPoints));
   macroAirGap?.setAttribute("d", gapPath);
   if (macroAirGap) {
     const centerGap = surfacePoints[centerIndex].y - membranePoints[centerIndex].y;
@@ -945,6 +995,17 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   microSurfaceLine?.setAttribute("d", surfacePath);
   microMembrane.setAttribute("d", membranePath);
   microMembraneShadow?.setAttribute("d", membranePath);
+  // At this zoom a 3 mil (~76 um) membrane is a slab, not a skin: the sampled
+  // window is ~100 um wide, so the membrane's far side lies well outside the
+  // frame. Fill from the draped underside up past the top edge of the panel;
+  // the crop is the honest rendering of its thickness at this scale.
+  microMembraneBody?.setAttribute(
+    "d",
+    areaBetween(membranePoints, [
+      { x: 28, y: -12 },
+      { x: 492, y: -12 }
+    ])
+  );
   microGapArea?.setAttribute("d", areaBetween(membranePoints, surfacePoints));
 
   if (!microContactPoints) return;

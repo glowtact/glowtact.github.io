@@ -661,20 +661,32 @@ main {
   stroke-width: 1;
 }
 
+/*
+ * The membrane is drawn as a filled band (its 3 mil body) bounded by two
+ * edges: the shadow path now traces the lit TOP surface the indenter presses
+ * on, and .macro-membrane traces the underside facing the air gap. The old
+ * single 13px stroke both understated the film and leaked half its width
+ * into the air gap below the drawn boundary.
+ */
+.macro-membrane-body {
+  fill: #1d241f;
+  stroke: none;
+}
+
 .macro-membrane-shadow {
   fill: none;
-  stroke: rgba(215, 231, 222, 0.15);
+  stroke: rgba(215, 231, 222, 0.38);
   stroke-linecap: round;
-  stroke-width: 17;
+  stroke-width: 3;
   filter: url("#soft-glow");
 }
 
 .macro-membrane {
   fill: none;
-  stroke: #263029;
+  stroke: #0c100d;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 13;
+  stroke-width: 3;
 }
 
 .macro-gel {
@@ -987,6 +999,16 @@ main {
   stroke-width: 2;
 }
 
+/*
+ * In the ~100 um section a 3 mil membrane is a slab whose far side is out of
+ * frame, so the body fills from the draped underside past the top of the
+ * panel and the stroked paths become its lower edge, not the film itself.
+ */
+.micro-membrane-body {
+  fill: rgba(6, 8, 7, 0.94);
+  stroke: none;
+}
+
 .micro-membrane-shadow {
   fill: none;
   stroke: rgba(227, 161, 40, 0.18);
@@ -1000,7 +1022,7 @@ main {
   stroke: #030403;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 7;
+  stroke-width: 5;
 }
 
 .micro-contact-segment {
