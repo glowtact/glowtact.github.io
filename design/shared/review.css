@@ -1,4 +1,20 @@
 :root {
+  --font-serif: "Iowan Old Style", "Baskerville", Georgia, serif;
+
+  /*
+   * Type scale. Sizes were previously ad hoc -- this file alone used up to
+   * seventeen distinct values, with 1px differences carrying no meaning.
+   * Every fixed size now snaps to one of these steps; display headings keep
+   * their clamp() rules because they are genuinely fluid.
+   */
+  --t-micro: 10px;
+  --t-label: 12px;
+  --t-body: 16px;
+  --t-lead: 18px;
+  --t-h3: 22px;
+  --t-h2: 28px;
+  --t-display: 36px;
+
   --review-canvas: #f2f1ed;
   --review-paper: #faf9f5;
   --review-ink: #181817;
@@ -79,7 +95,7 @@ main {
 .review-header p,
 .review-footer {
   color: var(--review-muted);
-  font-size: 12px;
+  font-size: var(--t-label);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -89,7 +105,7 @@ main {
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  font-size: 15px;
+  font-size: var(--t-body);
   font-weight: 650;
   text-decoration: none;
 }
@@ -124,7 +140,7 @@ main {
   display: grid;
   gap: 8px;
   color: var(--review-muted);
-  font-size: 11px;
+  font-size: var(--t-label);
   font-weight: 650;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -133,7 +149,7 @@ main {
 .review-intro h1 {
   margin: 0;
   max-width: 840px;
-  font-family: "Iowan Old Style", "Baskerville", Georgia, serif;
+  font-family: var(--font-serif);
   font-size: clamp(58px, 7.2vw, 116px);
   font-weight: 400;
   letter-spacing: -0.065em;
@@ -145,7 +161,7 @@ main {
   display: grid;
   gap: 32px;
   color: var(--review-secondary);
-  font-size: 16px;
+  font-size: var(--t-body);
   line-height: 1.55;
   text-wrap: pretty;
 }
@@ -158,7 +174,7 @@ main {
   padding-top: 16px;
   border-top: 1px solid var(--review-rule);
   color: var(--review-muted);
-  font-size: 12px;
+  font-size: var(--t-label);
 }
 
 .concepts {
@@ -207,7 +223,7 @@ main {
   position: absolute;
   left: 24px;
   bottom: 20px;
-  font-size: 10px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.13em;
 }
@@ -275,7 +291,7 @@ main {
   position: absolute;
   top: 24px;
   left: 24px;
-  font-size: 10px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.13em;
 }
@@ -362,7 +378,7 @@ main {
 .section-label {
   margin: 0 0 24px;
   color: var(--review-muted);
-  font-size: 10px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -371,7 +387,7 @@ main {
 .concept-copy h2,
 .comparison h2 {
   margin: 0;
-  font-family: "Iowan Old Style", "Baskerville", Georgia, serif;
+  font-family: var(--font-serif);
   font-size: clamp(36px, 4vw, 64px);
   font-weight: 400;
   letter-spacing: -0.045em;
@@ -382,7 +398,7 @@ main {
   max-width: 520px;
   margin: 24px 0;
   color: var(--review-secondary);
-  font-size: 16px;
+  font-size: var(--t-body);
   line-height: 1.55;
 }
 
@@ -393,7 +409,7 @@ main {
   margin: 0 0 32px;
   padding: 0;
   color: var(--review-muted);
-  font-size: 12px;
+  font-size: var(--t-label);
   list-style: none;
 }
 
@@ -407,7 +423,7 @@ main {
   align-items: center;
   gap: 24px;
   border-bottom: 1px solid currentColor;
-  font-size: 13px;
+  font-size: var(--t-label);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-decoration: none;
@@ -445,7 +461,7 @@ table {
   width: 100%;
   min-width: 780px;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--t-label);
 }
 
 th,
@@ -457,7 +473,7 @@ td {
 
 thead th {
   color: var(--review-muted);
-  font-size: 10px;
+  font-size: var(--t-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
