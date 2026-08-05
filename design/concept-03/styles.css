@@ -759,29 +759,34 @@ main {
   letter-spacing: 0.08em;
 }
 
+/*
+ * The sampled-window marker is annotation, not signal. Amber is reserved for
+ * optical coupling in this view, so the marker is drawn in the same quiet
+ * gray as the other callouts and no longer competes with the physics.
+ */
 .macro-scale-marker path,
 .macro-scale-marker circle {
   fill: none;
-  stroke: var(--signal-amber-bright);
-  stroke-width: 1.25;
+  stroke: rgba(196, 210, 202, 0.3);
+  stroke-width: 1;
 }
 
 .macro-scale-marker .macro-sample-window {
-  fill: rgba(255, 192, 74, 0.035);
-  stroke-width: 1.35;
+  fill: none;
+  stroke-dasharray: 4 4;
 }
 
 .macro-scale-marker .macro-sample-crosshair {
   stroke-dasharray: 2 5;
-  stroke-opacity: 0.58;
+  stroke-opacity: 0.4;
 }
 
 .macro-scale-marker .macro-sample-leader {
-  stroke-width: 1.4;
+  stroke-width: 1;
 }
 
 .macro-scale-marker text {
-  fill: var(--signal-amber-bright);
+  fill: var(--readout-secondary);
   font-family: var(--font-mono);
   font-size: 8.5px;
   letter-spacing: 0.06em;

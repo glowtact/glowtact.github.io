@@ -113,17 +113,18 @@ function seededRandom(seed) {
 function createRoughness(seed) {
   const random = seededRandom(seed);
   // P2500 grit averages ~8.4 um across, so a ~100 um window holds roughly a
-  // dozen asperities per axis. The earlier 8x8 population read as sparse:
-  // isolated peaks with empty basins between them, which is not what a molded
-  // P2500 texture looks like. Radii shrink with the tighter pitch so
-  // neighbours abut without merging into one blob.
+  // dozen asperities per axis -- and in a molded sandpaper texture the grains
+  // ABUT: there is no flat land between them. Pitch sets the count (12x12);
+  // the radii are sized so the mean grain diameter matches the ~0.083 pitch,
+  // which is what removes the empty basins that made earlier populations read
+  // as scattered spikes on a plain.
   const gridSize = 12;
   const asperities = [];
 
   for (let row = 0; row < gridSize; row += 1) {
     for (let column = 0; column < gridSize; column += 1) {
-      const radiusMajor = 0.017 + random() * 0.028;
-      const radiusMinor = 0.012 + random() * 0.021;
+      const radiusMajor = 0.026 + random() * 0.034;
+      const radiusMinor = 0.019 + random() * 0.025;
       const angle = random() * Math.PI;
       const shoulderAngle = random() * Math.PI * 2;
       const shoulderDistance = radiusMajor * (0.35 + random() * 0.65);
