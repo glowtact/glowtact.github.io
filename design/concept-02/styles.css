@@ -79,6 +79,10 @@ img {
 
 .skip-link {
   position: fixed;
+  /* Measured 41px tall; a real target once focus reveals it. */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   z-index: 30;
   top: 12px;
   left: -9999px;

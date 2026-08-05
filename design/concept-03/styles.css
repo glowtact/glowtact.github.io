@@ -106,6 +106,10 @@ svg {
   z-index: 100;
   top: 12px;
   left: -9999px;
+  /* Measured 41px tall; a real target once focus reveals it. */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   padding: 12px 16px;
   color: var(--camera-black);
   background: var(--signal-amber-bright);
@@ -996,7 +1000,15 @@ main {
 .micro-panel canvas {
   width: 100%;
   height: auto;
-  max-height: 300px;
+  /*
+   * Bound the drawing by WIDTH, not height. Capping the height re-introduced
+   * the letterboxing this rule exists to remove: at 1920 a 528px-wide column
+   * clipped to 300px tall rendered at 1.76 instead of the artwork's 1.63.
+   * Constraining width lets aspect-ratio hold the proportion exactly while
+   * still bounding the height that feeds the 920px shell budget.
+   */
+  max-width: 488px;
+  margin-inline: auto;
   aspect-ratio: 520 / 320;
 }
 

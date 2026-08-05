@@ -949,6 +949,168 @@ def check_reduced_motion(browser) -> None:
     context.close()
 
 
+AUDIT_VIEWPORTS = {
+    "phone": {"width": 375, "height": 812},
+    "tablet": {"width": 768, "height": 1024},
+    "laptop": {"width": 1280, "height": 800},
+    "wide": {"width": 1920, "height": 1080},
+}
+
+# Distinct rendered font sizes permitted per route. These are ceilings on
+# sprawl, not targets: concept-01 once rendered seventeen sizes with 1px
+# steps that carried no meaning.
+MAX_DISTINCT_FONT_SIZES = {
+    "review": 6,
+    "optical": 11,
+    "atlas": 10,
+    "signal": 8,
+}
+
+CONTRAST_JS = r"""
+(() => {
+  const lum = (c) => {
+    const f = c.map((v) => {
+      v /= 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2];
+  };
+  const parse = (s) => {
+    const m = s.match(/rgba?\(([^)]+)\)/);
+    if (!m) return null;
+    const p = m[1].split(',').map(parseFloat);
+    return { rgb: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
+  };
+  const bgOf = (el) => {
+    let n = el;
+    while (n && n !== document.documentElement) {
+      const c = parse(getComputedStyle(n).backgroundColor);
+      if (c && c.a > 0.85) return c.rgb;
+      n = n.parentElement;
+    }
+    const r = parse(getComputedStyle(document.body).backgroundColor);
+    return r ? r.rgb : [255, 255, 255];
+  };
+  const ratio = (a, b) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+
+  const fails = [];
+  const sizes = new Set();
+  const touch = [];
+  document.querySelectorAll('body *').forEach((el) => {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) return;
+
+    if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(el.tagName)
+        && r.height > 0 && (r.height < 44 || r.width < 44)) {
+      touch.push({
+        tag: el.tagName, id: el.id || '',
+        w: Math.round(r.width), h: Math.round(r.height),
+        text: (el.textContent || '').trim().slice(0, 24)
+      });
+    }
+
+    const txt = (el.textContent || '').trim();
+    if (!txt || el.children.length) return;
+    sizes.add(parseFloat(cs.fontSize).toFixed(1));
+    const fg = parse(cs.color);
+    if (!fg) return;
+    const bg = bgOf(el);
+    const eff = fg.rgb.map((c, i) => c * fg.a + bg[i] * (1 - fg.a));
+    const cr = ratio(eff, bg);
+    const px = parseFloat(cs.fontSize);
+    const bold = parseInt(cs.fontWeight, 10) >= 700;
+    const need = (px >= 24 || (px >= 18.66 && bold)) ? 3.0 : 4.5;
+    if (cr < need) {
+      fails.push({
+        cr: +cr.toFixed(2), need, px: +px.toFixed(1),
+        color: cs.color, text: txt.slice(0, 40)
+      });
+    }
+  });
+  return {
+    fails, touch,
+    sizes: [...sizes].map(Number).sort((a, b) => a - b),
+    overflow: document.documentElement.scrollWidth
+              - document.documentElement.clientWidth
+  };
+})()
+"""
+
+
+def check_design_system(browser) -> None:
+    """Guard the four defect classes found in the 5-round design audit:
+    contrast, touch targets, font-size sprawl and horizontal overflow."""
+    for route_name, path in ROUTES.items():
+        for vp_name, viewport in AUDIT_VIEWPORTS.items():
+            page = browser.new_page(viewport=viewport)
+            block_media(page)
+            navigate(page, path)
+            page.wait_for_timeout(250)
+            data = page.evaluate(CONTRAST_JS)
+
+            if data["overflow"] > 0:
+                raise AssertionError(
+                    f"{route_name}@{vp_name}: page scrolls horizontally by "
+                    f"{data['overflow']}px"
+                )
+            if data["fails"]:
+                worst = sorted(data["fails"], key=lambda f: f["cr"])[:3]
+                raise AssertionError(
+                    f"{route_name}@{vp_name}: {len(data['fails'])} text nodes "
+                    f"below WCAG AA contrast; worst: {worst}"
+                )
+            if vp_name in {"phone", "tablet"} and data["touch"]:
+                raise AssertionError(
+                    f"{route_name}@{vp_name}: touch targets under 44px: "
+                    f"{data['touch'][:4]}"
+                )
+            limit = MAX_DISTINCT_FONT_SIZES[route_name]
+            if len(data["sizes"]) > limit:
+                raise AssertionError(
+                    f"{route_name}@{vp_name}: {len(data['sizes'])} distinct "
+                    f"font sizes exceeds {limit}: {data['sizes']}"
+                )
+            page.close()
+
+
+def check_media_scaling(browser) -> None:
+    """The mechanism animation must stay proportioned and crisp everywhere."""
+    for vp_name, viewport in AUDIT_VIEWPORTS.items():
+        page = browser.new_page(viewport=viewport, device_scale_factor=2)
+        navigate(page, ROUTES["signal"])
+        page.wait_for_timeout(300)
+
+        box = page.locator("#micro-svg").bounding_box()
+        aspect = box["width"] / box["height"]
+        if abs(aspect - 520 / 320) > 0.08:
+            raise AssertionError(
+                f"signal@{vp_name}: microscope section is letterboxed or "
+                f"stretched; aspect {aspect:.2f} vs 1.63"
+            )
+
+        page.locator("#micro-tab-3d").click()
+        page.wait_for_timeout(400)
+        canvas = page.evaluate(
+            """() => {
+              const c = document.querySelector('#micro-canvas');
+              const r = c.getBoundingClientRect();
+              return { backing: c.width, css: r.width, dpr: window.devicePixelRatio };
+            }"""
+        )
+        scale = canvas["backing"] / max(canvas["css"], 1)
+        if scale < canvas["dpr"] - 0.05:
+            raise AssertionError(
+                f"signal@{vp_name}: 3D canvas renders below device pixel "
+                f"ratio ({scale:.2f} vs {canvas['dpr']}) and will look soft"
+            )
+        page.close()
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
@@ -965,11 +1127,16 @@ def main() -> int:
             check_signal_interactions(browser)
             check_keyboard_focus(browser)
             check_reduced_motion(browser)
+        if MODE in {"all", "design"}:
+            check_design_system(browser)
+            check_media_scaling(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
     if MODE in {"all", "behavior"}:
         print("PASS: interactions, keyboard focus, reduced motion, console, network")
+    if MODE in {"all", "design"}:
+        print("PASS: contrast, touch targets, type scale, overflow, media scaling")
     return 0
 
 
