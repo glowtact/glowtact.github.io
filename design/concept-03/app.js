@@ -123,19 +123,25 @@ function createRoughness(seed) {
 
   for (let row = 0; row < gridSize; row += 1) {
     for (let column = 0; column < gridSize; column += 1) {
-      const radiusMajor = 0.026 + random() * 0.034;
-      const radiusMinor = 0.019 + random() * 0.025;
+      const radiusMajor = 0.03 + random() * 0.024;
+      const radiusMinor = 0.022 + random() * 0.02;
       const angle = random() * Math.PI;
       const shoulderAngle = random() * Math.PI * 2;
       const shoulderDistance = radiusMajor * (0.35 + random() * 0.65);
       asperities.push({
-        x: (column + 0.06 + random() * 0.88) / gridSize,
-        y: (row + 0.06 + random() * 0.88) / gridSize,
+        // Sandpaper grit is sieve-graded: the size and height dispersion is
+        // narrow. The earlier 0.5-1.12 height spread buried the short half of
+        // the population in the base relief, which halved the APPARENT grain
+        // density even though the count was right. Tight jitter and a raised
+        // height floor keep every grain visible, so the drawn density matches
+        // the true ~9 um period.
+        x: (column + 0.22 + random() * 0.56) / gridSize,
+        y: (row + 0.22 + random() * 0.56) / gridSize,
         radiusMajor,
         radiusMinor,
         angle,
         cuspPower: 0.72 + random() * 0.66,
-        height: 0.5 + random() * 0.62,
+        height: 0.68 + random() * 0.38,
         shoulderX: Math.cos(shoulderAngle) * shoulderDistance,
         shoulderY: Math.sin(shoulderAngle) * shoulderDistance,
         shoulderScale: 0.72 + random() * 0.68,
