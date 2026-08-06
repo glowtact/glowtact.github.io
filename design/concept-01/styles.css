@@ -980,14 +980,17 @@ fieldset legend {
   font-size: var(--t-label);
 }
 
-.site-footer > a:last-child {
+.site-footer > a {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  justify-self: end;
   gap: 16px;
   font-weight: 700;
   text-decoration: none;
+}
+
+.site-footer > a:last-child {
+  justify-self: end;
 }
 
 @media (max-width: 1050px) {

@@ -89,7 +89,7 @@ main {
 }
 
 .review-header {
-  min-height: 96px;
+  min-height: 88px;
   display: flex;
   align-items: center;
   justify-content: space-between;
