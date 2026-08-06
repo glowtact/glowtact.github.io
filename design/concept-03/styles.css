@@ -40,9 +40,9 @@
    * every small-text rule now maps to fine (annotations), label (readouts and
    * controls) or title (panel headings).
    */
-  --text-fine: 10px;
-  --text-label: 12px;
-  --text-title: 14px;
+  --text-fine: 12px;
+  --text-label: 14px;
+  --text-title: 16px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: var(--readout);
   background: var(--camera-black);
@@ -2394,6 +2394,6 @@ main {
 .build-stamp {
   opacity: 0.45;
   font-family: monospace;
-  font-size: 10px;
+  font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }

@@ -1318,7 +1318,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
     context.stroke();
   }
 
-  const labelSize = Math.max(Math.round(width * 0.017), 9 * pixelRatio);
+  const labelSize = Math.max(Math.round(width * 0.019), 11 * pixelRatio);
   context.font = `${labelSize}px "Cascadia Mono", Consolas, monospace`;
   context.fillStyle = "rgba(222, 229, 222, 0.52)";
   context.textAlign = "left";

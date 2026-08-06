@@ -28,14 +28,16 @@ for rel in PAGES:
     path = os.path.join(ROOT, rel)
     src = open(path, encoding="utf-8").read()
     marker = f'<span class="build-stamp" aria-hidden="true">{stamp}</span>'
-    if 'class="build-stamp"' in src:
-        out, n = re.subn(
-            r'<span class="build-stamp" aria-hidden="true">[^<]*</span>',
-            marker, src,
-        )
-    else:
-        out, n = re.subn(r"(</footer>)", f"  {marker}\n    \\1", src, count=1)
-    if n != 1:
-        raise SystemExit(f"{rel}: expected exactly one stamp point, found {n}")
+    # Strip any existing stamp first, then insert before the LAST </footer>.
+    # Matching the first one once planted the stamp inside concept-03's
+    # in-panel readout footer instead of the page footer.
+    src = re.sub(
+        r'\s*<span class="build-stamp" aria-hidden="true">[^<]*</span>',
+        "", src,
+    )
+    anchor = src.rfind("</footer>")
+    if anchor == -1:
+        raise SystemExit(f"{rel}: no </footer> found")
+    out = src[:anchor] + f"  {marker}\n    " + src[anchor:]
     open(path, "w", encoding="utf-8").write(out)
     print(f"{rel}: {stamp}")

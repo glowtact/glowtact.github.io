@@ -7,8 +7,8 @@
    * Every fixed size now snaps to one of these steps; display headings keep
    * their clamp() rules because they are genuinely fluid.
    */
-  --t-micro: 10px;
-  --t-label: 12px;
+  --t-micro: 12px;
+  --t-label: 14px;
   --t-body: 16px;
   --t-lead: 18px;
   --t-h3: 22px;
@@ -628,6 +628,6 @@ tbody td {
 .build-stamp {
   opacity: 0.45;
   font-family: monospace;
-  font-size: 10px;
+  font-size: var(--t-micro);
   letter-spacing: 0.08em;
 }
