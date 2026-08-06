@@ -1060,11 +1060,11 @@ main {
 }
 
 .micro-contact-segment {
-  fill: none;
+  /* A filled seam that hugs the interface, not a stroked curve over it. */
+  fill: var(--signal-amber-bright);
   stroke: var(--signal-amber-bright);
-  stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.45;
+  stroke-width: 0.8;
   opacity: calc(0.32 + var(--coupling-strength) * 0.68);
   filter: drop-shadow(0 0 2px rgba(244, 184, 64, calc(var(--coupling-strength) * 0.32)));
 }

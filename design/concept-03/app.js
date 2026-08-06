@@ -1112,17 +1112,43 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
       0
     );
     const capCurvature = Math.min(1.1 + maxIndentation * 6.2, 3.4);
-    const lift = 1.2;
-    let d = "";
     const half = sampleSpacing / 2;
     const first = run[0];
     const last = run[run.length - 1];
-    const inner = run
-      .map((point) => `L${point.x.toFixed(2)} ${(point.y - lift).toFixed(2)}`)
+
+    /*
+     * Fill the coupled SEAM, bounded above by the membrane underside and
+     * below by the gel surface -- that pair of curves is what "optically
+     * coupled" means here, so the mark conforms to the interface by
+     * construction. A stroked polyline floating 1.2px above the surface
+     * read as a plotted line instead: at high compression the gel is drawn
+     * pressed nearly flat, leaving a bright zig-zag hovering over it with
+     * no visible attachment to either surface.
+     *
+     * The seam closes to a hairline as coupling completes (that is the
+     * physics), so a minimum drawn thickness keeps it legible without
+     * detaching it from the gel contour it follows.
+     */
+    const MIN_SEAM = 1.7;
+    const edge = (point, offset) => {
+      const bottom = point.y;
+      const membraneY = membranePoints[point.index].y;
+      const top = Math.min(membraneY, bottom - MIN_SEAM);
+      return { x: point.x + offset, top, bottom };
+    };
+    const columns = [
+      edge(first, -half),
+      ...run.map((point) => edge(point, 0)),
+      edge(last, half)
+    ];
+    const tops = columns
+      .map((c, i) => `${i === 0 ? "M" : "L"}${c.x.toFixed(2)} ${c.top.toFixed(2)}`)
       .join(" ");
-    d = `M${(first.x - half).toFixed(2)} ${(first.y - lift).toFixed(2)} ` +
-        inner +
-        ` L${(last.x + half).toFixed(2)} ${(last.y - lift).toFixed(2)}`;
+    const bottoms = [...columns]
+      .reverse()
+      .map((c) => `L${c.x.toFixed(2)} ${c.bottom.toFixed(2)}`)
+      .join(" ");
+    const d = `${tops} ${bottoms} Z`;
     plateauWidths.push(drawnWidth);
     contactCapWidths.push(drawnWidth);
     contactFootprintWidths.push(drawnWidth);
