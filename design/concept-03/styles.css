@@ -1007,7 +1007,7 @@ main {
    * Constraining width lets aspect-ratio hold the proportion exactly while
    * still bounding the height that feeds the 920px shell budget.
    */
-  max-width: 488px;
+  max-width: 400px;
   margin-inline: auto;
   aspect-ratio: 520 / 320;
 }
@@ -1167,7 +1167,14 @@ main {
    * from the column width; the response is a centred disc, so losing the
    * strict 4:3 costs nothing.
    */
-  max-height: 220px;
+  /*
+   * Sized as the sensor's actual ROI (320x240) and centred in its column:
+   * the stage previously computed a 293px width from its height cap and
+   * then sat flush left, which read as off-centre on the page.
+   */
+  max-height: 240px;
+  max-width: 320px;
+  margin-inline: auto;
   min-height: 0;
   overflow: hidden;
   background:

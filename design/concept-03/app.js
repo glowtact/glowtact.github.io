@@ -673,6 +673,15 @@ function contactChordUnits(ratio) {
   return ratio > 0 ? Math.max(10, 14 + Math.sqrt(ratio) * 104) : 0;
 }
 
+/**
+ * Width of membrane the camera images, in device-view units. 260 units
+ * (about a third of the drawn sensor) keeps the full-compression contact
+ * patch at ~45% of the frame: clearly dominant, with enough surrounding
+ * field that it reads as a patch seen by a camera rather than a zoomed
+ * crop of the contact itself.
+ */
+const CAMERA_VIEW_SPAN = 260;
+
 /** Lowest edge of the #macro-indenter outline in SVG coordinates. */
 const MACRO_INDENTER_TIP_Y = 197;
 
@@ -1080,53 +1089,50 @@ function renderMicro2D(pressure, contactModel = microContactModel(couplingPressu
   const plateauWidths = [];
   const contactCapWidths = [];
   const contactFootprintWidths = [];
+  /*
+   * One amber path per CONTACT RUN, tracing the flattened surface for the
+   * run's full extent. The old rendering drew a small (max 24px) cap at each
+   * peak inside the run, so at high pressure -- when contact is a nearly
+   * continuous plateau -- the highlight showed a row of beads over a surface
+   * that was drawn pressed flat, and its total extent could never match the
+   * LOCAL WINDOW percentage. The highlighted length now IS the coupled
+   * length: the sum of run widths over the section width tracks the coupled
+   * fraction by construction.
+   */
+  const sampleSpacing = 464 / (PROFILE_SIZE - 1);
   const appendContactRun = () => {
     if (!run.length) return;
-    const peakPoints = run.filter((point) => {
-      const previous = surfaceProfile[Math.max(point.index - 1, 0)];
-      const next = surfaceProfile[Math.min(point.index + 1, surfaceProfile.length - 1)];
-      return surfaceProfile[point.index] >= previous && surfaceProfile[point.index] >= next;
-    });
-    const peaks = peakPoints.length
-      ? peakPoints
-      : [
-          run.reduce((highest, point) =>
-            surfaceProfile[point.index] > surfaceProfile[highest.index]
-              ? point
-              : highest
-          )
-        ];
-
-    peaks.forEach((peak) => {
-      const localIndentation = contactIndentations[peak.index];
-      const capWidth = Math.min(
-        24,
-        Math.max(7.5, 5.5 + Math.sqrt(Math.max(localIndentation, 0)) * 18)
-      );
-      const footprintWidth = Math.max(
-        capWidth / 0.54,
-        22 + Math.sqrt(Math.max(localIndentation, 0)) * 46
-      );
-      const capCurvature = Math.min(1.1 + localIndentation * 6.2, 3.4);
-      const centerX = peak.x;
-      const leftX = centerX - capWidth / 2;
-      const rightX = centerX + capWidth / 2;
-      const edgeY = peak.y + capCurvature * 0.35 - 1.1;
-      const centerY = peak.y - capCurvature * 0.48 - 1.1;
-      plateauWidths.push(capWidth);
-      contactCapWidths.push(capWidth);
-      contactFootprintWidths.push(footprintWidth);
-      const contact = document.createElementNS(SVG_NS, "path");
-      contact.setAttribute("class", "micro-contact-segment");
-      contact.dataset.capCurvature = capCurvature.toFixed(3);
-      contact.dataset.capWidth = capWidth.toFixed(2);
-      contact.dataset.footprintWidth = footprintWidth.toFixed(2);
-      contact.setAttribute(
-        "d",
-        `M${leftX.toFixed(2)} ${edgeY.toFixed(2)} Q${centerX.toFixed(2)} ${centerY.toFixed(2)} ${rightX.toFixed(2)} ${edgeY.toFixed(2)}`
-      );
-      microContactPoints.append(contact);
-    });
+    // Each sample owns one spacing-wide cell; summing endpoint differences
+    // instead under-counted every run by one cell (a fencepost per run,
+    // ~12pp across a fragmented mid-pressure state).
+    const width = run[run.length - 1].x - run[0].x + sampleSpacing;
+    const drawnWidth = width;
+    const maxIndentation = run.reduce(
+      (maximum, point) => Math.max(maximum, contactIndentations[point.index]),
+      0
+    );
+    const capCurvature = Math.min(1.1 + maxIndentation * 6.2, 3.4);
+    const lift = 1.2;
+    let d = "";
+    const half = sampleSpacing / 2;
+    const first = run[0];
+    const last = run[run.length - 1];
+    const inner = run
+      .map((point) => `L${point.x.toFixed(2)} ${(point.y - lift).toFixed(2)}`)
+      .join(" ");
+    d = `M${(first.x - half).toFixed(2)} ${(first.y - lift).toFixed(2)} ` +
+        inner +
+        ` L${(last.x + half).toFixed(2)} ${(last.y - lift).toFixed(2)}`;
+    plateauWidths.push(drawnWidth);
+    contactCapWidths.push(drawnWidth);
+    contactFootprintWidths.push(drawnWidth);
+    const contact = document.createElementNS(SVG_NS, "path");
+    contact.setAttribute("class", "micro-contact-segment");
+    contact.dataset.capCurvature = capCurvature.toFixed(3);
+    contact.dataset.capWidth = drawnWidth.toFixed(2);
+    contact.dataset.footprintWidth = drawnWidth.toFixed(2);
+    contact.setAttribute("d", d);
+    microContactPoints.append(contact);
     run = [];
   };
 
@@ -1374,7 +1380,6 @@ function render(value) {
    * at full compression the patch spans ~65% of the frame, exactly like
    * the chord under the indenter.
    */
-  const CAMERA_VIEW_SPAN = 180;
   const cameraSpan =
     ratio > 0
       ? Math.max(8, (contactChordUnits(ratio) / CAMERA_VIEW_SPAN) * 100)

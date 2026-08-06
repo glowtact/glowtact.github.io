@@ -621,24 +621,18 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(
             "signal: 2D contact-cap metrics do not match contact segments"
         )
-    if any(width > 28 for width in contact_cap_widths):
-        raise AssertionError(
-            f"signal: 2D coupling caps are too wide for peak-top contact: {contact_cap_widths}"
-        )
-    footprint_widths_value = page.locator("#micro-svg").get_attribute(
-        "data-contact-footprint-widths"
+    # The amber highlight now traces each contact run for its full extent,
+    # so its summed length over the 464px section must track the coupled
+    # fraction -- that agreement is the whole point of the highlight.
+    coupled_area_55 = float(
+        page.locator("#micro-svg").get_attribute("data-contact-area") or 0
     )
-    if footprint_widths_value is None:
-        raise AssertionError("signal: 2D contact-footprint metrics are missing")
-    footprint_widths = [
-        float(value) for value in footprint_widths_value.split(",") if value
-    ]
-    for cap_width, footprint_width in zip(contact_cap_widths, footprint_widths):
-        if footprint_width > 0 and cap_width > footprint_width * 0.68:
-            raise AssertionError(
-                "signal: 2D yellow cap covers too much of the asperity footprint; "
-                f"cap={cap_width:.2f}, footprint={footprint_width:.2f}"
-            )
+    highlighted_fraction = sum(contact_cap_widths) / 464
+    if abs(highlighted_fraction - coupled_area_55) > 0.1:
+        raise AssertionError(
+            f"signal: 2D highlight covers {highlighted_fraction:.1%} of the "
+            f"section but the model couples {coupled_area_55:.1%}"
+        )
     shared_mask_signature = page.locator("#micro-svg").get_attribute(
         "data-contact-mask-signature"
     )
@@ -750,10 +744,15 @@ def check_signal_interactions(browser) -> None:
     high_pressure_cap_widths = [
         float(value) for value in high_pressure_cap_widths_value.split(",") if value
     ]
-    if any(width > 28 for width in high_pressure_cap_widths):
+    high_pressure_area = float(
+        page.locator("#micro-svg").get_attribute("data-contact-area") or 0
+    )
+    high_pressure_highlight = sum(high_pressure_cap_widths) / 464
+    if abs(high_pressure_highlight - high_pressure_area) > 0.1:
         raise AssertionError(
-            "signal: high-pressure microscope coupling caps are too wide: "
-            f"{high_pressure_cap_widths}"
+            f"signal: at full pressure the 2D highlight covers "
+            f"{high_pressure_highlight:.1%} but the model couples "
+            f"{high_pressure_area:.1%}"
         )
     high_pressure_macro_chord = page.locator("#macro-coupling-line").get_attribute(
         "data-coupling-chord-width"
@@ -1213,7 +1212,7 @@ def check_coupling_readability(browser) -> None:
               return b.width / s.width;
             }"""
         )
-        expected = law / 180
+        expected = page.evaluate("(l) => l / CAMERA_VIEW_SPAN", law)
         if abs(cam - expected) > 0.07:
             raise AssertionError(
                 f"signal@{pct}%: camera patch spans {cam:.0%} of the frame "
