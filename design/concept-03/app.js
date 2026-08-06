@@ -352,7 +352,7 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
       reflection: "Diffuse reflection",
       intensity: "No signal",
       copy:
-        "The indenter is approaching the membrane. A thin microscopic air gap still separates the membrane from the gel, so the camera sees no dark contact signal."
+        "An air gap still separates membrane and gel; the camera sees no contact signal."
     };
   }
 
@@ -364,7 +364,7 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
       reflection: "Reduced locally",
       intensity: "Reduced",
       copy:
-        "Pressure closes local gaps. The black membrane begins to absorb light where it optically couples to the gel."
+        "Local gaps close; the membrane absorbs light wherever it couples."
     };
   }
 
@@ -375,7 +375,7 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
     reflection: "Further reduced",
     intensity: "Dark region",
     copy:
-      "Contact islands merge until only the deepest valleys still trap air. The absorbing region stops spreading and keeps darkening as contact grows more intimate."
+      "Contact islands merge; only the deepest valleys trap air, and the dark region deepens."
   };
 }
 
