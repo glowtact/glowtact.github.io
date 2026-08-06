@@ -176,7 +176,7 @@ main {
   grid-template-columns: 110px minmax(480px, 1.35fr) minmax(280px, 0.65fr);
   grid-template-rows: auto 1fr auto;
   gap: 48px;
-  padding-block: 112px 40px;
+  padding-block: 96px 48px;
 }
 
 .hero-index {

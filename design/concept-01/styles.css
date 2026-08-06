@@ -899,7 +899,7 @@ fieldset legend {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 40px;
+  padding: 48px;
   color: var(--acrylic-bright);
   background: var(--nitrile);
 }

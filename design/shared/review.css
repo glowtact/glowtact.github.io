@@ -136,7 +136,7 @@ main {
   grid-template-columns: minmax(120px, 0.8fr) minmax(520px, 2.4fr) minmax(260px, 1fr);
   gap: 32px;
   align-items: end;
-  padding-block: 120px 88px;
+  padding-block: 144px 96px;
 }
 
 .review-kicker {
@@ -375,7 +375,7 @@ main {
 }
 
 .concept-copy {
-  padding: 40px;
+  padding: 48px;
 }
 
 .concept-index,
@@ -448,7 +448,7 @@ main {
   display: grid;
   grid-template-columns: 0.7fr 2fr;
   gap: 48px;
-  padding-block: 112px;
+  padding-block: 96px;
   border-top: 1px solid var(--review-rule);
 }
 
@@ -503,7 +503,7 @@ tbody td {
   .review-intro {
     min-height: auto;
     grid-template-columns: 1fr;
-    padding-block: 80px 64px;
+    padding-block: 96px 64px;
   }
 
   .review-kicker {
@@ -567,7 +567,7 @@ tbody td {
   }
 
   .concepts {
-    padding-block: 32px 88px;
+    padding-block: 32px 96px;
   }
 
   .concept-card,
@@ -593,7 +593,7 @@ tbody td {
   }
 
   .comparison {
-    padding-block: 80px;
+    padding-block: 96px;
   }
 
   .review-footer {
