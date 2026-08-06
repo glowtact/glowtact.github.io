@@ -88,12 +88,16 @@ def main() -> None:
         message += "\n\n" + open(args.body, encoding="utf-8").read().strip()
     message += "\n\n" + TRAILER
     run(["git", "commit", "-m", message])
-    run(["git", "push", "origin", "main"])
+
     head = subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"],
         capture_output=True, text=True, cwd=ROOT,
     ).stdout.strip()
-    print(f"release: pushed {head}")
+    run([sys.executable, os.path.join("design", "tools", "stamp.py")])
+    run(["git", "add", "design"])
+    run(["git", "commit", "-m", f"chore(design): stamp {head}\n\n{TRAILER}"])
+    run(["git", "push", "origin", "main"])
+    print(f"release: pushed {head} (+stamp)")
 
 
 if __name__ == "__main__":
