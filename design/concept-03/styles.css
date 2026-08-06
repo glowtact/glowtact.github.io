@@ -570,8 +570,11 @@ main {
 
 .mechanism-grid {
   display: grid;
-  /* Was 1.92 / 0.72 -- the microscope column held 27% of the width. */
-  grid-template-columns: minmax(0, 1.72fr) minmax(360px, 0.88fr);
+  /*
+   * 6:4. The microscope and sensor views carry as much of the explanation
+   * as the device schematic, and at 1.72/0.88 (66/34) they were cramped.
+   */
+  grid-template-columns: minmax(0, 6fr) minmax(380px, 4fr);
   grid-template-rows: minmax(300px, auto) minmax(250px, auto);
 }
 
@@ -1007,7 +1010,7 @@ main {
    * Constraining width lets aspect-ratio hold the proportion exactly while
    * still bounding the height that feeds the 920px shell budget.
    */
-  max-width: 400px;
+  max-width: 460px;
   margin-inline: auto;
   aspect-ratio: 520 / 320;
 }
@@ -1172,8 +1175,8 @@ main {
    * the stage previously computed a 293px width from its height cap and
    * then sat flush left, which read as off-centre on the page.
    */
-  max-height: 240px;
-  max-width: 320px;
+  max-height: 220px;
+  max-width: 293px;
   margin-inline: auto;
   min-height: 0;
   overflow: hidden;

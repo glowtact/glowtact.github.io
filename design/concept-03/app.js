@@ -113,6 +113,16 @@ function seededRandom(seed) {
  */
 function createRoughness(seed) {
   const random = seededRandom(seed);
+  // Grain PROFILE, measured rather than styled. The falloff constant used
+  // to be 2.7, which leaves exp(-2.7) = 7% of peak height at the nominal
+  // radius: grains were effectively far smaller than the radius said, so
+  // they never reached their neighbours and 60% of the field was flat land
+  // with isolated spikes (p99 was 5.5x the median). At 1.1 a grain still
+  // has a third of its height where it meets the next one, and cuspPower
+  // near 2 makes it a dome rather than a cusp. Sieve-graded abrasive also
+  // has a narrow height spread, so the random height band is tight.
+  // Result: p99/median 5.5x -> 2.6x, flat land 60% -> 19%.
+  //
   // P2500 grit averages ~8.4 um across, so a ~100 um window holds roughly a
   // dozen asperities per axis -- and in a molded sandpaper texture the grains
   // ABUT: there is no flat land between them. Pitch sets the count (12x12);
@@ -141,8 +151,8 @@ function createRoughness(seed) {
         radiusMajor,
         radiusMinor,
         angle,
-        cuspPower: 0.72 + random() * 0.66,
-        height: 0.68 + random() * 0.38,
+        cuspPower: 1.8 + random() * 0.5,
+        height: 0.82 + random() * 0.18,
         shoulderX: Math.cos(shoulderAngle) * shoulderDistance,
         shoulderY: Math.sin(shoulderAngle) * shoulderDistance,
         shoulderScale: 0.72 + random() * 0.68,
@@ -172,7 +182,7 @@ function createRoughness(seed) {
       );
       const mainHeight =
         asperity.height *
-        Math.exp(-Math.pow(distance, asperity.cuspPower) * 2.7);
+        Math.exp(-Math.pow(distance, asperity.cuspPower) * 1.1);
       const shoulderDx = dx - asperity.shoulderX;
       const shoulderDy = dy - asperity.shoulderY;
       const shoulderX = shoulderDx * cosine + shoulderDy * sine;

@@ -15,6 +15,8 @@ the guards encode the acceptance criteria below.
 | `INTIMACY_DEPTH` | 0.055 | Penetration for full optical intimacy | Measured to act as near-pure gain (0.055–0.22 all give the same curve shape); low end maximizes saturation |
 | `CONTACT_FLOOR` | 0.55 | Optical coupling of a barely-touching patch | |
 | `FIELD_SIZE` / `PROFILE_SIZE` | 61 / 97 | Field & section sampling | Resolves the 12×12 grain population without aliasing |
+| grain falloff / `cuspPower` | 1.1 / 1.8–2.3 | Grain profile shape | At the old 2.7 falloff a grain kept only 7% of its height at its nominal radius, so grains never met: 60% flat land, p99 = 5.5× median. At 1.1 with dome-shaped cusps: 19% land, p99 = 2.6× median (sieve-graded grit is ~2×) |
+| `height` spread | 0.82–1.00 | Grain height band | Sieve-graded abrasive has a narrow height distribution |
 | `gridSize` (createRoughness) | 12 | Grains per axis | = ~9 µm period in the ~100 µm window; radii sized so grains abut (sieve-graded sandpaper, no flat land) |
 
 ## Cross-view consistency (single source of truth)
