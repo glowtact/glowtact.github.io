@@ -2397,29 +2397,3 @@ main {
   font-size: var(--text-fine);
   letter-spacing: 0.08em;
 }
-
-/* ---- Bilingual layer: English is the source language and the default.
-   The zh strings ship in the same page as verified derivatives; the
-   toggle only flips visibility, so interactive state survives. ---- */
-html[data-lang="zh"] .lang-en { display: none !important; }
-html:not([data-lang="zh"]) .lang-zh { display: none !important; }
-
-.lang-toggle {
-  min-width: 44px;
-  min-height: 44px;
-  justify-self: end;
-  margin-left: 18px;
-  border: 1px solid var(--optic-ring);
-  color: var(--readout-secondary);
-  background: transparent;
-  font-family: var(--font-mono);
-  font-size: var(--text-label);
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: color 140ms var(--ease-out), border-color 140ms var(--ease-out);
-}
-
-.lang-toggle:hover {
-  color: var(--signal-amber-bright);
-  border-color: rgba(244, 184, 64, 0.4);
-}

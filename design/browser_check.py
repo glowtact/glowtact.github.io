@@ -1222,48 +1222,6 @@ def check_coupling_readability(browser) -> None:
     page.close()
 
 
-def check_bilingual_pairs(browser) -> None:
-    """Every English narrative span must have a Chinese sibling and vice
-    versa -- the zh layer is a derivative of the en source, and an orphan
-    on either side means the translation drifted (bilingual-pages rule)."""
-    page = browser.new_page(viewport=VIEWPORTS["desktop"])
-    block_media(page)
-    navigate(page, ROUTES["signal"])
-    orphans = page.evaluate(
-        """() => {
-          const bad = [];
-          document.querySelectorAll('.lang-en, .lang-zh').forEach((el) => {
-            const parent = el.parentElement;
-            const en = parent.querySelectorAll(':scope > .lang-en').length;
-            const zh = parent.querySelectorAll(':scope > .lang-zh').length;
-            if (en !== zh) {
-              bad.push({
-                cls: el.className,
-                text: (el.textContent || '').trim().slice(0, 40)
-              });
-            }
-          });
-          return bad;
-        }"""
-    )
-    if orphans:
-        raise AssertionError(
-            f"signal: bilingual desync, {len(orphans)} orphan spans: "
-            f"{orphans[:4]}"
-        )
-    # Default must be English with the zh layer hidden.
-    lang = page.evaluate("document.documentElement.dataset.lang || 'en'")
-    if lang != "en":
-        raise AssertionError(f"signal: default language is {lang}, not en")
-    zh_visible = page.evaluate(
-        """() => [...document.querySelectorAll('.lang-zh')]
-             .some((el) => el.offsetParent !== null)"""
-    )
-    if zh_visible:
-        raise AssertionError("signal: zh spans visible in the default state")
-    page.close()
-
-
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
@@ -1284,7 +1242,6 @@ def main() -> int:
             check_design_system(browser)
             check_media_scaling(browser)
             check_coupling_readability(browser)
-            check_bilingual_pairs(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
@@ -1293,7 +1250,7 @@ def main() -> int:
     if MODE in {"all", "design"}:
         print(
             "PASS: contrast, touch targets, type scale, overflow, "
-            "media scaling, coupling readability, bilingual sync"
+            "media scaling, coupling readability"
         )
     return 0
 
