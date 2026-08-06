@@ -188,7 +188,7 @@ main {
   border-right: 1px solid var(--registration);
   color: var(--graphite-faint);
   font-size: var(--t-micro);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 }
@@ -641,7 +641,7 @@ main {
   color: var(--graphite-faint);
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -797,7 +797,7 @@ input[type="range"]::-moz-range-thumb {
   color: var(--paper-light);
   background: var(--graphite);
   font-size: var(--t-micro);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -890,7 +890,7 @@ input[type="range"]::-moz-range-thumb {
   margin: 0;
   color: var(--graphite-faint);
   font-size: var(--t-micro);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -1034,7 +1034,7 @@ input[type="range"]::-moz-range-thumb {
 .geometry-figure figcaption > span {
   color: var(--graphite-faint);
   font-size: var(--t-micro);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -1092,7 +1092,7 @@ input[type="range"]::-moz-range-thumb {
   color: var(--measure-amber);
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 

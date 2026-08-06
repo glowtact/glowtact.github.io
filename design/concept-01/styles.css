@@ -301,7 +301,7 @@ main {
   color: var(--secondary-ink);
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -331,7 +331,7 @@ fieldset legend {
   color: var(--tertiary-ink);
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -537,7 +537,7 @@ fieldset legend {
   fill: var(--tertiary-ink);
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .diagram-legend .legend-amber { fill: var(--led-amber); }

@@ -156,7 +156,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
 }
 
 .status-lamp {
@@ -180,7 +180,7 @@ main {
   align-items: center;
   color: var(--readout-secondary);
   font-size: var(--text-label);
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-decoration: none;
   text-transform: uppercase;
   transition: color 140ms var(--ease-out);
@@ -232,7 +232,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -430,7 +430,7 @@ main {
   color: var(--signal-amber);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
 }
 
 .hero-figure figcaption p {
@@ -453,7 +453,7 @@ main {
   box-shadow: inset 0 1px var(--optic-ring);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
 }
 
 .hero-status span {
@@ -549,7 +549,7 @@ main {
   color: var(--readout);
   font-size: var(--text-label);
   font-weight: 650;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 .toolbar-identity div > span,
@@ -557,7 +557,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
 }
 
 .toolbar-status {
@@ -617,7 +617,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
 }
 
 .view-header h3 {
@@ -818,7 +818,7 @@ main {
   fill: rgba(9, 16, 13, 0.82);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 .macro-fov {
@@ -1315,7 +1315,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .sequence-control button {
@@ -1608,7 +1608,7 @@ main {
   color: var(--signal-amber);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .capability-stack h3 {
@@ -1653,7 +1653,7 @@ main {
   color: var(--signal-amber);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .form-glyph {
@@ -1849,7 +1849,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .research-meta dd {
@@ -1890,7 +1890,7 @@ main {
   color: var(--readout-dim);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-decoration: none;
   text-transform: uppercase;
 }

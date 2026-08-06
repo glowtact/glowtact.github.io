@@ -229,7 +229,7 @@ main {
   bottom: 20px;
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
 }
 
 .preview-stage--optical {
@@ -297,7 +297,7 @@ main {
   left: 24px;
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
 }
 
 .atlas-specimen {
@@ -384,7 +384,7 @@ main {
   color: var(--review-muted);
   font-size: var(--t-micro);
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
