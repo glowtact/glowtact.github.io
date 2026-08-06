@@ -343,16 +343,33 @@ const EXPANDED_COUPLING_AREA = 0.4;
  * The narrated state is read from the coupled area rather than from the slider
  * position, so the caption always describes what the views actually show.
  */
+/**
+ * Bilingual copy for the dynamic readouts. English is the source language
+ * and every machine-readable surface (dataset attributes, aria labels,
+ * canvas captions) stays English; the zh strings are display derivatives
+ * selected at render time.
+ */
+function currentLang() {
+  return document.documentElement.dataset.lang === "zh" ? "zh" : "en";
+}
+
+function pick(text) {
+  return typeof text === "string" ? text : text[currentLang()];
+}
+
 function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(pressure))) {
   if (pressure < INDENTER_CONTACT_PRESSURE || coupledArea < LOCAL_COUPLING_AREA) {
     return {
       key: "gap",
       index: "STATE 00",
       title: "Air gap",
-      reflection: "Diffuse reflection",
-      intensity: "No signal",
-      copy:
-        "An air gap still separates membrane and gel; the camera sees no contact signal."
+      titleZh: "气隙",
+      reflection: { en: "Diffuse reflection", zh: "漫反射" },
+      intensity: { en: "No signal", zh: "无信号" },
+      copy: {
+        en: "An air gap still separates membrane and gel; the camera sees no contact signal.",
+        zh: "气隙仍隔开薄膜与凝胶；相机看不到接触信号。"
+      }
     };
   }
 
@@ -361,10 +378,13 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
       key: "local",
       index: "STATE 01",
       title: "Local coupling",
-      reflection: "Reduced locally",
-      intensity: "Reduced",
-      copy:
-        "Local gaps close; the membrane absorbs light wherever it couples."
+      titleZh: "局部耦合",
+      reflection: { en: "Reduced locally", zh: "局部减弱" },
+      intensity: { en: "Reduced", zh: "减弱" },
+      copy: {
+        en: "Local gaps close; the membrane absorbs light wherever it couples.",
+        zh: "局部间隙闭合；薄膜在耦合处吸收光。"
+      }
     };
   }
 
@@ -372,10 +392,13 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
     key: "expanded",
     index: "STATE 02",
     title: "Expanded coupling",
-    reflection: "Further reduced",
-    intensity: "Dark region",
-    copy:
-      "Contact islands merge; only the deepest valleys trap air, and the dark region deepens."
+    titleZh: "扩展耦合",
+    reflection: { en: "Further reduced", zh: "进一步减弱" },
+    intensity: { en: "Dark region", zh: "暗区" },
+    copy: {
+      en: "Contact islands merge; only the deepest valleys trap air, and the dark region deepens.",
+      zh: "接触岛屿合并；仅最深谷仍困住空气，暗区持续加深。"
+    }
   };
 }
 
@@ -1407,11 +1430,15 @@ function render(value) {
 
   if (pressureInput) pressureInput.value = String(percent);
   if (pressurePercent) pressurePercent.value = `${percent}%`;
-  if (toolbarState) toolbarState.value = state.title;
+  // Display surfaces pick the active language; aria labels and dataset
+  // attributes stay English (the machine-readable source language).
+  if (toolbarState) {
+    toolbarState.value = currentLang() === "zh" ? state.titleZh : state.title;
+  }
   if (stateIndex) stateIndex.textContent = state.index;
-  if (stateCopy) stateCopy.textContent = state.copy;
+  if (stateCopy) stateCopy.textContent = pick(state.copy);
   if (contactFraction) contactFraction.value = `${Math.round(ratio * 100)}%`;
-  if (cameraIntensity) cameraIntensity.value = state.intensity;
+  if (cameraIntensity) cameraIntensity.value = pick(state.intensity);
   if (microCanvas) {
     microCanvas.setAttribute(
       "aria-label",
@@ -1566,6 +1593,34 @@ window.addEventListener("resize", () => {
 });
 
 render(currentPressure);
+
+// ---- Language toggle: English default, zh opt-in, persisted. ----
+const langToggle = document.querySelector("#lang-toggle");
+
+function setLang(lang) {
+  if (lang === "zh") document.documentElement.dataset.lang = "zh";
+  else delete document.documentElement.dataset.lang;
+  try {
+    localStorage.setItem("gt-lang", lang);
+  } catch (storageError) {
+    /* private mode: session-only */
+  }
+  if (langToggle) langToggle.textContent = lang === "zh" ? "EN" : "中";
+  // Re-render so the dynamic readouts pick up the new language.
+  render(currentPressure);
+}
+
+langToggle?.addEventListener("click", () => {
+  setLang(document.documentElement.dataset.lang === "zh" ? "en" : "zh");
+});
+
+let storedLang = "en";
+try {
+  storedLang = localStorage.getItem("gt-lang") || "en";
+} catch (storageError) {
+  storedLang = "en";
+}
+if (storedLang === "zh") setLang("zh");
 setActiveMicroView("2d");
 if (microContext) canvasFallback?.setAttribute("hidden", "");
 revealContent();
