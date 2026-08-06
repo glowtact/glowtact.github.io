@@ -210,7 +210,9 @@ main {
   max-width: 600px;
   margin: 40px 0 32px;
   color: var(--secondary-ink);
-  font-size: clamp(17px, 1.4vw, 22px);
+  /* Floor raised 17 -> 18 so the 1280px rendering (17.92px) stops sitting
+     0.1px off the 18px lead step. */
+  font-size: clamp(18px, 1.4vw, 22px);
   line-height: 1.5;
   text-wrap: pretty;
 }
@@ -1192,4 +1194,11 @@ fieldset legend {
   .tactile-inset ellipse {
     transition: opacity 120ms linear;
   }
+}
+
+.build-stamp {
+  opacity: 0.45;
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }

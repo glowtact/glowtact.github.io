@@ -2390,3 +2390,10 @@ main {
     transition-duration: 0.01ms !important;
   }
 }
+
+.build-stamp {
+  opacity: 0.45;
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}

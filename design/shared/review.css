@@ -269,7 +269,7 @@ main {
   width: 24%;
   height: 32px;
   border-radius: 50%;
-  background: #d89213;
+  background: #d89122;
   filter: blur(2px);
 }
 
@@ -334,7 +334,7 @@ main {
 }
 
 .preview-stage--signal {
-  color: #e6a52e;
+  color: #e3a128;
   background:
     linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 100% 32px,
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 32px 100%,
@@ -623,4 +623,11 @@ tbody td {
     transform: none;
     transition: opacity 120ms linear;
   }
+}
+
+.build-stamp {
+  opacity: 0.45;
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
