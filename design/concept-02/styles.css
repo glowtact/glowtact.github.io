@@ -985,7 +985,12 @@ input[type="range"]::-moz-range-thumb {
 
 .geometry-image {
   position: relative;
-  min-height: 520px;
+  /*
+   * 520px of stage around a reconstruction that itself is mostly flat grey
+   * read as an empty plate. The stage now hugs the artwork: enough height
+   * for presence, no dead field above and below it.
+   */
+  min-height: 380px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -996,8 +1001,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .geometry-image img {
-  width: min(88%, 900px);
-  max-height: 440px;
+  width: min(92%, 900px);
+  max-height: 340px;
   object-fit: contain;
   filter: sepia(0.12) contrast(1.04);
 }
