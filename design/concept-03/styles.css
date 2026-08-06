@@ -1709,11 +1709,16 @@ main {
 .form-comparison h3 {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: clamp(30px, 3.15vw, 52px);
+  font-size: clamp(24px, 3.15vw, 52px);
   font-weight: 640;
   letter-spacing: -0.045em;
   text-transform: uppercase;
-  overflow-wrap: anywhere;
+  /*
+   * overflow-wrap: anywhere licensed arbitrary mid-word breaks, and at
+   * phone width OMNIDIRECTIONAL rendered as "OMNIDIRECTION AL". The floor
+   * of the size clamp drops instead, so the longest label fits whole.
+   */
+  overflow-wrap: normal;
 }
 
 .form-comparison p {
@@ -2293,7 +2298,7 @@ main {
   }
 
   .form-comparison h3 {
-    font-size: 30px;
+    font-size: 24px;
   }
 
   .evidence-secondary {
