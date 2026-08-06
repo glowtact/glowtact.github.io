@@ -28,6 +28,12 @@ the guards encode the acceptance criteria below.
 
 ## Rendering conventions (display only — bit-exact to physics)
 
+| Constant | Value | Meaning | Accepted bounds / notes |
+|---|---|---|---|
+| `MICRO_HEIGHT_EXAGGERATION` | 0.12 | 3D vertical exaggeration, canvas fraction per unit roughness | Measured: 0.24 drew grains at 1:1 (tall ones 2.35:1) against a ~0.2:1 physical aspect and read as needles; 0.12 gives ~0.5:1; below ~0.10 grains merge and the truncation stops reading |
+| `MIN_SEAM` (2D) | 1.7 px | Minimum drawn thickness of the coupled seam | The seam physically closes to a hairline at full coupling; this keeps it legible without detaching it from the gel contour it follows |
+
+
 - 2D section: gamma-stretched vertical exaggeration (`SECTION_DISPLAY_GAMMA`
   0.45); any strictly increasing map keeps the coupled fraction identical.
 - 3D deformation: per-vertex truncation at the membrane plane (`min(h, plane)`),

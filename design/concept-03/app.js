@@ -379,6 +379,21 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
   };
 }
 
+/**
+ * Vertical exaggeration of the 3D height field, as a fraction of the canvas
+ * height per unit of normalised roughness. Purely a display constant -- the
+ * contact model never sees it.
+ *
+ * Measured reference: at 0.24 a typical grain drew ~28px wide and ~28px tall
+ * (1:1) with tall grains at 2.35:1, against a physical P2500 aspect near
+ * 0.2:1. That reads as a bed of needles rather than a molded texture. At
+ * 0.12 the same grain is ~0.5:1 -- still exaggerated, as the panel declares,
+ * but it reads as molded relief while keeping the truncated flat tops that
+ * make the deformation legible. 0.09 was measured too: grains merge and the
+ * flattening stops reading.
+ */
+const MICRO_HEIGHT_EXAGGERATION = 0.12;
+
 /** Sub-samples per cell axis when measuring the coupled area of a cell. */
 const CELL_SUBSAMPLES = 4;
 
@@ -1203,7 +1218,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   const scaleX = (width * 0.84) / (FIELD_SIZE * 2);
   const scaleY = (height * 0.5) / (FIELD_SIZE * 2);
-  const heightScale = height * 0.24;
+  const heightScale = height * MICRO_HEIGHT_EXAGGERATION;
   const originX = width * 0.5;
   const originY = height * 0.34;
   const couplingPressure = couplingPressureFor(pressure);
