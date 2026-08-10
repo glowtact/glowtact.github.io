@@ -1,2 +1,8 @@
 .worktrees/
 __pycache__/
+
+# Raw source material (~435 MB of figures, slides, captures, video, meshes).
+# Deliberately not tracked: this repo is served by GitHub Pages and every
+# clone would otherwise pull the full set. See MATERIALS.md for the layout
+# and for how to move it between machines.
+materials/

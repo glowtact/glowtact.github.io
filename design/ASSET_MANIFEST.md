@@ -174,17 +174,21 @@ When an asset is missing:
 The three-concept review build uses the following deliberate derivatives. Source
 files remain unchanged.
 
+Source paths are relative to the repository root and live in the untracked
+`materials/` tree; see `../MATERIALS.md` for its layout and for how to obtain
+it on a new machine.
+
 | Review asset | Source |
 |---|---|
-| `assets/images/hero-teaser.jpg` | `../glowtact_materials/figures/teaser.png` |
-| `assets/images/fingerprint-pressure.jpg` | `../glowtact_materials/figures/fingerprints.png` |
-| `assets/images/reconstruction-overview.jpg` | `../glowtact_materials/figures/3d_recon.png` |
-| `assets/images/contact-geometry.jpg` | `../glowtact_materials/figures/glowtact_h.png` |
-| `assets/images/thread-mesh.png` | `../glowtact_materials/single_meshes_gt/single_meshes/glowtact_1_steep_01_screw_threads_mesh.png` |
-| `assets/images/phillips-mesh.png` | `../glowtact_materials/single_meshes_gt/single_meshes/glowtact_1_steep_04_philips_head_mesh.png` |
-| `assets/images/ball-array-mesh.png` | `../glowtact_materials/single_meshes_gt/single_meshes/glowtact_1_steep_03_cali_balls_mesh.png` |
+| `assets/images/hero-teaser.jpg` | `materials/figures/teaser.png` |
+| `assets/images/fingerprint-pressure.jpg` | `materials/figures/fingerprints.png` |
+| `assets/images/reconstruction-overview.jpg` | `materials/figures/3d_recon.png` |
+| `assets/images/contact-geometry.jpg` | `materials/figures/glowtact_h.png` |
+| `assets/images/thread-mesh.png` | `materials/meshes/flat/glowtact_1_steep_01_screw_threads_mesh.png` |
+| `assets/images/phillips-mesh.png` | `materials/meshes/flat/glowtact_1_steep_04_philips_head_mesh.png` |
+| `assets/images/ball-array-mesh.png` | `materials/meshes/flat/glowtact_1_steep_03_cali_balls_mesh.png` |
 | `assets/images/mms-contact-poster.jpg` | Midpoint frame extracted from `assets/video/mms-contact.mp4` |
-| `assets/video/mms-contact.mp4` | `../mms_gt.mp4` |
+| `assets/video/mms-contact.mp4` | `materials/video/mms_gt.mp4` |
 
 The JPEG derivatives use quality 88 and a maximum dimension of 2200 pixels.
 The video and mesh PNGs are byte-for-byte copies of the supplied source files.
