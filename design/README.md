@@ -59,3 +59,28 @@ python design/verify.py
 The review build is intentionally plain HTML, CSS, and JavaScript so every
 direction can be opened without installing a framework. The original Next.js
 recommendation above remains the production path after a direction is selected.
+
+## Published Site Root
+
+GitHub Pages serves this repository from `main:/`, so the bare domain needs a
+root page. `design/tools/publish.py` generates the repository-root
+`index.html` from `concept-03/index.html`, rewriting its relative references
+to resolve from the root:
+
+```powershell
+python design/tools/publish.py
+```
+
+Only `index.html` is generated. CSS, JS, images, and video are referenced
+where they already live under `design/`, so nothing is duplicated and the
+published page cannot drift from the reviewed one. The generated file carries
+a DO-NOT-EDIT banner; change `concept-03` and re-run the tool instead.
+
+`design/tools/release.py` runs the publish step automatically after each stamp
+and stages the root page alongside `design/`. To preview the published root
+exactly as Pages serves it, run the server from the repository root rather
+than from `design/`:
+
+```powershell
+python -m http.server 4173
+```

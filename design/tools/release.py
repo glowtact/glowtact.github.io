@@ -61,6 +61,7 @@ def main() -> None:
     args = parser.parse_args()
 
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
+    run([sys.executable, os.path.join("design", "tools", "publish.py")])
 
     if not args.skip_checks:
         run([sys.executable, os.path.join("design", "verify.py")])
@@ -75,7 +76,7 @@ def main() -> None:
             if server is not None:
                 server.terminate()
 
-    run(["git", "add", "design"])
+    run(["git", "add", "design", "index.html"])
     staged = subprocess.run(
         ["git", "diff", "--cached", "--quiet"], cwd=ROOT
     ).returncode
@@ -94,7 +95,8 @@ def main() -> None:
         capture_output=True, text=True, cwd=ROOT,
     ).stdout.strip()
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
-    run(["git", "add", "design"])
+    run([sys.executable, os.path.join("design", "tools", "publish.py")])
+    run(["git", "add", "design", "index.html"])
     run(["git", "commit", "-m", f"chore(design): stamp {head}\n\n{TRAILER}"])
     run(["git", "push", "origin", "main"])
     print(f"release: pushed {head} (+stamp)")

@@ -1,0 +1,664 @@
+<!doctype html>
+<!--
+  GENERATED FILE - DO NOT EDIT.
+  Produced from design/concept-03/index.html by design/tools/publish.py.
+  Edit the concept, then re-run the tool (or design/tools/release.py).
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="GlowTact Signal Chamber: a teaser-led interactive explanation of pressure-induced optical coupling."
+    >
+    <title>GlowTact — Signal Chamber</title>
+    <link rel="stylesheet" href="./design/concept-03/styles.css">
+    <script src="./design/concept-03/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="instrument-header">
+      <a class="instrument-brand" href="./" aria-label="Back to GlowTact concept review">
+        <span class="status-lamp" aria-hidden="true"></span>
+        <strong>GLOWTACT</strong>
+        <span>OPTICAL TACTILE SENSOR</span>
+      </a>
+      <nav aria-label="Signal Chamber sections">
+        <a href="#mechanism">Mechanism</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#research">Research</a>
+      </nav>
+      <a class="concept-channel" href="./">
+        <span>CONCEPT</span>
+        <strong>03</strong>
+      </a>
+    </header>
+
+    <main id="main">
+      <section class="signal-hero" aria-labelledby="signal-title">
+        <div class="hero-copy" data-reveal>
+          <p class="signal-label"><span>LIVE / OPTICAL COUPLING</span> Compact tactile vision</p>
+          <h1 id="signal-title">Contact,<br>made visible.</h1>
+          <p class="hero-summary">
+            GlowTact turns pressure-induced optical coupling into a direct,
+            high-contrast tactile image using a microtextured clear gel,
+            a black membrane, and single-color illumination.
+          </p>
+          <div class="hero-actions">
+            <a class="button button--primary" href="#mechanism">
+              Explore the mechanism
+              <span aria-hidden="true">↓</span>
+            </a>
+            <a class="button button--quiet" href="#record">
+              Watch the experiment
+              <span aria-hidden="true">↘</span>
+            </a>
+          </div>
+          <dl class="hero-capabilities" aria-label="GlowTact capabilities">
+            <div>
+              <dt>INTERFACE</dt>
+              <dd>P2500-molded silicone</dd>
+            </div>
+            <div>
+              <dt>SIGNAL</dt>
+              <dd>Local darkening</dd>
+            </div>
+            <div>
+              <dt>FORM</dt>
+              <dd>Compact fingertips</dd>
+            </div>
+          </dl>
+        </div>
+
+        <figure class="hero-figure" data-reveal>
+          <div class="hero-figure__frame">
+            <img
+              src="./design/assets/images/hero-teaser.jpg"
+              alt="Paper teaser showing robotic hands using black GlowTact fingertips to contact screws, with corresponding tactile camera images"
+            >
+            <span class="figure-corner figure-corner--top" aria-hidden="true"></span>
+            <span class="figure-corner figure-corner--bottom" aria-hidden="true"></span>
+          </div>
+          <figcaption>
+            <span>PAPER TEASER / SUPPLIED FIGURE</span>
+            <p>One sensing principle across robotic contact, tactile imaging, and compact fingertip hardware.</p>
+          </figcaption>
+        </figure>
+
+        <div class="hero-status" aria-label="Concept status">
+          <span><i aria-hidden="true"></i> SIGNAL CHAMBER ONLINE</span>
+          <span>QUALITATIVE MECHANISM VIEW</span>
+          <span>SCROLL TO INSPECT</span>
+        </div>
+      </section>
+
+      <section class="mechanism" id="mechanism" aria-labelledby="mechanism-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>SYS / 01</span> Coupling mechanism</p>
+            <h2 id="mechanism-title">How contact<br>becomes signal.</h2>
+          </div>
+          <p>
+            One pressure control drives the deformation, the air-gap closure, and the camera response.
+          </p>
+        </header>
+
+        <div class="mechanism-shell" data-reveal>
+          <header class="mechanism-toolbar">
+            <div class="toolbar-identity">
+              <span class="status-lamp" aria-hidden="true"></span>
+              <div>
+                <strong>GT / COUPLING MONITOR</strong>
+                <span>P2500-inspired qualitative model</span>
+              </div>
+            </div>
+            <div class="toolbar-status">
+              <span>INTERFACE STATE</span>
+              <output id="toolbar-state">Local coupling</output>
+            </div>
+          </header>
+
+          <div class="mechanism-grid">
+            <article class="instrument-view macro-view" aria-labelledby="macro-title">
+              <header class="view-header">
+                <div>
+                  <span>VIEW A / DEVICE SCALE</span>
+                  <h3 id="macro-title">Membrane–gel interface</h3>
+                </div>
+                <span class="view-badge">SCHEMATIC</span>
+              </header>
+
+              <div class="macro-stage">
+                <svg
+                  id="macro-svg"
+                  viewBox="0 0 920 540"
+                  role="img"
+                  aria-labelledby="macro-svg-title macro-svg-desc"
+                >
+                  <title id="macro-svg-title">GlowTact device-scale optical coupling diagram</title>
+                  <desc id="macro-svg-desc">
+                    A black membrane deforms toward a near-flat, approximately 9 UM
+                    microtextured clear-gel interface as qualitative pressure increases.
+                    A centered camera and field of view magnify the interface into a
+                    qualitative, approximately 100 UM local window.
+                  </desc>
+                  <defs>
+                    <linearGradient id="gel-gradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#9db3ad" stop-opacity=".54"></stop>
+                      <stop offset=".55" stop-color="#5f746e" stop-opacity=".32"></stop>
+                      <stop offset="1" stop-color="#26322e" stop-opacity=".82"></stop>
+                    </linearGradient>
+                    <linearGradient id="acrylic-gradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0" stop-color="#29302d"></stop>
+                      <stop offset=".5" stop-color="#515b56"></stop>
+                      <stop offset="1" stop-color="#29302d"></stop>
+                    </linearGradient>
+                    <radialGradient id="coupling-gradient">
+                      <stop offset="0" stop-color="#ffc04a" stop-opacity=".76"></stop>
+                      <stop offset=".55" stop-color="#e3a128" stop-opacity=".32"></stop>
+                      <stop offset="1" stop-color="#e3a128" stop-opacity="0"></stop>
+                    </radialGradient>
+                    <filter id="soft-glow" x="-80%" y="-80%" width="260%" height="260%">
+                      <feGaussianBlur stdDeviation="10"></feGaussianBlur>
+                    </filter>
+                    <marker
+                      id="ray-arrow"
+                      markerWidth="8"
+                      markerHeight="8"
+                      refX="6"
+                      refY="4"
+                      orient="auto"
+                    >
+                      <path d="M0,0 L8,4 L0,8 Z" fill="currentColor"></path>
+                    </marker>
+                  </defs>
+
+                  <g class="macro-grid-lines" aria-hidden="true">
+                    <path d="M70 88H850 M70 144H850 M70 200H850 M70 256H850 M70 312H850 M70 368H850 M70 424H850"></path>
+                    <path d="M126 64V460 M238 64V460 M350 64V460 M462 64V460 M574 64V460 M686 64V460 M798 64V460"></path>
+                  </g>
+
+                  <g id="macro-indenter">
+                    <path d="M390 52H530V150C530 176 509 197 483 197H437C411 197 390 176 390 150Z"></path>
+                    <path class="indenter-highlight" d="M405 66H420V156C420 169 430 180 443 182"></path>
+                    <text x="460" y="92" text-anchor="middle">INDENTER</text>
+                  </g>
+
+                  <path id="macro-air-gap" class="macro-air-gap"></path>
+                  <path id="macro-membrane-body" class="macro-membrane-body"></path>
+                  <path id="macro-membrane-shadow" class="macro-membrane-shadow"></path>
+                  <path id="macro-membrane" class="macro-membrane"></path>
+
+                  <g id="macro-rays" class="macro-rays" aria-hidden="true">
+                    <path class="ray ray--incident" d="M126 444L268 292"></path>
+                    <path class="ray ray--reflected ray--left" d="M274 294L428 438" marker-end="url(#ray-arrow)"></path>
+                    <path class="ray ray--incident" d="M794 444L652 292"></path>
+                    <path class="ray ray--reflected ray--right" d="M646 294L492 438" marker-end="url(#ray-arrow)"></path>
+                    <path class="ray ray--center" d="M460 300L460 436" marker-end="url(#ray-arrow)"></path>
+                  </g>
+
+                  <path
+                    class="macro-gel"
+                    d="M70 300
+                      C92 286 105 296 126 281
+                      C148 266 163 298 184 282
+                      C208 263 224 300 246 280
+                      C268 260 286 299 310 279
+                      C334 257 350 301 374 278
+                      C397 256 418 301 440 277
+                      C461 254 482 302 505 278
+                      C528 258 545 299 568 279
+                      C590 260 610 299 632 281
+                      C654 263 670 298 694 282
+                      C718 265 734 297 756 282
+                      C779 268 797 294 820 281
+                      C832 274 842 278 850 282
+                      L850 448H70Z"
+                  ></path>
+                  <path
+                    class="macro-texture-line"
+                    d="M70 286 C260 284 660 288 850 286"
+                  ></path>
+                  <rect class="macro-acrylic" x="70" y="448" width="780" height="52"></rect>
+                  <ellipse id="macro-coupling-glow" class="macro-coupling-glow" cx="460" cy="290" rx="80" ry="28"></ellipse>
+                  <path id="macro-coupling-line" class="macro-coupling-line"></path>
+
+                  <g class="macro-label macro-label--membrane">
+                    <path d="M100 204H210L244 247"></path>
+                    <text x="100" y="194">BLACK NITRILE MEMBRANE / 3 MIL</text>
+                  </g>
+                  <g class="macro-label macro-label--gel">
+                    <path d="M778 376H710L674 350"></path>
+                    <text x="778" y="366" text-anchor="end">TEXTURED XP-565 GEL</text>
+                  </g>
+
+                  <g class="macro-interface-note">
+                    <path d="M120 330H206L238 296"></path>
+                    <text x="120" y="322">~9 UM TEXTURE / EXAGGERATED</text>
+                  </g>
+
+                  <!-- Sampled ~100 um window: at a ~10 um texture period the
+                       zoom region is only ~0.1-0.2 mm across, so the marker
+                       is a small chip on the contact centre. It is kept
+                       nearly silent and rides the membrane vertically (see
+                       renderMacro); the micro panel header carries the
+                       wording, so the schematic needs no label here. -->
+                  <g id="macro-scale-marker" class="macro-scale-marker">
+                    <path class="macro-sample-window" d="M442 279H478L486 286L478 293H442L434 286Z"></path>
+                  </g>
+
+                  <g class="macro-fov" aria-label="Camera field of view">
+                    <path
+                      id="macro-field-of-view"
+                      class="macro-field-of-view"
+                      d="M402 448L460 346L518 448Z"
+                    ></path>
+                    <path class="macro-fov-axis" d="M460 448V348"></path>
+                    <text x="528" y="410">CAMERA FOV GUIDE</text>
+                  </g>
+                  <g class="macro-camera">
+                    <path class="macro-camera-mount" d="M438 448H482L490 468H430Z"></path>
+                    <path class="macro-camera-body" d="M390 478H530L540 532H380Z"></path>
+                    <rect class="macro-camera-sensor" x="414" y="490" width="92" height="26" rx="4"></rect>
+                    <circle class="macro-camera-ring" cx="460" cy="505" r="31"></circle>
+                    <circle class="macro-camera-lens" cx="460" cy="505" r="21"></circle>
+                    <circle class="macro-camera-glass" cx="452" cy="499" r="6"></circle>
+                    <circle class="macro-camera-aperture" cx="460" cy="505" r="8"></circle>
+                    <text x="460" y="545" text-anchor="middle">CAMERA</text>
+                  </g>
+                  <g class="macro-led macro-led--left">
+                    <circle cx="116" cy="470" r="8"></circle>
+                    <path d="M98 470H82 M150 470H134 M116 452V440"></path>
+                  </g>
+                  <g class="macro-led macro-led--right">
+                    <circle cx="804" cy="470" r="8"></circle>
+                    <path d="M786 470H770 M838 470H822 M804 452V440"></path>
+                  </g>
+                </svg>
+
+                <div class="macro-legend" aria-hidden="true">
+                  <span><i class="legend-ray"></i>Reflected light</span>
+                  <span><i class="legend-gap"></i>Air gap</span>
+                  <span><i class="legend-coupling"></i>Optical coupling</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="instrument-view microscope-view" aria-labelledby="microscope-title">
+              <header class="view-header view-header--tabs">
+                <div>
+                  <span>VIEW B / MICRO SCALE</span>
+                  <h3 id="microscope-title">Asperity coupling</h3>
+                </div>
+                <div class="micro-tabs" role="tablist" aria-label="Microscope view">
+                  <button
+                    id="micro-tab-2d"
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="micro-panel-2d"
+                    tabindex="0"
+                  >
+                    2D
+                  </button>
+                  <button
+                    id="micro-tab-3d"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="micro-panel-3d"
+                    tabindex="-1"
+                  >
+                    3D
+                  </button>
+                </div>
+              </header>
+
+              <div
+                id="micro-panel-2d"
+                class="micro-panel micro-panel--2d"
+                role="tabpanel"
+                aria-labelledby="micro-tab-2d"
+              >
+                <svg
+                  id="micro-svg"
+                  viewBox="0 0 520 320"
+                  role="img"
+                  aria-labelledby="micro-svg-title micro-svg-desc"
+                >
+                  <title id="micro-svg-title">Two-dimensional microscopic coupling view</title>
+                  <desc id="micro-svg-desc">
+                    A qualitative side section of an approximately 100 um local
+                    window, showing a black membrane approaching spatially
+                    distributed asperities and closing local air gaps.
+                  </desc>
+                  <defs>
+                    <linearGradient id="micro-gel-gradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#a7bbb5" stop-opacity=".75"></stop>
+                      <stop offset="1" stop-color="#34433e" stop-opacity=".92"></stop>
+                    </linearGradient>
+                    <pattern id="micro-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+                      <path d="M26 0H0V26" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="1"></path>
+                    </pattern>
+                  </defs>
+                  <rect width="520" height="320" fill="url(#micro-grid)"></rect>
+                  <path id="micro-gap-area" class="micro-gap-area"></path>
+                  <path id="micro-surface-fill" class="micro-surface-fill"></path>
+                  <path id="micro-surface-line" class="micro-surface-line"></path>
+                  <path id="micro-membrane-body" class="micro-membrane-body"></path>
+                  <path id="micro-membrane-shadow" class="micro-membrane-shadow"></path>
+                  <path id="micro-membrane" class="micro-membrane"></path>
+                  <g id="micro-contact-points" class="micro-contact-points"></g>
+
+                  <g class="micro-annotation micro-annotation--membrane">
+                    <path d="M34 46H132L158 75"></path>
+                    <text x="34" y="36">NITRILE MEMBRANE / 3 MIL, CROPPED</text>
+                  </g>
+                  <g class="micro-annotation micro-annotation--gap">
+                    <path d="M486 82H412L388 112"></path>
+                    <text x="486" y="72" text-anchor="end">AIR GAP</text>
+                  </g>
+                  <g class="micro-annotation micro-annotation--surface">
+                    <path d="M486 242H414L386 220"></path>
+                    <text x="486" y="232" text-anchor="end">P2500-MOLDED TEXTURE</text>
+                  </g>
+                </svg>
+                <div class="micro-scale">
+                  <span>SECTION / HEIGHT EXAGGERATED</span>
+                  <span>Fixed seed 2500-A</span>
+                </div>
+              </div>
+
+              <div
+                id="micro-panel-3d"
+                class="micro-panel micro-panel--3d"
+                role="tabpanel"
+                aria-labelledby="micro-tab-3d"
+                hidden
+              >
+                <canvas
+                  id="micro-canvas"
+                  width="640"
+                  height="400"
+                  role="img"
+                  aria-label="3D contact field, Local coupling. Qualitative coupled fraction 0 percent."
+                ></canvas>
+                <p class="canvas-fallback">
+                  A fixed oblique projection shows contact islands expanding
+                  across the P2500-inspired surface.
+                </p>
+                <div class="micro-scale">
+                  <span>HEIGHT FIELD / DIMENSIONLESS</span>
+                  <span><i></i> Coupled area</span>
+                </div>
+              </div>
+
+              <footer class="microscope-readout">
+                <span class="micro-window-label">LOCAL WINDOW / ~100 UM / QUALITATIVE</span>
+                <output id="contact-fraction">24%</output>
+    </footer>
+            </article>
+
+            <article class="instrument-view output-view" aria-labelledby="output-title">
+              <header class="view-header">
+                <div>
+                  <span>VIEW C / SENSOR OUTPUT / DEVICE FOV</span>
+                  <h3 id="output-title">Camera response</h3>
+                </div>
+                <span class="view-badge">SIMULATED</span>
+              </header>
+              <div class="camera-stage" aria-hidden="true">
+                <span class="camera-vignette"></span>
+                <span class="camera-noise"></span>
+                <span class="camera-contact">
+                  <span class="camera-reference"></span>
+                  <i></i><i></i><i></i><i></i><i></i>
+                </span>
+                <span class="camera-reticle camera-reticle--x"></span>
+                <span class="camera-reticle camera-reticle--y"></span>
+                <span class="camera-coordinate">DEVICE FOV / ROI 320 × 240</span>
+              </div>
+              <footer class="camera-readout">
+                <span>LOCAL INTENSITY</span>
+                <output id="camera-intensity">No signal</output>
+              </footer>
+            </article>
+          </div>
+
+          <div class="mechanism-console">
+            <div class="sequence-control">
+              <span>SEQUENCE</span>
+              <button id="play-sequence" type="button" aria-pressed="false">
+                <span class="play-icon" aria-hidden="true"></span>
+                <span id="play-label">Run once</span>
+              </button>
+            </div>
+
+            <div class="pressure-control">
+              <label for="signal-pressure">
+                <span>QUALITATIVE INDENTATION</span>
+                <output id="pressure-percent" for="signal-pressure">0%</output>
+              </label>
+              <input
+                id="signal-pressure"
+                type="range"
+                min="0"
+                max="100"
+                value="0"
+                aria-describedby="instrument-disclosure"
+              >
+            </div>
+
+            <ol class="state-rail" aria-label="Coupling states">
+              <li data-state="gap" class="is-active" aria-current="step">
+                <span>00</span>
+                <strong>Air gap</strong>
+              </li>
+              <li data-state="local">
+                <span>01</span>
+                <strong>Local coupling</strong>
+              </li>
+              <li data-state="expanded">
+                <span>02</span>
+                <strong>Expanded coupling</strong>
+              </li>
+            </ol>
+
+            <div class="state-explanation" aria-live="polite">
+              <span id="state-index">STATE 00</span>
+              <p id="state-copy">
+                An air gap still separates membrane and gel; the camera sees no
+                contact signal.
+              </p>
+            </div>
+          </div>
+
+          <p class="instrument-disclosure" id="instrument-disclosure">
+            Qualitative model of the reported P2500 texture and coupling mechanism. Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.
+          </p>
+        </div>
+      </section>
+
+      <section class="record" id="record" aria-labelledby="record-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>REC / 01</span> Experimental context</p>
+            <h2 id="record-title">A compact signal<br>at the fingertip.</h2>
+          </div>
+          <p>
+            Supplied project media places the sensor in robotic manipulation.
+            The adjacent capabilities summarize what the paper evaluates.
+          </p>
+        </header>
+
+        <div class="record-layout">
+          <figure class="video-module" data-reveal>
+            <video
+              controls
+              muted
+              playsinline
+              preload="metadata"
+              poster="./design/assets/images/mms-contact-poster.jpg"
+              aria-label="GlowTact robotic contact demonstration video"
+            >
+              <source src="./design/assets/video/mms-contact.mp4" type="video/mp4">
+              Your browser does not support embedded video.
+            </video>
+            <figcaption>
+              <span>EXPERIMENTAL VIDEO / MMS CONTACT</span>
+              <span>User-controlled playback</span>
+            </figcaption>
+          </figure>
+
+          <div class="capability-stack">
+            <article data-reveal>
+              <span>01 / PASSIVE CONTACT</span>
+              <h3>Visible under light loading.</h3>
+              <p>Small local interface changes produce spatially concentrated tactile responses.</p>
+            </article>
+            <article data-reveal>
+              <span>02 / FINE GEOMETRY</span>
+              <h3>Structure survives the signal.</h3>
+              <p>Contact images preserve fine patterns, including fingerprint ridges and M1 threads.</p>
+            </article>
+            <article data-reveal>
+              <span>03 / FORCE CUE</span>
+              <h3>Darkness changes continuously.</h3>
+              <p>Pressure-responsive images support continuous normal-force estimation.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="forms" aria-labelledby="forms-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>CFG / 01</span> Sensor forms</p>
+            <h2 id="forms-title">One principle.<br>Three bodies.</h2>
+          </div>
+        </header>
+
+        <div class="form-comparison" data-reveal>
+          <article>
+            <span class="form-index">A / 01</span>
+            <div class="form-glyph form-glyph--flat" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <div>
+              <h3>Flat</h3>
+              <p>4 mm XP-565 gel, P2500 mold texture, perimeter illumination.</p>
+            </div>
+          </article>
+          <article>
+            <span class="form-index">A / 02</span>
+            <div class="form-glyph form-glyph--omni" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <div>
+              <h3>Omni&shy;directional</h3>
+              <p>Textured silicone over a clear epoxy skeleton with an LED ring.</p>
+            </div>
+          </article>
+          <article>
+            <span class="form-index">A / 03</span>
+            <div class="form-glyph form-glyph--finger" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <div>
+              <h3>Humanoid</h3>
+              <p>Approximately 17 mm wide with front-facing tactile coverage.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="evidence" id="evidence" aria-labelledby="evidence-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <p class="signal-label"><span>DAT / 01</span> Spatial evidence</p>
+            <h2 id="evidence-title">The dark signal<br>keeps its shape.</h2>
+          </div>
+          <p>
+            Experimental contact images and qualitative reconstructions show
+            spatial structure across pressure, fine threads, and multiple objects.
+          </p>
+        </header>
+
+        <div class="evidence-layout">
+          <figure class="evidence-primary" data-reveal>
+            <header>
+              <span>ARCHIVE / MULTI-OBJECT</span>
+              <span>SUPPLIED SOURCE OVERVIEW</span>
+            </header>
+            <img
+              src="./design/assets/images/reconstruction-overview.jpg"
+              alt="Multiple contact objects, tactile images, and qualitative geometry reconstructions"
+            >
+            <figcaption>
+              <strong>Contact geometry collection</strong>
+              <span>Experimental images with qualitative reconstruction outputs</span>
+            </figcaption>
+          </figure>
+
+          <div class="evidence-secondary">
+            <figure data-reveal>
+              <header>
+                <span>INPUT / FINGERPRINT</span>
+                <span>0.3 → 2.0 N</span>
+              </header>
+              <img
+                src="./design/assets/images/fingerprint-pressure.jpg"
+                alt="Fingerprint tactile contacts that darken from 0.3 to 2.0 newtons"
+              >
+              <figcaption>Experimental controlled-contact sequence</figcaption>
+            </figure>
+            <figure data-reveal>
+              <header>
+                <span>OUTPUT / GEOMETRY</span>
+                <span>M1 THREADS</span>
+              </header>
+              <img
+                src="./design/assets/images/thread-mesh.png"
+                alt="Qualitative reconstruction of M1 screw threads"
+              >
+              <figcaption>Qualitative reconstruction</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="research-console" id="research" aria-labelledby="research-title">
+        <div class="research-heading" data-reveal>
+          <p class="signal-label"><span>DOC / 01</span> Research record</p>
+          <h2 id="research-title">GlowTact</h2>
+          <p>
+            Simple and Compact Vision-Based Tactile Sensing with High
+            Sensitivity and Spatial Resolution
+          </p>
+        </div>
+        <div class="research-meta" data-reveal>
+          <dl>
+            <div><dt>PAPER</dt><dd>Not yet available</dd></div>
+            <div><dt>CODE</dt><dd>Not yet available</dd></div>
+            <div><dt>DATA</dt><dd>Not yet available</dd></div>
+          </dl>
+          <pre><code>@article{anonymous2026glowtact,
+  title  = {GlowTact: Simple and Compact Vision-Based
+            Tactile Sensing with High Sensitivity and Spatial Resolution},
+  author = {Anonymous},
+  year   = {2026}
+}</code></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="instrument-footer">
+      <a href="./design/concept-02/"><span aria-hidden="true">←</span> Contact Atlas</a>
+      <p><span class="status-lamp" aria-hidden="true"></span> GLOWTACT / SIGNAL CHAMBER</p>
+      <a href="./">All concepts <span aria-hidden="true">↗</span></a>
+      <span class="build-stamp" aria-hidden="true">2026-08-06 · b9039bb</span>
+    </footer>
+  </body>
+</html>
