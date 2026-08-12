@@ -13,7 +13,7 @@ edit figures and slides, or to work on the paper.
 ## Layout
 
 ```text
-materials/                        449 files, 464 MiB
+materials/                        452 files, 467 MiB
 ├── paper/
 │   └── paper.pdf                 the manuscript
 ├── figures/                       14 files,  33 MiB
@@ -40,6 +40,10 @@ materials/                        449 files, 464 MiB
 │   ├── premiere-autosave/         Premiere auto-save copies
 │   └── session_20260728_010530/   6 recorded episodes; per episode:
 │                                  streams/gelsight, gelsight_diff, hx711_force
+├── _session/                       3 files,   3 MiB
+│                                  Claude Code transcripts (raw .jsonl plus a
+│                                  readable .md), kept out of the public repo;
+│                                  see _session/README.md
 └── _archives/                      3 files,  38 MiB
     ├── single_meshes_gt.zip       redundant: identical to meshes/flat/
     ├── single_meshes_h.zip        redundant: identical to meshes/humanoid/
@@ -94,9 +98,9 @@ the mesh PNGs and the video are byte-for-byte copies.
 ## Why it is not in git
 
 This repository is `glowtact.github.io` — GitHub Pages builds and serves it
-from `main:/`. Committing 464 MiB of sources would mean:
+from `main:/`. Committing 467 MiB of sources would mean:
 
-- every clone downloads 464 MiB to get a 17 MiB website;
+- every clone downloads 467 MiB to get a 17 MiB website;
 - GitHub warns above 50 MiB per file, and `slides/GlowTact_video.mp4` is
   76 MiB;
 - the sources would count against the Pages 1 GiB site limit;
@@ -113,9 +117,22 @@ repository or use Git LFS — do not add them to this one.
 The website and the materials travel by different routes: git carries the
 site, and `tools/materials_sync.py` carries the sources.
 
-**On the old machine**, send `materials/` to somewhere both machines can
-reach — an external drive, a network share, or a cloud-synced folder. All
-three are just paths, so they work the same way:
+**On the old machine**, first capture anything that lives outside the repo
+and outside `materials/` — chiefly the Claude Code session history, which
+Claude Code stores in your user profile:
+
+```powershell
+python tools/save_session.py
+```
+
+That writes the transcripts into `materials/_session/` so they travel with
+everything else; see `materials/_session/README.md`. The project's decisions
+and open items are in [`docs/HANDOFF.md`](docs/HANDOFF.md), which git already
+carries.
+
+Then send `materials/` to somewhere both machines can reach — an external
+drive, a network share, or a cloud-synced folder. All three are just paths,
+so they work the same way:
 
 ```powershell
 python tools/materials_sync.py push E:\glowtact-materials
@@ -130,7 +147,7 @@ python tools/materials_sync.py pull E:\glowtact-materials
 ```
 
 The clone brings the site, `design/`, and the tooling — about 17 MiB. The
-pull brings the 464 MiB of sources.
+pull brings the 467 MiB of sources.
 
 The location is saved to `.materials-remote` (untracked, per-machine) on
 first use, so from then on it is just `push` or `pull` with no argument.
@@ -147,7 +164,7 @@ environment.
   seconds.
 - **Verifies the receiving end** by re-hashing every file against the
   manifest, and exits non-zero if anything is missing, changed, or extra. A
-  single flipped byte anywhere in the 464 MiB fails the run. Silent transfer
+  single flipped byte anywhere in the 467 MiB fails the run. Silent transfer
   corruption is exactly what you want to hear about now rather than the day
   you need the file.
 - **Refuses to destroy things.** Mirroring deletes files at the receiving
