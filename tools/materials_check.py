@@ -10,6 +10,10 @@ another machine trustworthy.
 
 The manifest lives at materials/MANIFEST.sha256 so it travels with the data.
 It is excluded from its own checksums.
+
+`--root PATH` points either operation at some other copy of the tree -- the
+one on the external drive, the share, or the new machine -- which is how
+materials_sync.py checks both ends of a transfer.
 """
 from __future__ import annotations
 
@@ -22,7 +26,6 @@ ROOT = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 )
 MATERIALS = os.path.join(ROOT, "materials")
-MANIFEST = os.path.join(MATERIALS, "MANIFEST.sha256")
 MANIFEST_NAME = "MANIFEST.sha256"
 
 
@@ -34,22 +37,22 @@ def digest(path: str) -> str:
     return sha.hexdigest()
 
 
-def walk() -> list[str]:
-    """Every file under materials/, as sorted forward-slash relative paths."""
+def walk(root: str) -> list[str]:
+    """Every file under root, as sorted forward-slash relative paths."""
     found = []
-    for dirpath, _, filenames in os.walk(MATERIALS):
+    for dirpath, _, filenames in os.walk(root):
         for name in filenames:
             full = os.path.join(dirpath, name)
-            rel = os.path.relpath(full, MATERIALS).replace(os.sep, "/")
+            rel = os.path.relpath(full, root).replace(os.sep, "/")
             if rel == MANIFEST_NAME:
                 continue
             found.append(rel)
     return sorted(found)
 
 
-def read_manifest() -> dict[str, str]:
+def read_manifest(root: str) -> dict[str, str]:
     entries = {}
-    with open(MANIFEST, encoding="utf-8") as handle:
+    with open(os.path.join(root, MANIFEST_NAME), encoding="utf-8") as handle:
         for line in handle:
             line = line.rstrip("\n")
             if not line or line.startswith("#"):
@@ -59,18 +62,20 @@ def read_manifest() -> dict[str, str]:
     return entries
 
 
-def write() -> None:
-    files = walk()
+def write(root: str, quiet: bool = False) -> None:
+    files = walk(root)
     total = 0
     lines = []
     for index, rel in enumerate(files, 1):
-        full = os.path.join(MATERIALS, rel.replace("/", os.sep))
+        full = os.path.join(root, rel.replace("/", os.sep))
         total += os.path.getsize(full)
         lines.append(f"{digest(full)}  {rel}")
-        if index % 50 == 0 or index == len(files):
+        if not quiet and (index % 50 == 0 or index == len(files)):
             print(f"  hashed {index}/{len(files)}", end="\r", flush=True)
-    print()
-    with open(MANIFEST, "w", encoding="utf-8", newline="\n") as handle:
+    if not quiet:
+        print()
+    with open(os.path.join(root, MANIFEST_NAME), "w",
+              encoding="utf-8", newline="\n") as handle:
         handle.write(
             f"# GlowTact materials manifest\n"
             f"# {len(files)} files, {total / 1048576:.1f} MiB\n"
@@ -81,25 +86,26 @@ def write() -> None:
           f"{total / 1048576:.1f} MiB")
 
 
-def verify() -> None:
-    if not os.path.exists(MANIFEST):
+def verify(root: str, quiet: bool = False) -> None:
+    if not os.path.exists(os.path.join(root, MANIFEST_NAME)):
         raise SystemExit(
-            f"no {MANIFEST_NAME}; run --write on the source machine first"
+            f"no {MANIFEST_NAME} in {root}; run --write on the source first"
         )
-    expected = read_manifest()
-    actual = set(walk())
+    expected = read_manifest(root)
+    actual = set(walk(root))
 
     missing = sorted(set(expected) - actual)
     extra = sorted(actual - set(expected))
     shared = sorted(set(expected) & actual)
     changed = []
     for index, rel in enumerate(shared, 1):
-        full = os.path.join(MATERIALS, rel.replace("/", os.sep))
+        full = os.path.join(root, rel.replace("/", os.sep))
         if digest(full) != expected[rel]:
             changed.append(rel)
-        if index % 50 == 0 or index == len(shared):
+        if not quiet and (index % 50 == 0 or index == len(shared)):
             print(f"  checked {index}/{len(expected)}", end="\r", flush=True)
-    print()
+    if not quiet:
+        print()
 
     for label, items in (("MISSING", missing), ("CHANGED", changed),
                          ("UNTRACKED", extra)):
@@ -120,11 +126,20 @@ def main() -> None:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--write", action="store_true")
     group.add_argument("--verify", action="store_true")
+    parser.add_argument(
+        "--root", default=MATERIALS,
+        help="materials tree to operate on (default: ./materials)",
+    )
+    parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
 
-    if not os.path.isdir(MATERIALS):
-        raise SystemExit("no materials/ directory here; see MATERIALS.md")
-    write() if args.write else verify()
+    root = os.path.abspath(args.root)
+    if not os.path.isdir(root):
+        raise SystemExit(f"no such directory: {root}; see MATERIALS.md")
+    if args.write:
+        write(root, args.quiet)
+    else:
+        verify(root, args.quiet)
 
 
 if __name__ == "__main__":

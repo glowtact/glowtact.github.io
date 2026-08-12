@@ -6,3 +6,6 @@ __pycache__/
 # clone would otherwise pull the full set. See MATERIALS.md for the layout
 # and for how to move it between machines.
 materials/
+
+# Per-machine sync location remembered by tools/materials_sync.py.
+.materials-remote

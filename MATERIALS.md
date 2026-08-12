@@ -111,69 +111,74 @@ repository or use Git LFS — do not add them to this one.
 ## Moving to another machine
 
 The website and the materials travel by different routes: git carries the
-site, and a copy carries the sources.
+site, and `tools/materials_sync.py` carries the sources.
 
-**1. On the new machine, clone the repository.**
+**On the old machine**, send `materials/` to somewhere both machines can
+reach — an external drive, a network share, or a cloud-synced folder. All
+three are just paths, so they work the same way:
+
+```powershell
+python tools/materials_sync.py push E:\glowtact-materials
+```
+
+**On the new machine**, two commands and you are working:
 
 ```powershell
 git clone git@github.com:glowtact/glowtact.github.io.git
 cd glowtact.github.io
+python tools/materials_sync.py pull E:\glowtact-materials
 ```
 
-That gives you the full site, `design/`, and the tooling — about 17 MiB.
+The clone brings the site, `design/`, and the tooling — about 17 MiB. The
+pull brings the 464 MiB of sources.
 
-**2. On the old machine, refresh the manifest.**
+The location is saved to `.materials-remote` (untracked, per-machine) on
+first use, so from then on it is just `push` or `pull` with no argument.
+`GLOWTACT_MATERIALS_REMOTE` works too if you would rather set it in the
+environment.
+
+### What the sync does for you
+
+- **Refreshes the manifest** before pushing, so the checksums always match
+  what is being sent.
+- **Mirrors** with `robocopy /MIR` on Windows (`rsync -a --delete`
+  elsewhere), which retries and resumes — worth having for a 76 MiB video
+  over a flaky link. Re-running only moves what changed; a no-op sync takes
+  seconds.
+- **Verifies the receiving end** by re-hashing every file against the
+  manifest, and exits non-zero if anything is missing, changed, or extra. A
+  single flipped byte anywhere in the 464 MiB fails the run. Silent transfer
+  corruption is exactly what you want to hear about now rather than the day
+  you need the file.
+- **Refuses to destroy things.** Mirroring deletes files at the receiving
+  end that are absent from the sending end. Any run that would delete
+  something stops and lists what, unless you pass `--force`; and it will not
+  mirror onto a non-empty folder that does not already look like a materials
+  tree, so a mistyped path cannot wipe your documents.
+
+Check either side at any time:
 
 ```powershell
-python tools/materials_check.py --write
+python tools/materials_sync.py status
 ```
 
-This rewrites `materials/MANIFEST.sha256` so it matches what you are about
-to copy.
+### Keeping both machines current
 
-**3. Copy `materials/` across.** Any of these work; pick by what you have.
-
-*External drive or network share* — `robocopy` mirrors and retries, which
-matters for a 76 MiB video over a flaky link:
+`push` is safe to repeat, so it can run on a schedule and keep the shared
+copy fresh; the other machine then only ever needs `pull`. To have Windows
+do it nightly at 19:00:
 
 ```powershell
-robocopy materials E:\glowtact-materials /MIR /R:3 /W:5
+schtasks /create /tn "GlowTact materials push" /sc daily /st 19:00 /tr "python C:\path\to\glowtact.github.io\tools\materials_sync.py push"
 ```
 
-Then on the new machine, into the freshly cloned repository:
+The scheduled run takes no location argument, so it uses the one saved in
+`.materials-remote`; run `push` by hand once first to establish it. The
+tools resolve paths from their own location, so the task works whatever
+directory it starts in. Drop it again with
+`schtasks /delete /tn "GlowTact materials push" /f`.
 
-```powershell
-robocopy E:\glowtact-materials materials /MIR /R:3 /W:5
-```
-
-*Single archive* — one file is easier to hand off through cloud storage.
-Store-only (`-mx0`) is worth it: the bulk is already-compressed PNG, MP4,
-PPTX, and ZIP, so compression buys little and costs a lot of time:
-
-```powershell
-7z a -mx0 glowtact-materials.7z materials
-```
-
-Unpack it inside the cloned repository so the tree lands at `materials/`.
-
-*Directly between machines on one network:*
-
-```powershell
-scp -r materials user@newmachine:/path/to/glowtact.github.io/
-```
-
-**4. On the new machine, verify the copy.**
-
-```powershell
-python tools/materials_check.py --verify
-```
-
-It re-hashes all 449 files and names anything missing, changed, or extra,
-exiting non-zero if the tree is incomplete. A silent transfer failure on a
-464 MiB copy is exactly the kind of thing you want to catch before you need
-the file, not after.
-
-**5. Confirm the site still builds.**
+### Confirm the site still builds
 
 ```powershell
 python design/verify.py
@@ -184,6 +189,20 @@ python -m http.server 4173
 Then open `http://127.0.0.1:4173/`. Note the server runs from the
 repository root, not from `design/`, so that the published root page
 resolves its `design/assets/...` references the way GitHub Pages does.
+
+### If the two machines cannot share a path
+
+Mirror to a drive or share and move that, or replace the mirror step with
+`rclone`/`scp` and keep the verification:
+
+```powershell
+rclone sync materials remote:glowtact-materials
+# then, on the new machine, after rclone sync back:
+python tools/materials_check.py --verify
+```
+
+`materials_check.py` takes `--root PATH` to check any copy of the tree, so
+the verification works regardless of how the bytes got there.
 
 ### What you also need on the new machine
 
