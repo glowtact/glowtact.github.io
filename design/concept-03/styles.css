@@ -2881,7 +2881,9 @@ main {
   line-height: 1.6;
 }
 
-.evidence-figure figcaption > span {
+/* The eyebrow only. Unscoped, this also caught the inline data-metric spans
+ * in the caption body and stacked each number onto its own line. */
+.evidence-figure figcaption > span:first-child {
   display: block;
   margin-bottom: 8px;
   color: var(--readout-tertiary);
