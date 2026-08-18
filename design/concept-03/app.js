@@ -1981,8 +1981,15 @@ function initShearViewer() {
     });
     const clip = tab.dataset.clip;
     const wasPlaying = !video.paused && !video.ended;
-    source.src = `../assets/video/shear/${clip}.mp4`;
-    video.poster = `../assets/images/shear/${clip}-poster.jpg`;
+    // Derive the directory from the markup rather than hardcoding `../`.
+    // publish.py rewrites the page's relative references so the root page
+    // resolves from the repository root, but it cannot rewrite a path this
+    // script builds at runtime -- hardcoding `../assets/` made every clip
+    // except the first 404 on the published site while working locally.
+    const videoDir = source.getAttribute("src").replace(/[^/]+$/, "");
+    const posterDir = video.getAttribute("poster").replace(/[^/]+$/, "");
+    source.src = `${videoDir}${clip}.mp4`;
+    video.poster = `${posterDir}${clip}-poster.jpg`;
     video.load();
     if (wasPlaying) video.play().catch(() => {});
     label.textContent = `${tab.dataset.label.toUpperCase()} / ${tab.dataset.duration.toUpperCase()}`;

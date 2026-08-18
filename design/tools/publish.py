@@ -69,6 +69,31 @@ class RefCollector(HTMLParser):
             self.refs.append(value.split("?", 1)[0].split("#", 1)[0])
 
 
+def check_runtime_paths() -> list[str]:
+    """Reject asset paths built at runtime by the concept's script.
+
+    The rewrites below are textual, so they can only fix references that
+    exist in the HTML. A path assembled in JavaScript -- `"../assets/" + name`
+    -- survives untouched and resolves against the ROOT page's directory,
+    which is one level up from the concept's. That failure is invisible
+    locally, where the concept route is the one being served, and shows up
+    only on the published site, only after an interaction.
+    """
+    script = os.path.join(ROOT, SOURCE_DIR, "app.js")
+    if not os.path.exists(script):
+        return [f"cannot audit runtime paths: {SOURCE_DIR}/app.js is missing"]
+    text = open(script, encoding="utf-8").read()
+    # Strip comments first: prose about this very rule would otherwise match.
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    text = re.sub(r"^\s*//.*$", "", text, flags=re.M)
+    hits = sorted(set(re.findall(r'["\'`](\.\./assets/[^"\'`$]*)', text)))
+    return [
+        f"runtime asset path in app.js: {hit!r} -- derive the directory from "
+        "the markup instead, so the published root resolves it too"
+        for hit in hits
+    ]
+
+
 def check(html: str) -> list[str]:
     errors = []
     if "../" in html:
@@ -97,7 +122,7 @@ def main() -> None:
         html = html.replace(old, new)
     html = html.replace("<!doctype html>", f"<!doctype html>\n{BANNER}", 1)
 
-    errors = check(html)
+    errors = check(html) + check_runtime_paths()
     if errors:
         for error in errors:
             print(f"publish: {error}", file=sys.stderr)

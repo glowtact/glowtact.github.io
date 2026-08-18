@@ -9,3 +9,4 @@ materials/
 
 # Per-machine sync location remembered by tools/materials_sync.py.
 .materials-remote
+glowtact-review/
