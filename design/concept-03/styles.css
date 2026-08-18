@@ -480,7 +480,7 @@ main {
 .mechanism,
 .record,
 .forms,
-.evidence {
+.reconstruction {
   padding-top: clamp(124px, 15vw, 240px);
 }
 
@@ -1358,7 +1358,8 @@ main {
   border-left: 7px solid currentColor;
 }
 
-.sequence-control button[aria-pressed="true"] .play-icon {
+.sequence-control button[aria-pressed="true"] .play-icon,
+.recon-control button[aria-pressed="true"] .play-icon {
   width: 7px;
   height: 8px;
   border: 0;
@@ -1557,8 +1558,8 @@ main {
 }
 
 .video-module figcaption,
-.evidence-layout figure > header,
-.evidence-layout figcaption {
+.recon-card > header,
+.recon-card figcaption {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1737,70 +1738,151 @@ main {
   line-height: 1.55;
 }
 
-.evidence-layout {
+/*
+ * Turntable gallery. One card per pressed object, all of them GlowTact
+ * output: the rotating reconstruction is the subject, and the tactile frame
+ * it was computed from rides in the caption as a 48px thumbnail. The
+ * thumbnail sat over the render first, where it covered relief on half the
+ * objects and put mono type on a white plate; in the caption it stays legible
+ * and the card still reads input-to-output without a second column.
+ */
+.recon-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding: 9px 16px;
+  background: var(--optic-surface-1);
+  box-shadow: 0 0 0 1px var(--optic-ring);
+}
+
+.recon-control > span {
+  color: var(--readout-dim);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.12em;
+}
+
+.recon-control button {
+  min-width: 180px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  color: var(--camera-black);
+  background: var(--signal-amber-bright);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    background-color 140ms var(--ease-out),
+    transform 120ms var(--ease-out);
+}
+
+.recon-control button:hover {
+  background: #ffd077;
+}
+
+.recon-control button:active {
+  transform: scale(0.98);
+}
+
+.recon-gallery {
+  /*
+   * Seven objects plus the note cell make eight: four columns and two columns
+   * both divide it exactly, so the panel never ends on a half-empty row.
+   */
   display: grid;
-  grid-template-columns: minmax(0, 1.48fr) minmax(360px, 0.72fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   background: var(--optic-ring);
   box-shadow: 0 0 0 1px var(--optic-ring);
 }
 
-.evidence-layout figure {
+.recon-card {
   min-width: 0;
   margin: 0;
   padding: 10px;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
   background: var(--optic-surface-1);
 }
 
-.evidence-layout figure > header {
-  min-height: 36px;
+.recon-card > header {
+  min-height: 30px;
   padding: 0 4px 10px;
 }
 
-.evidence-layout figure > header span:first-child {
+.recon-card > header span:first-child {
   color: var(--signal-amber);
 }
 
-.evidence-layout img {
-  width: 100%;
-  height: auto;
+.recon-stage {
   background: #0a0c0a;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-.evidence-primary img {
-  aspect-ratio: 1.74 / 1;
+.recon-spin {
+  display: block;
+  width: 100%;
+  aspect-ratio: 720 / 507;
   object-fit: contain;
+  background: #0a0c0a;
 }
 
-.evidence-layout figcaption {
+.recon-card figcaption {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
   min-height: 54px;
   padding: 12px 4px 2px;
 }
 
-.evidence-layout figcaption strong {
+.recon-input {
+  width: 48px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--optic-ring);
+}
+
+.recon-caption-text {
+  display: grid;
+  gap: 3px;
+}
+
+.recon-card figcaption strong {
   color: var(--readout-secondary);
   font-size: var(--text-fine);
   font-weight: 550;
 }
 
-.evidence-secondary {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: 1px;
-  background: var(--optic-ring);
+.recon-note {
+  padding: 16px;
+  background: var(--optic-surface-1);
 }
 
-.evidence-secondary figure {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+.recon-note > span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--signal-amber);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.08em;
 }
 
-.evidence-secondary img {
-  height: 100%;
-  min-height: 190px;
-  object-fit: contain;
+.recon-note p {
+  margin: 0;
+  color: var(--readout-dim);
+  font-size: var(--text-label);
+  line-height: 1.55;
 }
+
 
 .research-console {
   display: grid;
@@ -1935,8 +2017,7 @@ main {
     grid-template-columns: 132px minmax(220px, 0.82fr) minmax(360px, 1.18fr);
   }
 
-  .record-layout,
-  .evidence-layout {
+  .record-layout {
     grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
   }
 
@@ -2058,9 +2139,12 @@ main {
   }
 
   .record-layout,
-  .evidence-layout,
   .research-console {
     grid-template-columns: 1fr;
+  }
+
+  .recon-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .capability-stack {
@@ -2085,10 +2169,7 @@ main {
     grid-column: 1 / -1;
   }
 
-  .evidence-secondary {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-  }
+
 }
 
 @media (max-width: 640px) {
@@ -2171,7 +2252,7 @@ main {
   .mechanism,
   .record,
   .forms,
-  .evidence {
+  .reconstruction {
     padding-top: 120px;
   }
 
@@ -2310,8 +2391,18 @@ main {
     font-size: 22px;
   }
 
-  .evidence-secondary {
+  .recon-gallery {
     grid-template-columns: 1fr;
+  }
+
+  .recon-control {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+  }
+
+  .recon-control button {
+    width: 100%;
   }
 
   .research-console {

@@ -1616,7 +1616,68 @@ window.addEventListener("resize", () => {
   if (activeMicroView === "3d") renderMicro3D(currentPressure);
 });
 
+/*
+ * Turntable gallery. Seven looping reconstructions decode at once if left
+ * alone, so playback is gated three ways: a reduced-motion preference holds
+ * every card on its poster frame, offscreen cards stay paused, and the
+ * section control lets any visitor stop the motion outright.
+ */
+const reconVideos = [...document.querySelectorAll(".recon-spin")];
+const reconToggle = document.querySelector("#recon-toggle");
+const reconToggleLabel = document.querySelector("#recon-toggle-label");
+let reconWanted = !reduceMotion.matches;
+const reconVisible = new WeakSet();
+
+function syncReconVideo(video) {
+  if (reconWanted && reconVisible.has(video)) {
+    const started = video.play();
+    if (started) started.catch(() => {});
+    return;
+  }
+  video.pause();
+}
+
+function setReconPlayback(playing) {
+  reconWanted = playing;
+  reconToggle?.setAttribute("aria-pressed", String(playing));
+  if (reconToggleLabel) {
+    reconToggleLabel.textContent = playing ? "Pause rotation" : "Play rotation";
+  }
+  reconVideos.forEach(syncReconVideo);
+}
+
+function watchReconVisibility() {
+  if (!("IntersectionObserver" in window)) {
+    reconVideos.forEach((video) => reconVisible.add(video));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
+        if (entry.isIntersecting) reconVisible.add(video);
+        else reconVisible.delete(video);
+        syncReconVideo(video);
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  reconVideos.forEach((video) => observer.observe(video));
+}
+
+reconToggle?.addEventListener("click", () => {
+  setReconPlayback(!reconWanted);
+});
+
+reduceMotion.addEventListener("change", (event) => {
+  setReconPlayback(!event.matches);
+});
+
 render(currentPressure);
 setActiveMicroView("2d");
 if (microContext) canvasFallback?.setAttribute("hidden", "");
 revealContent();
+watchReconVisibility();
+setReconPlayback(reconWanted);
