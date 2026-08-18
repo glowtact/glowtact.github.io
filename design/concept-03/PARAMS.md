@@ -15,7 +15,7 @@ the guards encode the acceptance criteria below.
 | `INTIMACY_DEPTH` | 0.055 | Penetration for full optical intimacy | Measured to act as near-pure gain (0.055–0.22 all give the same curve shape); low end maximizes saturation |
 | `CONTACT_FLOOR` | 0.55 | Optical coupling of a barely-touching patch | |
 | `FIELD_SIZE` / `PROFILE_SIZE` | 61 / 97 | Field & section sampling | Resolves the 12×12 grain population without aliasing |
-| grain falloff / `cuspPower` | 1.1 / 1.8–2.3 | Grain profile shape | At the old 2.7 falloff a grain kept only 7% of its height at its nominal radius, so grains never met: 60% flat land, p99 = 5.5× median. At 1.1 with dome-shaped cusps: 19% land, p99 = 2.6× median (sieve-graded grit is ~2×) |
+| grain falloff / `cuspPower` | 1.1 / 1.05–1.40 | Grain profile shape | At the old 2.7 falloff a grain kept only 7% of its height at its nominal radius, so grains never met: 60% flat land, p99 = 5.5× median. At 1.1 with dome cusps (1.8–2.3): 19% land, p99 = 2.6× median. Sharpened to 1.05–1.40 on 2026-08-14 for a spikier read: **7% land, p99 = 2.27× median** — better on both counts, because below the nominal radius a smaller exponent decays faster and sharpens the tip, while beyond it the same exponent decays slower and keeps the skirts abutting |
 | `height` spread | 0.82–1.00 | Grain height band | Sieve-graded abrasive has a narrow height distribution |
 | `gridSize` (createRoughness) | 12 | Grains per axis | = ~9 µm period in the ~100 µm window; radii sized so grains abut (sieve-graded sandpaper, no flat land) |
 
@@ -32,7 +32,7 @@ the guards encode the acceptance criteria below.
 
 | Constant | Value | Meaning | Accepted bounds / notes |
 |---|---|---|---|
-| `MICRO_HEIGHT_EXAGGERATION` | 0.12 | 3D vertical exaggeration, canvas fraction per unit roughness | Measured: 0.24 drew grains at 1:1 (tall ones 2.35:1) against a ~0.2:1 physical aspect and read as needles; 0.12 gives ~0.5:1; below ~0.10 grains merge and the truncation stops reading |
+| `MICRO_HEIGHT_EXAGGERATION` | 0.18 | 3D vertical exaggeration, canvas fraction per unit roughness | Measured: 0.24 drew grains at 1:1 (tall ones 2.35:1) against a ~0.2:1 physical aspect and read as needles; below ~0.10 grains merge and the truncation stops reading. Raised 0.12 → 0.18 on 2026-08-14 with the cusp profile above; a cusp cut flat by the membrane plane gives a more legible plateau than a dome does, so the truncation reads better at mid-compression than it did at 0.12 |
 | `MIN_SEAM` (2D) | 1.7 px | Minimum drawn thickness of the coupled seam | The seam physically closes to a hairline at full coupling; this keeps it legible without detaching it from the gel contour it follows |
 
 

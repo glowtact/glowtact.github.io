@@ -119,7 +119,10 @@ function createRoughness(seed) {
   // they never reached their neighbours and 60% of the field was flat land
   // with isolated spikes (p99 was 5.5x the median). At 1.1 a grain still
   // has a third of its height where it meets the next one, and cuspPower
-  // near 2 makes it a dome rather than a cusp. Sieve-graded abrasive also
+  // near 1.2 makes it a cusp rather than a dome: below the nominal radius a
+  // smaller exponent decays faster and sharpens the tip, while beyond it the
+  // same exponent decays slower and keeps the skirts abutting. Sieve-graded
+  // abrasive also
   // has a narrow height spread, so the random height band is tight.
   // Result: p99/median 5.5x -> 2.6x, flat land 60% -> 19%.
   //
@@ -151,7 +154,7 @@ function createRoughness(seed) {
         radiusMajor,
         radiusMinor,
         angle,
-        cuspPower: 1.8 + random() * 0.5,
+        cuspPower: 1.05 + random() * 0.35,
         height: 0.82 + random() * 0.18,
         shoulderX: Math.cos(shoulderAngle) * shoulderDistance,
         shoulderY: Math.sin(shoulderAngle) * shoulderDistance,
@@ -402,7 +405,7 @@ function stateFor(pressure, coupledArea = contactRatio(couplingPressureFor(press
  * make the deformation legible. 0.09 was measured too: grains merge and the
  * flattening stops reading.
  */
-const MICRO_HEIGHT_EXAGGERATION = 0.12;
+const MICRO_HEIGHT_EXAGGERATION = 0.18;
 
 /** Sub-samples per cell axis when measuring the coupled area of a cell. */
 const CELL_SUBSAMPLES = 4;
