@@ -1953,3 +1953,59 @@ function writeSnrTitle(data) {
     `The gap is widest where it matters: ${ratio(0.1)}\u00d7 the signal-to-noise ` +
     `at 0.1 N, narrowing to ${ratio(10)}\u00d7 at 10 N`;
 }
+
+/* ------------------------------------------------------------------ *
+ * DAT / 03 -- shear clip selector
+ *
+ * Source and poster are swapped together and the element reloaded; swapping
+ * only the source leaves the previous clip's poster behind, which reads as
+ * the wrong clip until playback starts. browser_check asserts both move.
+ * ------------------------------------------------------------------ */
+
+function initShearViewer() {
+  const tabs = [...document.querySelectorAll(".shear-tabs button")];
+  const video = document.querySelector("#shear-video");
+  const source = document.querySelector("#shear-source");
+  const label = document.querySelector("#shear-clip-label");
+  const note = document.querySelector("#shear-clip-note");
+  if (!tabs.length || !video || !source) return;
+
+  function select(tab) {
+    tabs.forEach((other) => {
+      const active = other === tab;
+      other.setAttribute("aria-selected", String(active));
+      other.tabIndex = active ? 0 : -1;
+    });
+    const clip = tab.dataset.clip;
+    const wasPlaying = !video.paused && !video.ended;
+    source.src = `../assets/video/shear/${clip}.mp4`;
+    video.poster = `../assets/images/shear/${clip}-poster.jpg`;
+    video.load();
+    if (wasPlaying) video.play().catch(() => {});
+    label.textContent = `${tab.dataset.label.toUpperCase()} / ${tab.dataset.duration.toUpperCase()}`;
+    note.textContent = tab.dataset.note;
+    video.setAttribute(
+      "aria-label",
+      `Marker-free shear field for ${tab.dataset.label}: ${tab.dataset.note}`
+    );
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => select(tab));
+    tab.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const index = tabs.indexOf(tab);
+      let next =
+        event.key === "ArrowLeft"
+          ? (index - 1 + tabs.length) % tabs.length
+          : (index + 1) % tabs.length;
+      if (event.key === "Home") next = 0;
+      if (event.key === "End") next = tabs.length - 1;
+      tabs[next].focus();
+      select(tabs[next]);
+    });
+  });
+}
+
+initShearViewer();

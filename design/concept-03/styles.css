@@ -2891,3 +2891,139 @@ main {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * DAT / 03 -- shear tracking
+ * ------------------------------------------------------------------ */
+
+.shear-layout {
+  display: grid;
+  gap: clamp(28px, 3vw, 48px);
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  align-items: start;
+}
+
+.shear-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  margin-bottom: 1px;
+  background: var(--optic-ring-soft);
+}
+
+.shear-tabs button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 12px 18px;
+  color: var(--readout-secondary);
+  background: var(--optic-surface-1);
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+
+.shear-tabs button:hover {
+  color: var(--readout);
+  background: var(--optic-surface-2);
+}
+
+.shear-tabs button[aria-selected="true"] {
+  color: var(--camera-black);
+  background: var(--signal-amber);
+  font-weight: 600;
+}
+
+.shear-stage {
+  margin: 0;
+  background: var(--optic-surface-1);
+  border: 1px solid var(--optic-ring-soft);
+}
+
+.shear-stage video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--camera-black);
+}
+
+.shear-stage figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 16px 20px;
+  color: var(--readout-secondary);
+  font-size: var(--text-label);
+}
+
+.shear-stage figcaption span:first-child {
+  color: var(--signal-amber);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.14em;
+}
+
+.shear-legend {
+  max-width: 620px;
+  margin: 18px 0 0;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.tracker-table h4 {
+  margin: 0 0 16px;
+  font-size: var(--text-title);
+  font-weight: 620;
+}
+
+.tracker-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-label);
+}
+
+.tracker-table caption {
+  margin-bottom: 14px;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  line-height: 1.55;
+  text-align: left;
+}
+
+.tracker-table th,
+.tracker-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--optic-ring-soft);
+  color: var(--readout-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tracker-table thead th {
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tracker-table tbody th {
+  text-align: left;
+  color: var(--readout);
+  font-weight: 500;
+}
+
+.tracker-table tr.is-best th,
+.tracker-table tr.is-best td {
+  color: var(--signal-amber-bright);
+  font-weight: 620;
+}
+
+@media (max-width: 900px) {
+  .shear-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
