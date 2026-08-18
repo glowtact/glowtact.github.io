@@ -3239,7 +3239,14 @@ main {
 }
 
 @media (max-width: 700px) {
+  /* Keep the sensor names: hiding the header row left the two columns
+   * unlabelled, and which sensor is which is the whole point of the figure.
+   * The empty spacer cell goes instead. */
   .passive-head {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .passive-head span:first-child {
     display: none;
   }
 
