@@ -1684,3 +1684,272 @@ if (microContext) canvasFallback?.setAttribute("hidden", "");
 revealContent();
 watchReconVisibility();
 setReconPlayback(reconWanted);
+
+/* ------------------------------------------------------------------ *
+ * DAT / 01 -- SNR against normal force
+ *
+ * Hand-drawn SVG rather than a chart library: one bespoke chart, and the
+ * page already owns its own rendering conventions. The series are embedded
+ * as JSON in the page so no fetch is needed and the published root page --
+ * which resolves from a different directory -- needs no rewrite rule.
+ *
+ * Series colours are the page's own: GlowTact amber, GelSight blue, fixed
+ * by SCIENTIFIC_CONSTRAINTS.md rather than chosen here. Because that pins
+ * the amber above the lightness band a validator would prefer, identity is
+ * carried a second way as well -- every curve is directly labelled, and a
+ * table view sits below the chart -- so nothing depends on colour alone.
+ * ------------------------------------------------------------------ */
+
+const SNR_SERIES_COLOURS = { glowtact: "#d89122", gelsight: "#2f95d0" };
+const SNR_PLOT = { left: 82, right: 168, top: 46, bottom: 62, w: 920, h: 470 };
+const SNR_X = { min: 0.06, max: 24 };
+const SNR_Y = { min: 2.1, max: 44000 };
+
+function snrScaleX(force) {
+  const t =
+    (Math.log10(force) - Math.log10(SNR_X.min)) /
+    (Math.log10(SNR_X.max) - Math.log10(SNR_X.min));
+  return SNR_PLOT.left + t * (SNR_PLOT.w - SNR_PLOT.left - SNR_PLOT.right);
+}
+
+function snrScaleY(value) {
+  const t =
+    (Math.log10(value) - Math.log10(SNR_Y.min)) /
+    (Math.log10(SNR_Y.max) - Math.log10(SNR_Y.min));
+  return SNR_PLOT.h - SNR_PLOT.bottom - t * (SNR_PLOT.h - SNR_PLOT.top - SNR_PLOT.bottom);
+}
+
+function snrDecadeLabel(value) {
+  if (value >= 1000) return `${value / 1000}k`;
+  if (value >= 1) return String(value);
+  return String(value);
+}
+
+function svgNode(name, attributes = {}, text) {
+  const node = document.createElementNS(SVG_NS, name);
+  Object.entries(attributes).forEach(([key, value]) =>
+    node.setAttribute(key, String(value))
+  );
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function renderSnrChart() {
+  const svg = document.querySelector("#snr-chart");
+  const payload = document.querySelector("#snr-series");
+  if (!svg || !payload) return;
+
+  const data = JSON.parse(payload.textContent);
+  const plotRight = SNR_PLOT.w - SNR_PLOT.right;
+  const plotBottom = SNR_PLOT.h - SNR_PLOT.bottom;
+
+  const grid = svgNode("g", { class: "chart-grid" });
+  [1, 10, 100, 1000, 10000].forEach((value) => {
+    if (value < SNR_Y.min || value > SNR_Y.max) return;
+    const y = snrScaleY(value);
+    grid.append(svgNode("line", { x1: SNR_PLOT.left, x2: plotRight, y1: y, y2: y }));
+    grid.append(
+      svgNode(
+        "text",
+        { x: SNR_PLOT.left - 14, y: y + 4, "text-anchor": "end", class: "chart-tick" },
+        snrDecadeLabel(value)
+      )
+    );
+  });
+  [0.1, 1, 10].forEach((force) => {
+    const x = snrScaleX(force);
+    grid.append(svgNode("line", { x1: x, x2: x, y1: SNR_PLOT.top, y2: plotBottom }));
+    grid.append(
+      svgNode(
+        "text",
+        { x, y: plotBottom + 28, "text-anchor": "middle", class: "chart-tick" },
+        force < 1 ? String(force) : String(force)
+      )
+    );
+  });
+  svg.append(grid);
+
+  svg.append(
+    svgNode(
+      "text",
+      { x: SNR_PLOT.left, y: SNR_PLOT.h - 12, class: "chart-axis-label" },
+      "Normal force (N)"
+    )
+  );
+  svg.append(
+    svgNode(
+      "text",
+      {
+        x: 18,
+        y: (SNR_PLOT.top + plotBottom) / 2,
+        class: "chart-axis-label",
+        transform: `rotate(-90 18 ${(SNR_PLOT.top + plotBottom) / 2})`,
+        "text-anchor": "middle",
+      },
+      "SNR"
+    )
+  );
+
+  // Detection threshold: the definition the minimum-detectable-force numbers
+  // are measured against, so it belongs on the chart rather than in prose.
+  const thresholdY = snrScaleY(data.threshold);
+  svg.append(
+    svgNode("line", {
+      x1: SNR_PLOT.left,
+      x2: plotRight,
+      y1: thresholdY,
+      y2: thresholdY,
+      class: "chart-threshold",
+    })
+  );
+  svg.append(
+    svgNode(
+      "text",
+      { x: plotRight - 8, y: thresholdY - 12, "text-anchor": "end", class: "chart-threshold-label" },
+      `Detection threshold · SNR = ${data.threshold}`
+    )
+  );
+
+  data.series.forEach((series) => {
+    const colour = SNR_SERIES_COLOURS[series.key];
+    const d = series.points
+      .map(([force, snr], index) =>
+        `${index ? "L" : "M"}${snrScaleX(force).toFixed(1)} ${snrScaleY(snr).toFixed(1)}`
+      )
+      .join(" ");
+    svg.append(svgNode("path", { d, class: "chart-line", stroke: colour }));
+
+    const [lastForce, lastSnr] = series.points[series.points.length - 1];
+    svg.append(
+      svgNode("circle", {
+        cx: snrScaleX(lastForce),
+        cy: snrScaleY(lastSnr),
+        r: 4.5,
+        fill: colour,
+        class: "chart-end-dot",
+      })
+    );
+    // Direct label: identity never rests on colour alone.
+    svg.append(
+      svgNode(
+        "text",
+        {
+          x: snrScaleX(lastForce) + 12,
+          y: snrScaleY(lastSnr) + 4,
+          class: "chart-series-label",
+          fill: colour,
+        },
+        series.label
+      )
+    );
+  });
+
+  writeSnrTitle(data);
+  buildSnrTable(data);
+  attachSnrHover(svg, data);
+}
+
+function buildSnrTable(data) {
+  const table = document.querySelector("#snr-table");
+  if (!table) return;
+  const head = document.createElement("thead");
+  head.innerHTML =
+    "<tr><th scope=\"col\">Force (N)</th>" +
+    data.series.map((s) => `<th scope="col">${s.label} SNR</th>`).join("") +
+    "</tr>";
+  table.append(head);
+
+  const body = document.createElement("tbody");
+  const rows = data.series[0].points.filter((_, index) => index % 10 === 0);
+  rows.forEach(([force], index) => {
+    const cells = data.series.map((s) => {
+      const point = s.points[index * 10];
+      return `<td>${point ? point[1].toLocaleString() : "—"}</td>`;
+    });
+    const row = document.createElement("tr");
+    row.innerHTML = `<th scope="row">${force.toFixed(2)}</th>${cells.join("")}`;
+    body.append(row);
+  });
+  table.append(body);
+}
+
+function attachSnrHover(svg, data) {
+  const readout = svgNode("g", { class: "chart-readout", "aria-hidden": "true" });
+  const rule = svgNode("line", {
+    y1: SNR_PLOT.top,
+    y2: SNR_PLOT.h - SNR_PLOT.bottom,
+    class: "chart-crosshair",
+  });
+  readout.append(rule);
+  const dots = data.series.map(() => svgNode("circle", { r: 5, class: "chart-hover-dot" }));
+  dots.forEach((dot) => readout.append(dot));
+  const label = svgNode("text", { class: "chart-hover-label" });
+  readout.append(label);
+  svg.append(readout);
+
+  const nearest = (points, force) =>
+    points.reduce((best, point) =>
+      Math.abs(Math.log10(point[0]) - Math.log10(force)) <
+      Math.abs(Math.log10(best[0]) - Math.log10(force))
+        ? point
+        : best
+    );
+
+  function move(event) {
+    const box = svg.getBoundingClientRect();
+    const x = ((event.clientX - box.left) / box.width) * SNR_PLOT.w;
+    if (x < SNR_PLOT.left || x > SNR_PLOT.w - SNR_PLOT.right) return hide();
+    const t =
+      (x - SNR_PLOT.left) / (SNR_PLOT.w - SNR_PLOT.left - SNR_PLOT.right);
+    const force =
+      10 **
+      (Math.log10(SNR_X.min) +
+        t * (Math.log10(SNR_X.max) - Math.log10(SNR_X.min)));
+    svg.classList.add("is-probing");
+    rule.setAttribute("x1", x);
+    rule.setAttribute("x2", x);
+    const readings = data.series.map((series, index) => {
+      const point = nearest(series.points, force);
+      dots[index].setAttribute("cx", snrScaleX(point[0]));
+      dots[index].setAttribute("cy", snrScaleY(point[1]));
+      dots[index].setAttribute("fill", SNR_SERIES_COLOURS[series.key]);
+      return `${series.label} ${Math.round(point[1]).toLocaleString()}`;
+    });
+    const anchorForce = nearest(data.series[0].points, force)[0];
+    label.textContent = `${anchorForce.toFixed(2)} N · ${readings.join(" · ")}`;
+    label.setAttribute("x", Math.min(x, SNR_PLOT.w - SNR_PLOT.right - 8));
+    label.setAttribute("y", SNR_PLOT.top - 16);
+    label.setAttribute("text-anchor", t > 0.6 ? "end" : "start");
+  }
+
+  function hide() {
+    svg.classList.remove("is-probing");
+  }
+
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerleave", hide);
+}
+
+renderSnrChart();
+
+/**
+ * The headline states the finding, and derives it from the plotted series so
+ * the sentence cannot drift away from the curve it describes.
+ */
+function writeSnrTitle(data) {
+  const title = document.querySelector(".chart-title");
+  if (!title) return;
+  const [glowtact, gelsight] = data.series;
+  const readAt = (points, force) =>
+    points.reduce((best, point) =>
+      Math.abs(Math.log10(point[0]) - Math.log10(force)) <
+      Math.abs(Math.log10(best[0]) - Math.log10(force))
+        ? point
+        : best
+    )[1];
+  const ratio = (force) =>
+    Math.round(readAt(glowtact.points, force) / readAt(gelsight.points, force));
+  title.textContent =
+    `The gap is widest where it matters: ${ratio(0.1)}\u00d7 the signal-to-noise ` +
+    `at 0.1 N, narrowing to ${ratio(10)}\u00d7 at 10 N`;
+}

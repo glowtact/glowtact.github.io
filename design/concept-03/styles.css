@@ -2616,3 +2616,278 @@ main {
     justify-content: space-between;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * DAT / 01 -- sensitivity
+ * ------------------------------------------------------------------ */
+
+.sensitivity-layout {
+  display: grid;
+  gap: clamp(28px, 3vw, 48px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-pair {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 1px;
+  background: var(--optic-ring-soft);
+}
+
+.stat {
+  padding: 26px 28px 24px;
+  background: var(--optic-surface-1);
+  border-top: 2px solid var(--optic-ring);
+}
+
+.stat--glowtact {
+  border-top-color: var(--signal-amber);
+}
+
+.stat--gelsight {
+  border-top-color: #2f95d0;
+}
+
+.stat dt {
+  color: var(--readout-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stat dd {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+.stat dd strong {
+  font-size: clamp(32px, 3.4vw, 54px);
+  font-weight: 620;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stat--glowtact dd strong {
+  color: var(--signal-amber-bright);
+}
+
+.stat--gelsight dd strong {
+  color: #6bbef0;
+}
+
+.stat dd span {
+  color: var(--readout-secondary);
+  font-size: var(--text-title);
+}
+
+.stat p {
+  margin: 0;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  line-height: 1.5;
+}
+
+.chart-figure {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.chart-title {
+  max-width: 720px;
+  margin: 0 0 20px;
+  color: var(--readout);
+  font-size: var(--text-title);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.chart-frame {
+  padding: 8px 4px;
+  background: var(--optic-surface-1);
+  border: 1px solid var(--optic-ring-soft);
+}
+
+#snr-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart-grid line {
+  stroke: var(--optic-grid);
+  stroke-width: 1;
+}
+
+.chart-tick {
+  fill: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+}
+
+.chart-axis-label {
+  fill: var(--readout-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.12em;
+}
+
+.chart-threshold {
+  stroke: var(--readout-dim);
+  stroke-width: 1.5;
+  stroke-dasharray: 7 6;
+}
+
+.chart-threshold-label {
+  fill: var(--readout-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-series-label {
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.chart-readout {
+  opacity: 0;
+  transition: opacity 0.15s var(--ease-out);
+}
+
+#snr-chart.is-probing .chart-readout {
+  opacity: 1;
+}
+
+.chart-crosshair {
+  stroke: var(--readout-dim);
+  stroke-width: 1;
+}
+
+.chart-hover-dot {
+  stroke: var(--optic-surface-1);
+  stroke-width: 2;
+}
+
+.chart-hover-label {
+  fill: var(--readout);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+}
+
+.chart-table {
+  margin-top: 18px;
+}
+
+.chart-table summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--readout-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  cursor: pointer;
+}
+
+.chart-table summary:hover {
+  color: var(--signal-amber-bright);
+}
+
+.chart-table__scroll {
+  overflow-x: auto;
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid var(--optic-ring-soft);
+}
+
+.chart-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+}
+
+.chart-table caption {
+  padding: 12px 14px;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  text-align: left;
+}
+
+.chart-table th,
+.chart-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--optic-ring-soft);
+  color: var(--readout-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--optic-surface-2);
+  color: var(--readout);
+  text-align: right;
+}
+
+.chart-table tbody th {
+  text-align: left;
+  color: var(--readout);
+}
+
+.chart-note {
+  max-width: 660px;
+  margin: 16px 0 0;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.evidence-figure {
+  margin: 0;
+  background: var(--optic-surface-1);
+  border: 1px solid var(--optic-ring-soft);
+}
+
+.evidence-figure img,
+.evidence-figure video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.evidence-figure figcaption {
+  padding: 18px 20px 20px;
+  color: var(--readout-secondary);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.evidence-figure figcaption > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.14em;
+}
+
+@media (max-width: 860px) {
+  .sensitivity-layout,
+  .stat-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
