@@ -1,0 +1,11 @@
+# The project moved from Windows to Linux; normalize text to LF in the
+# repository so a checkout on either platform stops producing whole-file
+# diffs that hide the real change.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.mp4 binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.npz binary
