@@ -3180,3 +3180,74 @@ main {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Passive-contact comparison: raw frames only, identical treatment per side. */
+.passive-grid {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.passive-rows {
+  display: grid;
+  gap: 1px;
+  max-width: 880px;
+  padding: 1px;
+  background: var(--optic-ring-soft);
+}
+
+.passive-head,
+.passive-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1px;
+}
+
+.passive-head span {
+  padding: 12px 16px;
+  color: var(--readout-tertiary);
+  background: var(--optic-surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.passive-object {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  color: var(--readout);
+  background: var(--optic-surface-1);
+  font-size: var(--text-label);
+}
+
+.passive-object small {
+  margin-top: 6px;
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+}
+
+.passive-row img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--optic-surface-1);
+}
+
+@media (max-width: 700px) {
+  .passive-head {
+    display: none;
+  }
+
+  .passive-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .passive-object {
+    grid-column: 1 / -1;
+  }
+}
