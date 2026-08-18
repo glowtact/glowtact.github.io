@@ -27,7 +27,7 @@
       </a>
       <nav aria-label="Signal Chamber sections">
         <a href="#mechanism">Mechanism</a>
-        <a href="#reconstruction">3D reconstruction</a>
+        <a href="#results">Results</a>
         <a href="#research">Research</a>
       </nav>
       <a class="concept-channel" href="./">
@@ -51,8 +51,8 @@
               Explore the mechanism
               <span aria-hidden="true">↓</span>
             </a>
-            <a class="button button--quiet" href="#record">
-              Watch the experiment
+            <a class="button button--quiet" href="#results">
+              See the results
               <span aria-hidden="true">↘</span>
             </a>
           </div>
@@ -481,63 +481,16 @@
         </div>
       </section>
 
-      <section class="record" id="record" aria-labelledby="record-title">
-        <header class="section-header" data-reveal>
-          <div>
-            <p class="signal-label"><span>REC / 01</span> Experimental context</p>
-            <h2 id="record-title">A compact signal<br>at the fingertip.</h2>
-          </div>
-          <p>
-            Supplied project media places the sensor in robotic manipulation.
-            The adjacent capabilities summarize what the paper evaluates.
-          </p>
-        </header>
-
-        <div class="record-layout">
-          <figure class="video-module" data-reveal>
-            <video
-              controls
-              muted
-              playsinline
-              preload="metadata"
-              poster="./design/assets/images/mms-contact-poster.jpg"
-              aria-label="GlowTact robotic contact demonstration video"
-            >
-              <source src="./design/assets/video/mms-contact.mp4" type="video/mp4">
-              Your browser does not support embedded video.
-            </video>
-            <figcaption>
-              <span>EXPERIMENTAL VIDEO / MMS CONTACT</span>
-              <span>User-controlled playback</span>
-            </figcaption>
-          </figure>
-
-          <div class="capability-stack">
-            <article data-reveal>
-              <span>01 / PASSIVE CONTACT</span>
-              <h3>Visible under light loading.</h3>
-              <p>Small local interface changes produce spatially concentrated tactile responses.</p>
-            </article>
-            <article data-reveal>
-              <span>02 / FINE GEOMETRY</span>
-              <h3>Structure survives the signal.</h3>
-              <p>Contact images preserve fine patterns, including fingerprint ridges and M1 threads.</p>
-            </article>
-            <article data-reveal>
-              <span>03 / FORCE CUE</span>
-              <h3>Darkness changes continuously.</h3>
-              <p>Pressure-responsive images support continuous normal-force estimation.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
       <section class="forms" aria-labelledby="forms-title">
         <header class="section-header" data-reveal>
           <div>
             <p class="signal-label"><span>CFG / 01</span> Sensor forms</p>
             <h2 id="forms-title">One principle.<br>Three bodies.</h2>
           </div>
+          <p>
+            The same pressure-induced coupling drives all three. Every result
+            that follows was measured on the flat sensor.
+          </p>
         </header>
 
         <div class="form-comparison" data-reveal>
@@ -574,246 +527,278 @@
         </div>
       </section>
 
-      <section
-        class="reconstruction"
-        id="reconstruction"
-        aria-labelledby="reconstruction-title"
-      >
-        <header class="section-header" data-reveal>
+
+      <section class="results" id="results" aria-labelledby="results-title">
+        <header class="section-header results-header" data-reveal>
           <div>
-            <p class="signal-label"><span>DAT / 01</span> 3D reconstruction</p>
-            <h2 id="reconstruction-title">One dark image,<br>turned in three dimensions.</h2>
+            <p class="signal-label"><span>DAT</span> Results</p>
+            <h2 id="results-title">Simple optics.<br>Nothing given up.</h2>
           </div>
           <p>
-            Every surface below is reconstructed from a single GlowTact tactile
-            frame — the darkening alone, with no second view and no marker
-            field. Each object turns through a full revolution so the relief can
-            be read from every angle.
+            Each result below tests the same doubt from a different side:
+            whether a sensor this simple — one colour, no directional
+            illumination, no photometric calibration — gives up what the
+            complicated ones buy. Every measurement is from the flat sensor.
           </p>
         </header>
 
-        <div class="recon-control">
-          <span>TURNTABLE</span>
-          <button id="recon-toggle" type="button" aria-pressed="true">
-            <span class="play-icon" aria-hidden="true"></span>
-            <span id="recon-toggle-label">Pause rotation</span>
-          </button>
-        </div>
+        <ol class="results-index" aria-label="Results index">
+          <li><a href="#sensitivity"><span>DAT / 01</span> Sensitivity</a></li>
+          <li><a href="#reconstruction"><span>DAT / 02</span> 3D reconstruction</a></li>
+          <li><a href="#shear"><span>DAT / 03</span> Shear tracking</a></li>
+          <li><a href="#force"><span>DAT / 04</span> Force prediction</a></li>
+          <li><a href="#endurance"><span>DAT / 05</span> Endurance</a></li>
+        </ol>
 
-        <div class="recon-gallery">
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 01</span><span>IN PAPER</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/screw-threads-spin-poster.jpg"
-                aria-label="Rotating reconstruction of five set screws pressed into the sensor"
-              >
-                <source src="./design/assets/video/recon/screw-threads-spin.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/screw-threads-tactile.jpg"
-                alt="GlowTact tactile image of five set screw threads"
-              >
-              <span class="recon-caption-text">
-                <strong>M2–M5 screw threads</strong>
-                <span>Five set screws pressed side by side</span>
-              </span>
-            </figcaption>
-          </figure>
+<!--MODULE-01-->
 
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 02</span><span>IN PAPER</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/philips-head-spin-poster.jpg"
-                aria-label="Rotating reconstruction of a Phillips screw head"
-              >
-                <source src="./design/assets/video/recon/philips-head-spin.mp4" type="video/mp4">
-              </video>
+        <article
+            class="result-module reconstruction"
+            id="reconstruction"
+            aria-labelledby="reconstruction-title"
+          >
+          <header class="section-header" data-reveal>
+            <div>
+              <p class="signal-label"><span>DAT / 02</span> 3D reconstruction</p>
+              <h2 id="reconstruction-title">One dark image,<br>turned in three dimensions.</h2>
             </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/philips-head-tactile.jpg"
-                alt="GlowTact tactile image of a Phillips screw head"
-              >
-              <span class="recon-caption-text">
-                <strong>Phillips screw head</strong>
-                <span>Cross recess inside a round head</span>
-              </span>
-            </figcaption>
-          </figure>
-
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 03</span><span>IN PAPER</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/cali-balls-spin-poster.jpg"
-                aria-label="Rotating reconstruction of a calibration ball array"
-              >
-                <source src="./design/assets/video/recon/cali-balls-spin.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/cali-balls-tactile.jpg"
-                alt="GlowTact tactile image of a calibration ball array"
-              >
-              <span class="recon-caption-text">
-                <strong>4.7 mm calibration balls</strong>
-                <span>Spherical caps at a known radius</span>
-              </span>
-            </figcaption>
-          </figure>
-
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 04</span><span>ARCHIVE</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/oreo-spin-poster.jpg"
-                aria-label="Rotating reconstruction of embossed biscuit lettering"
-              >
-                <source src="./design/assets/video/recon/oreo-spin.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/oreo-tactile.jpg"
-                alt="GlowTact tactile image of embossed biscuit lettering"
-              >
-              <span class="recon-caption-text">
-                <strong>Oreo embossing</strong>
-                <span>Raised lettering and floret border</span>
-              </span>
-            </figcaption>
-          </figure>
-
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 05</span><span>ARCHIVE</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/swirls-spin-poster.jpg"
-                aria-label="Rotating reconstruction of a repeating ridge band"
-              >
-                <source src="./design/assets/video/recon/swirls-spin.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/swirls-tactile.jpg"
-                alt="GlowTact tactile image of a repeating ridge band"
-              >
-              <span class="recon-caption-text">
-                <strong>Swirl ridge pattern</strong>
-                <span>Repeating ridge band across the pad</span>
-              </span>
-            </figcaption>
-          </figure>
-
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 06</span><span>ARCHIVE</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/battery-spin-poster.jpg"
-                aria-label="Rotating reconstruction of a knurled cell terminal"
-              >
-                <source src="./design/assets/video/recon/battery-spin.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/battery-tactile.jpg"
-                alt="GlowTact tactile image of a knurled cell terminal"
-              >
-              <span class="recon-caption-text">
-                <strong>Knurled cell terminal</strong>
-                <span>Cross-hatched knurl on a circular face</span>
-              </span>
-            </figcaption>
-          </figure>
-
-          <figure class="recon-card" data-reveal>
-            <header><span>OBJ / 07</span><span>ARCHIVE</span></header>
-            <div class="recon-stage">
-              <video
-                class="recon-spin"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="metadata"
-                poster="./design/assets/images/reconstruction/hex-head-spin-poster.jpg"
-                aria-label="Rotating reconstruction of an M2 hex socket head"
-              >
-                <source src="./design/assets/video/recon/hex-head-spin.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <img
-                class="recon-input"
-                src="./design/assets/images/reconstruction/hex-head-tactile.jpg"
-                alt="GlowTact tactile image of an M2 hex socket head"
-              >
-              <span class="recon-caption-text">
-                <strong>M2 hex socket head</strong>
-                <span>Recessed drive inside a raised rim</span>
-              </span>
-            </figcaption>
-          </figure>
-          <div class="recon-note" id="reconstruction-disclosure">
-            <span>NOTE / QUALITATIVE</span>
             <p>
-              Every panel is GlowTact output. Relief is recovered from
-              pressure-induced darkening in one tactile frame and is not validated
-              against measured heights, so each surface should be read as spatial
-              structure rather than exact geometry. The small frame on each card is
-              the tactile image the reconstruction came from.
+              Every surface below is reconstructed from a single GlowTact tactile
+              frame — the darkening alone, with no second view and no marker
+              field. Each object turns through a full revolution so the relief can
+              be read from every angle, down to threads of
+              <span data-metric="reconstruction.finest_thread_pitch">0.25</span> mm
+              pitch.
             </p>
+          </header>
+
+          <div class="recon-control">
+            <span>TURNTABLE</span>
+            <button id="recon-toggle" type="button" aria-pressed="true">
+              <span class="play-icon" aria-hidden="true"></span>
+              <span id="recon-toggle-label">Pause rotation</span>
+            </button>
           </div>
-        </div>
+
+          <div class="recon-gallery">
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 01</span><span>IN PAPER</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/screw-threads-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of five set screws, M3 down to M1, pressed into the sensor"
+                >
+                  <source src="./design/assets/video/recon/screw-threads-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/screw-threads-tactile.jpg"
+                  alt="GlowTact tactile image of five set screw threads, M3 down to M1"
+                >
+                <span class="recon-caption-text">
+                  <strong>M1–M3 screw threads</strong>
+                  <span>M3, M2.5, M2, M1.5 and M1 set screws</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 02</span><span>IN PAPER</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/philips-head-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of a Phillips screw head"
+                >
+                  <source src="./design/assets/video/recon/philips-head-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/philips-head-tactile.jpg"
+                  alt="GlowTact tactile image of a Phillips screw head"
+                >
+                <span class="recon-caption-text">
+                  <strong>Phillips screw head</strong>
+                  <span>Cross recess inside a round head</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 03</span><span>IN PAPER</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/cali-balls-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of a calibration ball array"
+                >
+                  <source src="./design/assets/video/recon/cali-balls-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/cali-balls-tactile.jpg"
+                  alt="GlowTact tactile image of a calibration ball array"
+                >
+                <span class="recon-caption-text">
+                  <strong>4.7 mm calibration balls</strong>
+                  <span>Spherical caps at a known radius</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 04</span><span>ARCHIVE</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/oreo-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of embossed biscuit lettering"
+                >
+                  <source src="./design/assets/video/recon/oreo-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/oreo-tactile.jpg"
+                  alt="GlowTact tactile image of embossed biscuit lettering"
+                >
+                <span class="recon-caption-text">
+                  <strong>Oreo embossing</strong>
+                  <span>Raised lettering and floret border</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 05</span><span>ARCHIVE</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/swirls-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of a repeating ridge band"
+                >
+                  <source src="./design/assets/video/recon/swirls-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/swirls-tactile.jpg"
+                  alt="GlowTact tactile image of a repeating ridge band"
+                >
+                <span class="recon-caption-text">
+                  <strong>Swirl ridge pattern</strong>
+                  <span>Repeating ridge band across the pad</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 06</span><span>ARCHIVE</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/battery-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of a knurled cell terminal"
+                >
+                  <source src="./design/assets/video/recon/battery-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/battery-tactile.jpg"
+                  alt="GlowTact tactile image of a knurled cell terminal"
+                >
+                <span class="recon-caption-text">
+                  <strong>Knurled cell terminal</strong>
+                  <span>Cross-hatched knurl on a circular face</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure class="recon-card" data-reveal>
+              <header><span>OBJ / 07</span><span>ARCHIVE</span></header>
+              <div class="recon-stage">
+                <video
+                  class="recon-spin"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="./design/assets/images/reconstruction/hex-head-spin-poster.jpg"
+                  aria-label="Rotating reconstruction of an M2 hex socket head"
+                >
+                  <source src="./design/assets/video/recon/hex-head-spin.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption>
+                <img
+                  class="recon-input"
+                  src="./design/assets/images/reconstruction/hex-head-tactile.jpg"
+                  alt="GlowTact tactile image of an M2 hex socket head"
+                >
+                <span class="recon-caption-text">
+                  <strong>M2 hex socket head</strong>
+                  <span>Recessed drive inside a raised rim</span>
+                </span>
+              </figcaption>
+            </figure>
+            <div class="recon-note" id="reconstruction-disclosure">
+              <span>NOTE / QUALITATIVE</span>
+              <p>
+                Every panel is GlowTact output. Relief is recovered from
+                pressure-induced darkening in one tactile frame and is not validated
+                against measured heights, so each surface should be read as spatial
+                structure rather than exact geometry. The small frame on each card is
+                the tactile image the reconstruction came from.
+              </p>
+            </div>
+          </div>
+        </article>
+
+<!--MODULE-03-->
+<!--MODULE-04-->
+<!--MODULE-05-->
       </section>
 
       <section class="research-console" id="research" aria-labelledby="research-title">
@@ -845,7 +830,7 @@
       <a href="./design/concept-02/"><span aria-hidden="true">←</span> Contact Atlas</a>
       <p><span class="status-lamp" aria-hidden="true"></span> GLOWTACT / SIGNAL CHAMBER</p>
       <a href="./">All concepts <span aria-hidden="true">↗</span></a>
-      <span class="build-stamp" aria-hidden="true">2026-08-13 · ac17d28</span>
+      <span class="build-stamp" aria-hidden="true">2026-08-18 · da09e4d</span>
     </footer>
   </body>
 </html>
