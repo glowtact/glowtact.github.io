@@ -1,8 +1,10 @@
-import os, socket, subprocess, sys, time
+import os, socket, subprocess, sys, tempfile, time
 from playwright.sync_api import sync_playwright
 import os as _os
 ROOT = _os.path.normpath(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), ".."))
-PORT = int(os.environ.get("P","4421")); OUT = os.environ.get("O","C:/tmp/gt-r1")
+PORT = int(os.environ.get("P","4421"))
+# Not "C:/tmp/..." -- that path makes a literal "C:" folder on Linux.
+OUT = os.environ.get("O", os.path.join(tempfile.gettempdir(), "gt-r1"))
 def free(p):
     with socket.socket() as s: return s.connect_ex(("127.0.0.1", p)) != 0
 os.makedirs(OUT, exist_ok=True)

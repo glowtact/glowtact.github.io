@@ -4,6 +4,7 @@ import os
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 from playwright.sync_api import sync_playwright
@@ -11,7 +12,11 @@ from playwright.sync_api import sync_playwright
 import os as _os
 ROOT = _os.path.normpath(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), ".."))
 PORT = int(os.environ.get("AUDIT_PORT", "4411"))
-OUT = "C:/tmp/glowtact-audit"
+# Windows-absolute by default from where this was written; on Linux that
+# literally created a "C:" folder inside the repository, so the platform
+# temp directory wins unless AUDIT_OUT says otherwise.
+OUT = os.environ.get("AUDIT_OUT",
+                     os.path.join(tempfile.gettempdir(), "glowtact-audit"))
 ROUTES = ["/", "/concept-01/", "/concept-02/", "/concept-03/"]
 VIEWPORTS = {
     "m375": {"width": 375, "height": 812},

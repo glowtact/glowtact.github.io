@@ -214,11 +214,20 @@ is 1160 px rather than 900 to hold the output resolution at the lower zoom.
 | `assets/images/reconstruction/<object>-spin-poster.jpg` | first frame of the same GIF |
 | `assets/images/reconstruction/<object>-tactile.jpg` | `<object>/<object>_tactile.png` |
 
+Each gallery folder also holds `<object>_object.png`, a photograph of the
+pressed object, for the three objects that were ever photographed. The site
+does not use them yet.
+
 Objects: `screw-threads`, `philips-head`, `cali-balls`, `oreo`, `swirls`,
 `battery`, `hex-head`.
 
+Every object is rendered through one camera and cropped with one shared box, so
+all seven turntables are 1160x817 and the pads are the same size card to card.
+A turn takes 12 s: 144 frames at 12 fps rather than 72 at 6, because the slower
+frame rate turns just as slowly and visibly judders.
+
 The turntables ship as H.264 rather than as the source GIFs. The seven GIFs are
-41 MB; the same 72 frames at 720 px wide are 2.7 MB as MP4, and re-encoding the
+83 MB; the same 144 frames at 720 px wide are 4.1 MB as MP4, and re-encoding the
 GIFs (12 fps, 96 colors) only made them larger, because dithering the speckled
 mesh defeats LZW. Each `<video>` is muted, looping, `playsinline`, and carries
 its first frame as a poster, so it reads as a GIF and still animates without JS.

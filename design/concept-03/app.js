@@ -13,8 +13,11 @@ const contactFraction = document.querySelector("#contact-fraction");
 const cameraIntensity = document.querySelector("#camera-intensity");
 const cameraContact = document.querySelector(".camera-contact");
 
-const microTabs = [...document.querySelectorAll('[role="tab"][aria-controls]')];
-const microPanels = [...document.querySelectorAll('[role="tabpanel"]')];
+// Scoped to the microscope: the shear selector in DAT/03 is also a tablist,
+// and an unscoped [role="tab"] query swept its buttons in here, so ArrowLeft
+// from the 2D tab wrapped into the shear clips instead of to 3D.
+const microTabs = [...document.querySelectorAll('.micro-tabs [role="tab"]')];
+const microPanels = [...document.querySelectorAll('.micro-panel[role="tabpanel"]')];
 const microCanvas = document.querySelector("#micro-canvas");
 const microContext = microCanvas?.getContext("2d") ?? null;
 const canvasFallback = document.querySelector(".canvas-fallback");

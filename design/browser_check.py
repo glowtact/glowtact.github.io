@@ -1,6 +1,9 @@
 from pathlib import Path
 import base64
+import json
+import math
 import os
+import subprocess
 import re
 import sys
 
@@ -28,6 +31,7 @@ OUTPUT = Path(
         str(Path(os.environ.get("TEMP", ".")) / "glowtact-review"),
     )
 )
+DESIGN_ROOT = Path(__file__).resolve().parent
 MODE = os.environ.get("GLOWTACT_CHECK_MODE", "all")
 TRANSPARENT_GIF = base64.b64decode(
     "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
@@ -1222,6 +1226,143 @@ def check_coupling_readability(browser) -> None:
     page.close()
 
 
+def check_results_region(browser) -> None:
+    """Freeze the defect classes the results region introduced.
+
+    Each assertion targets a failure that actually occurred while building it,
+    not a hypothetical one: a video whose codec no browser decodes, a chart
+    whose drawn geometry disagrees with the numbers printed beside it, and a
+    clip selector that swaps the source but leaves the previous poster.
+    """
+    page = browser.new_page(viewport=VIEWPORTS["desktop"])
+    navigate(page, "/concept-03/")
+
+    results = json.loads(
+        (DESIGN_ROOT / "data" / "results.json").read_text(encoding="utf-8")
+    )
+
+    # 1. Every video the results region ships must be web-baseline H.264.
+    #
+    #    This is a STATIC check on the encoded files, deliberately not a
+    #    runtime readyState assertion: this Chromium decodes High 4:4:4
+    #    Predictive in software and reports readyState 4 for it, so a runtime
+    #    check cannot tell a shippable file from one Safari and every hardware
+    #    decoder will refuse. The criterion has to be the profile itself.
+    videos = page.eval_on_selector_all(
+        "#results video source, #results video[src]",
+        "els => els.map(el => el.getAttribute('src'))",
+    )
+    assert videos, "no videos found in #results; the check would pass vacuously"
+    for src in videos:
+        path = (DESIGN_ROOT / "concept-03" / src).resolve()
+        assert path.exists(), f"results video missing on disk: {src}"
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=codec_name,profile,pix_fmt",
+             "-of", "csv=p=0", str(path)],
+            capture_output=True, text=True,
+        )
+        assert probe.returncode == 0 and probe.stdout.strip(), (
+            f"ffprobe produced nothing for {src}; the check cannot pass "
+            "vacuously on a missing tool"
+        )
+        codec, profile, pix_fmt = probe.stdout.strip().split(",")
+        assert codec == "h264", f"{src}: codec {codec} is not h264"
+        assert "4:4:4" not in profile, (
+            f"{src}: profile {profile!r} -- Safari and hardware decoders "
+            "will not play 4:4:4"
+        )
+        assert pix_fmt == "yuv420p", f"{src}: pix_fmt {pix_fmt} is not yuv420p"
+
+    # 2. The SNR chart's drawn geometry must agree with the data it plots.
+    #    Read the page's own scale functions so the test and the page share one
+    #    source of truth rather than re-deriving the mapping here.
+    #    The mapping is re-derived HERE from the page's constants rather than
+    #    by calling the page's own scale functions. Calling them compares a
+    #    function against itself: a bug inside snrScaleX moves the drawn path
+    #    and the expected value together and the assertion passes. Only the
+    #    axis constants are shared; the arithmetic is independent.
+    geometry = page.evaluate(
+        """() => {
+            const data = JSON.parse(document.querySelector('#snr-series').textContent);
+            const path = document.querySelector('#snr-chart path.chart-line');
+            const first = path.getAttribute('d').match(/M([\\d.]+) ([\\d.]+)/);
+            return {
+              drawnX: parseFloat(first[1]),
+              drawnY: parseFloat(first[2]),
+              point: data.series[0].points[0],
+              plot: SNR_PLOT, xDomain: SNR_X, yDomain: SNR_Y,
+            };
+        }"""
+    )
+    plot, xd, yd = geometry["plot"], geometry["xDomain"], geometry["yDomain"]
+    force, snr = geometry["point"]
+    span_x = plot["w"] - plot["left"] - plot["right"]
+    span_y = plot["h"] - plot["top"] - plot["bottom"]
+    expect_x = plot["left"] + span_x * (
+        (math.log10(force) - math.log10(xd["min"]))
+        / (math.log10(xd["max"]) - math.log10(xd["min"]))
+    )
+    expect_y = plot["h"] - plot["bottom"] - span_y * (
+        (math.log10(snr) - math.log10(yd["min"]))
+        / (math.log10(yd["max"]) - math.log10(yd["min"]))
+    )
+    assert abs(geometry["drawnX"] - expect_x) < 0.5, (
+        f"SNR chart x geometry drifted: drawn {geometry['drawnX']:.2f}, "
+        f"independently expected {expect_x:.2f}"
+    )
+    assert abs(geometry["drawnY"] - expect_y) < 0.5, (
+        f"SNR chart y geometry drifted: drawn {geometry['drawnY']:.2f}, "
+        f"independently expected {expect_y:.2f}"
+    )
+
+    # 3. The headline is generated from the series; assert it carries a ratio
+    #    consistent with the plotted data rather than a hand-typed number.
+    title = page.inner_text(".chart-title")
+    expected = page.evaluate(
+        """() => {
+            const data = JSON.parse(document.querySelector('#snr-series').textContent);
+            const read = (pts, f) => pts.reduce((b, p) =>
+              Math.abs(Math.log10(p[0]) - Math.log10(f)) <
+              Math.abs(Math.log10(b[0]) - Math.log10(f)) ? p : b)[1];
+            return Math.round(read(data.series[0].points, 0.1) /
+                              read(data.series[1].points, 0.1));
+        }"""
+    )
+    assert f"{expected}\u00d7" in title, (
+        f"chart headline {title!r} does not carry the plotted ratio {expected}x"
+    )
+
+    # 4. The shear selector must move source AND poster together.
+    before = page.evaluate(
+        """() => ({src: document.querySelector('#shear-source').getAttribute('src'),
+                  poster: document.querySelector('#shear-video').getAttribute('poster')})"""
+    )
+    page.click("#shear-tab-2")
+    page.wait_for_timeout(250)
+    after = page.evaluate(
+        """() => ({src: document.querySelector('#shear-source').getAttribute('src'),
+                  poster: document.querySelector('#shear-video').getAttribute('poster')})"""
+    )
+    assert before["src"] != after["src"], "shear selector did not change the source"
+    assert before["poster"] != after["poster"], (
+        "shear selector changed the source but not the poster; the previous "
+        "clip's still would show until playback starts"
+    )
+
+    # 5. The scope footnote is the part a reviewer checks first; it must exist
+    #    on every module rather than only on the ones that felt risky.
+    modules = page.eval_on_selector_all(
+        ".result-module",
+        "els => els.map(el => [el.id, !!el.querySelector('.module-scope')])",
+    )
+    assert len(modules) == 5, f"expected 5 result modules, found {len(modules)}"
+    missing = [name for name, has in modules if not has]
+    assert not missing, f"result modules without a scope footnote: {missing}"
+
+    page.close()
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
@@ -1242,6 +1383,7 @@ def main() -> int:
             check_design_system(browser)
             check_media_scaling(browser)
             check_coupling_readability(browser)
+            check_results_region(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
@@ -1250,7 +1392,7 @@ def main() -> int:
     if MODE in {"all", "design"}:
         print(
             "PASS: contrast, touch targets, type scale, overflow, "
-            "media scaling, coupling readability"
+            "media scaling, coupling readability, results region"
         )
     return 0
 
