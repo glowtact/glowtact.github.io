@@ -642,16 +642,23 @@
           >
           <header class="section-header" data-reveal>
             <div>
-              <p class="signal-label"><span>DAT / 02</span> 3D reconstruction</p>
+              <p class="signal-label"><span>DAT / 02</span> Drop photometric stereo and you lose geometry</p>
               <h2 id="reconstruction-title">One dark image,<br>turned in three dimensions.</h2>
             </div>
             <p>
               Every surface below is reconstructed from a single GlowTact tactile
               frame — the darkening alone, with no second view and no marker
               field. Each object turns through a full revolution so the relief can
-              be read from every angle, down to threads of
-              <span data-metric="reconstruction.finest_thread_pitch">0.25</span> mm
-              pitch.
+                be read from every angle.
+            </p>
+            <p class="module-claim">
+              GlowTact was not designed to recover shape — it was designed to
+              visualise pressure. The relief below comes from running
+              <em>9DTact&#8217;s</em> reconstruction pipeline on GlowTact frames,
+              and it resolves M1 threads at
+              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong> mm
+              pitch, where 9DTact&#8217;s own published results stop at M4 —
+              <span data-metric="reconstruction.ninedtact_limit_size">0.7</span> mm.
             </p>
           </header>
 
@@ -976,8 +983,132 @@
             calibrated shear forces.
           </p>
         </article>
-<!--MODULE-04-->
-<!--MODULE-05-->
+        <article class="result-module" id="force" aria-labelledby="force-title">
+          <header class="module-header" data-reveal>
+            <p class="signal-label"><span>DAT / 04</span> Darkening is qualitative; you cannot get newtons</p>
+            <h3 id="force-title">Darkness carries the load.</h3>
+            <p class="module-claim">
+              Across four everyday objects, a learned regressor reads normal
+              force from a GlowTact frame to
+              <strong data-metric="force.macro_mae_glowtact">0.106</strong> N
+              mean absolute error, against
+              <strong data-metric="force.macro_mae_gelsight">0.145</strong> N
+              for GelSight Mini — identical architecture, identical protocol,
+              held-out contact locations.
+            </p>
+          </header>
+
+          <div class="force-layout">
+            <figure class="chart-figure" data-reveal>
+              <figcaption class="chart-title">
+                The advantage is a low-force advantage — and it reverses above 2 N
+              </figcaption>
+              <div class="chart-frame">
+                <svg id="force-chart" viewBox="0 0 920 400" role="img"
+                     aria-label="Mean absolute error by force bin for both sensors.
+                     GlowTact is lower in the 0 to 0.5 newton bin, 0.056 against
+                     0.067, and in the 0.5 to 2 newton bin, 0.058 against 0.088.
+                     In the 2 to 20 newton bin GlowTact is higher, 0.209 against
+                     0.185."></svg>
+              </div>
+              <p class="chart-note">
+                Controlled-probe validation, Table I(a). Lower is better. The
+                third bin is the one where GlowTact loses: above 2 N its error
+                is <span data-metric="force.mae_high_glowtact">0.209</span> N
+                against GelSight Mini&#8217;s
+                <span data-metric="force.mae_high_gelsight">0.185</span> N.
+              </p>
+            </figure>
+
+            <div class="force-objects" data-reveal>
+              <h4>Everyday objects, held-out locations</h4>
+              <table>
+                <caption>Table I(b). Mean absolute error in newtons; lower is better.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Object</th>
+                    <th scope="col">GlowTact</th>
+                    <th scope="col">GelSight Mini</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Balloon</th><td class="is-best">0.087</td><td>0.134</td></tr>
+                  <tr><th scope="row">Light bulb</th><td class="is-best">0.093</td><td>0.151</td></tr>
+                  <tr><th scope="row">Pipe</th><td class="is-best">0.127</td><td>0.142</td></tr>
+                  <tr><th scope="row">Rope</th><td class="is-best">0.117</td><td>0.153</td></tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th scope="row">Macro average</th>
+                    <td class="is-best" data-metric="force.macro_mae_glowtact">0.106</td>
+                    <td data-metric="force.macro_mae_gelsight">0.145</td>
+                  </tr>
+                </tfoot>
+              </table>
+              <p class="force-method">
+                Identical ResNet-18 regressors, ImageNet-pretrained, trained
+                independently per sensor on
+                <span data-metric="force.frames_per_sensor">14716</span> frames —
+                <span data-metric="force.frames_controlled">13116</span> from ten
+                probe geometries and
+                <span data-metric="force.frames_objects">1600</span> from the four
+                objects. Ninety per cent of spatial locations train, ten validate,
+                with every depth from one indentation kept on the same side of the
+                split so no loading trajectory leaks across it.
+              </p>
+            </div>
+          </div>
+
+          <p class="module-scope">
+            Force is estimated by a learned model from the image, not measured by
+            the camera. The gain is concentrated below 2 N, which is where the
+            optical response is strongest and where the sensor is designed to
+            work; above 2 N GelSight Mini is the more accurate of the two. Overall
+            RMSE across the controlled probes is
+            <span data-metric="force.rmse_glowtact">0.276</span> N against
+            <span data-metric="force.rmse_gelsight">0.285</span> N.
+          </p>
+        </article>
+        <article class="result-module" id="endurance" aria-labelledby="endurance-title">
+          <header class="module-header" data-reveal>
+            <p class="signal-label"><span>DAT / 05</span> A nitrile membrane must be fragile</p>
+            <h3 id="endurance-title">The skin takes a blade.</h3>
+            <p class="module-claim">
+              The sensing surface is a sheet of black nitrile glove stretched over
+              the gel — unbonded, and replaceable in minutes. Two clips put a
+              knife to it.
+            </p>
+          </header>
+
+          <div class="endurance-layout">
+            <figure class="endurance-slot" data-pending="true" data-reveal>
+              <div class="endurance-frame">
+                <span class="endurance-state">AWAITING FOOTAGE</span>
+              </div>
+              <figcaption>
+                <span>01 / CUT</span>
+                A blade drawn across the membrane.
+              </figcaption>
+            </figure>
+            <figure class="endurance-slot" data-pending="true" data-reveal>
+              <div class="endurance-frame">
+                <span class="endurance-state">AWAITING FOOTAGE</span>
+              </div>
+              <figcaption>
+                <span>02 / PUNCTURE</span>
+                A blade pressed through the membrane.
+              </figcaption>
+            </figure>
+          </div>
+
+          <p class="module-scope">
+            These are qualitative demonstrations. There is no protocol, no cycle
+            count and no lifetime test behind them, and nothing here supports a
+            durability margin or a claim that the sensor is more robust than any
+            other. They exist because the paper&#8217;s conclusion claims a more
+            durable skin, and this is where that claim has to be answered.
+          </p>
+        </article>
       </section>
 
       <section class="research-console" id="research" aria-labelledby="research-title">

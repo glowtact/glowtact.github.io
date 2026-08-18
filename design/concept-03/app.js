@@ -2009,3 +2009,125 @@ function initShearViewer() {
 }
 
 initShearViewer();
+
+/* ------------------------------------------------------------------ *
+ * DAT / 04 -- force-estimation error by force bin
+ *
+ * Grouped bars, drawn from design/data/results.json values mirrored into the
+ * markup and checked by audit_metrics.py. The third bin is the one where
+ * GlowTact loses; it is drawn exactly like the other two.
+ * ------------------------------------------------------------------ */
+
+const FORCE_BINS = [
+  { label: "0 – 0.5 N", glowtact: 0.056, gelsight: 0.067 },
+  { label: "0.5 – 2 N", glowtact: 0.058, gelsight: 0.088 },
+  { label: "2 – 20 N", glowtact: 0.209, gelsight: 0.185 },
+];
+
+function renderForceChart() {
+  const svg = document.querySelector("#force-chart");
+  if (!svg) return;
+
+  const W = 920;
+  const H = 400;
+  const left = 96;
+  const right = 40;
+  const top = 34;
+  const bottom = 78;
+  const plotW = W - left - right;
+  const plotH = H - top - bottom;
+  const max = 0.24;
+  const y = (value) => top + plotH - (value / max) * plotH;
+
+  const grid = svgNode("g", { class: "chart-grid" });
+  [0, 0.05, 0.1, 0.15, 0.2].forEach((value) => {
+    grid.append(
+      svgNode("line", { x1: left, x2: left + plotW, y1: y(value), y2: y(value) })
+    );
+    grid.append(
+      svgNode(
+        "text",
+        { x: left - 14, y: y(value) + 4, "text-anchor": "end", class: "chart-tick" },
+        value.toFixed(2)
+      )
+    );
+  });
+  svg.append(grid);
+  svg.append(
+    svgNode(
+      "text",
+      {
+        x: 20,
+        y: top + plotH / 2,
+        class: "chart-axis-label",
+        transform: `rotate(-90 20 ${top + plotH / 2})`,
+        "text-anchor": "middle",
+      },
+      "MAE (N)"
+    )
+  );
+
+  const groupW = plotW / FORCE_BINS.length;
+  const barW = 74;
+  const gap = 14;                       // 2px+ surface gap between adjacent bars
+
+  FORCE_BINS.forEach((bin, index) => {
+    const centre = left + groupW * (index + 0.5);
+    [
+      { key: "glowtact", label: "GlowTact", value: bin.glowtact, offset: -1 },
+      { key: "gelsight", label: "GelSight Mini", value: bin.gelsight, offset: 0 },
+    ].forEach(({ key, value, offset }) => {
+      const x = centre + offset * (barW + gap) + gap / 2;
+      svg.append(
+        svgNode("rect", {
+          x,
+          y: y(value),
+          width: barW,
+          height: top + plotH - y(value),
+          rx: 4,
+          fill: SNR_SERIES_COLOURS[key],
+          class: "force-bar",
+        })
+      );
+      svg.append(
+        svgNode(
+          "text",
+          { x: x + barW / 2, y: y(value) - 12, "text-anchor": "middle", class: "force-value" },
+          value.toFixed(3)
+        )
+      );
+    });
+    svg.append(
+      svgNode(
+        "text",
+        { x: centre, y: top + plotH + 30, "text-anchor": "middle", class: "chart-tick" },
+        bin.label
+      )
+    );
+  });
+
+  // Legend: two series, so identity never rests on position alone either.
+  const legend = svgNode("g", { class: "chart-legend" });
+  [
+    { key: "glowtact", label: "GlowTact" },
+    { key: "gelsight", label: "GelSight Mini" },
+  ].forEach((series, index) => {
+    const x = left + index * 190;
+    legend.append(
+      svgNode("rect", {
+        x,
+        y: H - 26,
+        width: 14,
+        height: 14,
+        rx: 3,
+        fill: SNR_SERIES_COLOURS[series.key],
+      })
+    );
+    legend.append(
+      svgNode("text", { x: x + 22, y: H - 14, class: "chart-tick" }, series.label)
+    );
+  });
+  svg.append(legend);
+}
+
+renderForceChart();

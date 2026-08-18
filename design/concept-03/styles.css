@@ -2695,8 +2695,13 @@ main {
 }
 
 .chart-figure {
-  grid-column: 1 / -1;
   margin: 0;
+}
+
+/* Full-bleed only in the sensitivity layout; the force layout puts its chart
+ * beside the per-object table, so this must not be a global rule. */
+.sensitivity-layout .chart-figure {
+  grid-column: 1 / -1;
 }
 
 .chart-title {
@@ -3024,6 +3029,152 @@ main {
 
 @media (max-width: 900px) {
   .shear-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * DAT / 04 -- force prediction   |   DAT / 05 -- endurance
+ * ------------------------------------------------------------------ */
+
+.force-layout {
+  display: grid;
+  gap: clamp(28px, 3vw, 48px);
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
+  align-items: start;
+}
+
+.force-bar {
+  stroke: var(--optic-surface-1);
+  stroke-width: 2;
+}
+
+.force-value {
+  fill: var(--readout-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  font-variant-numeric: tabular-nums;
+}
+
+.force-objects h4 {
+  margin: 0 0 16px;
+  font-size: var(--text-title);
+  font-weight: 620;
+}
+
+.force-objects table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-label);
+}
+
+.force-objects caption {
+  margin-bottom: 14px;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  text-align: left;
+}
+
+.force-objects th,
+.force-objects td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--optic-ring-soft);
+  color: var(--readout-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.force-objects thead th {
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.force-objects tbody th,
+.force-objects tfoot th {
+  text-align: left;
+  color: var(--readout);
+  font-weight: 500;
+}
+
+.force-objects td.is-best {
+  color: var(--signal-amber-bright);
+}
+
+.force-objects tfoot th,
+.force-objects tfoot td {
+  border-bottom: 0;
+  border-top: 1px solid var(--optic-ring);
+  font-weight: 620;
+}
+
+.force-method {
+  margin: 18px 0 0;
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.endurance-layout {
+  display: grid;
+  gap: clamp(20px, 2.4vw, 36px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.endurance-slot {
+  margin: 0;
+  background: var(--optic-surface-1);
+  border: 1px solid var(--optic-ring-soft);
+}
+
+/* Placeholder holds the final aspect ratio so the module does not reflow
+ * when the footage lands. No <video> element until a file exists, so the
+ * link checker stays green. */
+.endurance-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 14px,
+      var(--optic-ring-soft) 14px 15px
+    ),
+    var(--optic-surface-2);
+}
+
+.endurance-state {
+  padding: 10px 16px;
+  border: 1px solid var(--optic-ring);
+  color: var(--readout-secondary);
+  background: var(--optic-surface-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.16em;
+}
+
+.endurance-slot figcaption {
+  padding: 16px 20px 18px;
+  color: var(--readout-secondary);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.endurance-slot figcaption > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.14em;
+}
+
+@media (max-width: 900px) {
+  .force-layout,
+  .endurance-layout {
     grid-template-columns: minmax(0, 1fr);
   }
 }
