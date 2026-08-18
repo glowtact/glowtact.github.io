@@ -1,0 +1,46 @@
+{
+  "_comment": "Single source of truth for every published number. Values are transcribed from glowtact_materails/GlowTact.pdf (now materials/paper/GlowTact-2026-08-14.pdf) and from the shear evaluation artifact. design/tools/audit_metrics.py asserts the markup agrees with this file; design/verify.py gates on it.",
+  "sensitivity": {
+    "min_detectable_force_median_glowtact": {"value": 0.12, "unit": "N", "source": "Fig. 10c"},
+    "min_detectable_force_median_gelsight": {"value": 0.23, "unit": "N", "source": "Fig. 10c"},
+    "snr_threshold": {"value": 3, "unit": "", "source": "Sec. V-C"},
+    "probe_count": {"value": 10, "unit": "", "source": "Sec. V-A"},
+    "force_range_max": {"value": 20, "unit": "N", "source": "Sec. V-A"},
+    "passive_mm_mass": {"value": 1.0, "unit": "g", "source": "Fig. 9"},
+    "passive_mm_force": {"value": 9.8, "unit": "mN", "source": "Fig. 9"},
+    "passive_m6_mass": {"value": 2.0, "unit": "g", "source": "Fig. 9"},
+    "passive_m6_force": {"value": 20.0, "unit": "mN", "source": "Fig. 9"},
+    "passive_m5_mass": {"value": 2.4, "unit": "g", "source": "Fig. 9"},
+    "passive_m5_force": {"value": 23.5, "unit": "mN", "source": "Fig. 9"}
+  },
+  "reconstruction": {
+    "finest_thread_pitch": {"value": 0.25, "unit": "mm", "source": "Sec. V-B"},
+    "ninedtact_limit_size": {"value": 0.7, "unit": "mm", "source": "Sec. V-B"},
+    "object_count": {"value": 7, "unit": "", "source": "3d_recon_pad/gallery"}
+  },
+  "shear": {
+    "score_phasecorr": {"value": 0.79, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
+    "score_lk": {"value": 0.42, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
+    "score_dis": {"value": 0.39, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
+    "score_farneback": {"value": 0.37, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
+    "coherence_phasecorr": {"value": 0.54, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
+    "clip_count": {"value": 5, "unit": "", "source": "shear_tracking/hicolor_mp4"}
+  },
+  "force": {
+    "rmse_glowtact": {"value": 0.276, "unit": "N", "source": "Table I-a"},
+    "rmse_gelsight": {"value": 0.285, "unit": "N", "source": "Table I-a"},
+    "mae_low_glowtact": {"value": 0.056, "unit": "N", "source": "Table I-a, 0-0.5 N"},
+    "mae_low_gelsight": {"value": 0.067, "unit": "N", "source": "Table I-a, 0-0.5 N"},
+    "mae_mid_glowtact": {"value": 0.058, "unit": "N", "source": "Table I-a, 0.5-2 N"},
+    "mae_mid_gelsight": {"value": 0.088, "unit": "N", "source": "Table I-a, 0.5-2 N"},
+    "mae_high_glowtact": {"value": 0.209, "unit": "N", "source": "Table I-a, 2-20 N"},
+    "mae_high_gelsight": {"value": 0.185, "unit": "N", "source": "Table I-a, 2-20 N"},
+    "macro_mae_glowtact": {"value": 0.106, "unit": "N", "source": "Table I-b"},
+    "macro_mae_gelsight": {"value": 0.145, "unit": "N", "source": "Table I-b"},
+    "macro_rmse_glowtact": {"value": 0.134, "unit": "N", "source": "Table I-b"},
+    "macro_rmse_gelsight": {"value": 0.184, "unit": "N", "source": "Table I-b"},
+    "frames_per_sensor": {"value": 14716, "unit": "", "source": "Sec. V-D"},
+    "frames_controlled": {"value": 13116, "unit": "", "source": "Sec. V-D"},
+    "frames_objects": {"value": 1600, "unit": "", "source": "Sec. V-D"}
+  }
+}

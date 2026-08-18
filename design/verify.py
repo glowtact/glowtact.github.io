@@ -1,6 +1,7 @@
 from html.parser import HTMLParser
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 
@@ -90,7 +91,20 @@ js_text = "\n".join(
 if re.search(r"\bconsole\.(?:log|debug)\s*\(", js_text):
     failures.append("scripts: debug console call found")
 
+# Published numbers must agree with design/data/results.json. Kept as its own
+# tool so it can be run alone while iterating on copy; gated here so a stale
+# claim cannot reach a commit.
+metrics = subprocess.run(
+    [sys.executable, str(ROOT / "tools" / "audit_metrics.py")],
+    capture_output=True,
+    text=True,
+)
+if metrics.returncode != 0:
+    failures.extend(
+        line.removeprefix("FAIL ") for line in metrics.stdout.strip().splitlines()
+    )
+
 if failures:
     print("\n".join(f"FAIL {item}" for item in failures))
     sys.exit(1)
-print(f"PASS: audited {len(ROUTES)} routes")
+print(f"PASS: audited {len(ROUTES)} routes, {metrics.stdout.strip()}")
