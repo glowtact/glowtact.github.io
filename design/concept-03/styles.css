@@ -478,9 +478,8 @@ main {
 }
 
 .mechanism,
-.record,
 .forms,
-.reconstruction {
+.results {
   padding-top: clamp(124px, 15vw, 240px);
 }
 
@@ -1830,7 +1829,7 @@ main {
 .recon-spin {
   display: block;
   width: 100%;
-  aspect-ratio: 720 / 507;
+  aspect-ratio: 720 / 508;
   object-fit: contain;
   background: #0a0c0a;
 }
@@ -2490,4 +2489,130 @@ main {
   font-family: monospace;
   font-size: var(--text-fine);
   letter-spacing: 0.08em;
+}
+
+
+/* ------------------------------------------------------------------ *
+ * Results region
+ *
+ * Five modules sharing one skeleton: eyebrow carrying the doubt each
+ * result answers, declarative headline, a claim line whose numbers are
+ * bound to design/data/results.json by data-metric, the evidence stage,
+ * and a scope footnote stating what the evidence is not. The skeleton is
+ * what keeps five different kinds of evidence reading as one section.
+ *
+ * No new type sizes or colour tokens: everything maps onto the existing
+ * three-step scale and the established amber/readout palette.
+ * ------------------------------------------------------------------ */
+
+.results-index {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 clamp(64px, 7vw, 116px);
+  padding: 1px;
+  list-style: none;
+  background: var(--optic-ring-soft);
+  border: 1px solid var(--optic-ring-soft);
+}
+
+.results-index a {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 88px;
+  padding: 18px 20px;
+  color: var(--readout);
+  background: var(--optic-surface-1);
+  font-size: var(--text-title);
+  text-decoration: none;
+  transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out);
+}
+
+.results-index a > span {
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.14em;
+}
+
+.results-index a:hover,
+.results-index a:focus-visible {
+  color: var(--signal-amber-bright);
+  background: var(--optic-surface-2);
+}
+
+.results-index a:hover > span,
+.results-index a:focus-visible > span {
+  color: var(--signal-amber);
+}
+
+.result-module {
+  padding-top: clamp(96px, 11vw, 176px);
+  border-top: 1px solid var(--optic-ring-soft);
+}
+
+.result-module:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.module-header {
+  margin-bottom: clamp(40px, 4.5vw, 72px);
+}
+
+.module-header h3 {
+  max-width: 900px;
+  margin: 0 0 24px;
+  font-size: clamp(32px, 3.4vw, 54px);
+  font-weight: 640;
+  letter-spacing: -0.042em;
+  line-height: 0.94;
+}
+
+.module-claim {
+  max-width: 640px;
+  margin: 0;
+  color: var(--readout-secondary);
+  font-size: var(--text-title);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.module-claim strong {
+  color: var(--signal-amber-bright);
+  font-weight: 640;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The scope footnote is deliberately quiet but never below AA: it states
+ * what each result is not, which is the part a reviewer checks first. */
+.module-scope {
+  max-width: 660px;
+  margin: clamp(28px, 3vw, 44px) 0 0;
+  padding-left: 18px;
+  border-left: 1px solid var(--optic-ring);
+  color: var(--readout-tertiary);
+  font-size: var(--text-label);
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+
+@media (max-width: 900px) {
+  .results-index {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .results-index {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .results-index a {
+    min-height: 64px;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+  }
 }
