@@ -68,3 +68,49 @@ flat land 13 % → 7 %, p99/median 2.38× → 2.27×.
    yuv420p and `preload="none"`, both of which are now asserted.
 4. **The passive comparison uses an M8 nut**, not the paper's M6, because the
    released matched set has no M6. No mass is claimed for it.
+
+## Shear preprocessing A/B (2026-08-14)
+
+Asked whether CLAHE is the right enhancement for the marker-free shear
+pipeline (`TheProbe/ProbingPi/glowtact_camera/shear.py`, `enhance()`,
+currently `clip=3.0, tiles=8`). Twelve variants, identical frames, scored with
+the module's own ground-truth-free harness.
+
+`score` is deliberately unused: it is normalised within the set of trackers
+evaluated, so it reads 1.0 for a lone tracker and cannot compare preprocessing
+at all. The comparison uses the absolute metrics.
+
+Phase correlation, 5 clips, stride 2:
+
+| variant | coherence | max shear px | noise floor | indent intrusion |
+|---|---|---|---|---|
+| clahe 3.0/8 (current) | 0.5444 | 2.280 | 0.0335 | 0.490 |
+| clahe 5.0/8 | 0.5660 | 2.363 | 0.0336 | 0.506 |
+| local normalisation | 0.6084 | 2.470 | 0.0334 | **0.524** |
+
+Ranked on coherence over 3 clips, both trackers: local norm +11.2 %,
+clahe 5.0/8 +4.0 %, equalizeHist +1.5 %, clahe 3.0/4 +0.7 %, **current**,
+clahe 3.0/16 −0.5 %, bilateral+clahe −3.7 %, clahe 1.5/8 −6.4 %, unsharp
+−11.1 %, **no enhancement −19.6 %**, high-pass only −20.4 %, gamma 0.5 −26.5 %.
+
+Findings:
+
+1. **Enhancement earns its place.** Removing it costs 19.6 % coherence, and
+   corner count drops 1500 → 1346. CLAHE beats every alternative tried except
+   local normalisation.
+2. **`clip=3.0` is slightly conservative.** `clip=5.0` gives +4 % coherence and
+   +4 % recovered shear at an unchanged noise floor — same algorithm, one
+   constant.
+3. **Local normalisation is the strongest for phase correlation, and is not a
+   drop-in.** It raises coherence 12 % and recovered shear 8 % at the same
+   noise floor. The obvious objection — that dividing by local standard
+   deviation homogenises the field and inflates *agreement* while erasing
+   motion — was tested and refuted: max shear rises with coherence, so it
+   recovers more motion rather than smoothing. But it worsens
+   `indent_intrusion` 0.490 → 0.524, which is the failure mode the module is
+   built around (a straight press must not read as shear), and it degrades LK
+   coherence badly (0.2974 → 0.2055). It is a phase-correlation-specific
+   option, not a general improvement.
+
+Caveats: all metrics are ground-truth free; five clips from one session; no
+change has been made to the pipeline, which lives in another repository.
