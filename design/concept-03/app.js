@@ -2033,15 +2033,27 @@ initShearViewer();
  * GlowTact loses; it is drawn exactly like the other two.
  * ------------------------------------------------------------------ */
 
-const FORCE_BINS = [
-  { label: "0 – 0.5 N", glowtact: 0.056, gelsight: 0.067 },
-  { label: "0.5 – 2 N", glowtact: 0.058, gelsight: 0.088 },
-  { label: "2 – 20 N", glowtact: 0.209, gelsight: 0.185 },
-];
+/**
+ * Read from the page rather than restated here. The same six numbers appear
+ * in the bars, in the prose and in design/data/results.json; a copy in this
+ * file is a fork that audit_metrics.py cannot see, so the drawn bars could
+ * disagree with the table beside them and nothing would catch it.
+ */
+function readForceBins() {
+  const node = document.querySelector("#force-bins");
+  if (!node) return [];
+  return JSON.parse(node.textContent).bins.map((bin) => ({
+    label: bin.label,
+    glowtact: bin.glowtact.value,
+    gelsight: bin.gelsight.value,
+  }));
+}
 
 function renderForceChart() {
   const svg = document.querySelector("#force-chart");
   if (!svg) return;
+  const bins = readForceBins();
+  if (!bins.length) return;
 
   const W = 920;
   const H = 400;
@@ -2082,11 +2094,11 @@ function renderForceChart() {
     )
   );
 
-  const groupW = plotW / FORCE_BINS.length;
+  const groupW = plotW / bins.length;
   const barW = 74;
   const gap = 14;                       // 2px+ surface gap between adjacent bars
 
-  FORCE_BINS.forEach((bin, index) => {
+  bins.forEach((bin, index) => {
     const centre = left + groupW * (index + 0.5);
     [
       { key: "glowtact", label: "GlowTact", value: bin.glowtact, offset: -1 },

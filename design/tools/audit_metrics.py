@@ -24,29 +24,46 @@ NUMERIC = re.compile(r"-?\d+(?:\.\d+)?")
 
 
 class MetricCollector(HTMLParser):
-    """Collect (path, rendered text) for every element carrying data-metric."""
+    """Collect data-metric elements and embedded application/json blocks.
+
+    Data a script reads out of the page is a published number too. Checking
+    only the visible spans would leave a chart free to draw one value while
+    the table beside it printed another.
+    """
 
     def __init__(self) -> None:
         super().__init__()
         self.found: list[tuple[str, str]] = []
+        self.blocks: list[tuple[str, str]] = []
         self._path: str | None = None
         self._text: list[str] = []
         self._depth = 0
+        self._json_id: str | None = None
+        self._json_text: list[str] = []
 
     def handle_starttag(
         self, tag: str, attrs: list[tuple[str, str | None]]
     ) -> None:
-        path = dict(attrs).get("data-metric")
+        values = dict(attrs)
+        if tag == "script" and values.get("type") == "application/json":
+            self._json_id = values.get("id") or "<unnamed>"
+            self._json_text = []
+        path = values.get("data-metric")
         if path and self._path is None:
             self._path, self._text, self._depth = path, [], 0
         elif self._path is not None:
             self._depth += 1
 
     def handle_data(self, data: str) -> None:
+        if self._json_id is not None:
+            self._json_text.append(data)
         if self._path is not None:
             self._text.append(data)
 
     def handle_endtag(self, tag: str) -> None:
+        if tag == "script" and self._json_id is not None:
+            self.blocks.append((self._json_id, "".join(self._json_text)))
+            self._json_id = None
         if self._path is None:
             return
         if self._depth:
@@ -75,10 +92,35 @@ def main() -> int:
     failures: list[str] = []
     total = 0
 
+    def walk_block(node, where: str) -> None:
+        """Any {"value": x, "metric": "a.b"} pair anywhere in the JSON."""
+        nonlocal total
+        if isinstance(node, dict):
+            if "metric" in node and "value" in node:
+                total += 1
+                leaf = resolve(data, node["metric"])
+                if leaf is None:
+                    failures.append(f"{where}: unknown metric path {node['metric']}")
+                elif normalize(str(node["value"])) != normalize(str(leaf["value"])):
+                    failures.append(
+                        f"{where}: {node['metric']} embeds {node['value']}, "
+                        f"data says {leaf['value']}"
+                    )
+            for value in node.values():
+                walk_block(value, where)
+        elif isinstance(node, list):
+            for value in node:
+                walk_block(value, where)
+
     for route in ROUTES:
         collector = MetricCollector()
         collector.feed(route.read_text(encoding="utf-8"))
         total += len(collector.found)
+        for block_id, raw in collector.blocks:
+            try:
+                walk_block(json.loads(raw), f"{route.name}#{block_id}")
+            except json.JSONDecodeError as error:
+                failures.append(f"{route.name}#{block_id}: invalid JSON ({error})")
         for path, text in collector.found:
             leaf = resolve(data, path)
             if leaf is None:
