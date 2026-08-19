@@ -109,6 +109,16 @@
                 <span>P2500-inspired qualitative model</span>
               </div>
             </div>
+            <div class="probe-control" role="group" aria-labelledby="probe-control-label">
+              <span id="probe-control-label">INDENTER PROBE</span>
+              <div class="probe-options">
+                <button type="button" data-probe="star" aria-pressed="true">Star</button>
+                <button type="button" data-probe="triangle" aria-pressed="false">Triangle</button>
+                <button type="button" data-probe="quad" aria-pressed="false">Quad</button>
+                <button type="button" data-probe="round" aria-pressed="false">Round</button>
+              </div>
+            </div>
+
             <div class="toolbar-status">
               <span>INTERFACE STATE</span>
               <output id="toolbar-state">Local coupling</output>
@@ -178,7 +188,7 @@
                   <g id="macro-indenter">
                     <path d="M390 52H530V150C530 176 509 197 483 197H437C411 197 390 176 390 150Z"></path>
                     <path class="indenter-highlight" d="M405 66H420V156C420 169 430 180 443 182"></path>
-                    <text x="460" y="92" text-anchor="middle">INDENTER</text>
+                    <text id="macro-indenter-label" x="460" y="92" text-anchor="middle">STAR PROBE</text>
                   </g>
 
                   <path id="macro-air-gap" class="macro-air-gap"></path>

@@ -82,6 +82,16 @@ def navigate(page: Page, path: str, wait_for_images: bool = False):
         timeout=15_000,
     )
     if wait_for_images:
+        # Below-fold images carry loading="lazy", so in a viewport-sized page
+        # they never begin loading and this wait would hang forever. Scrolling
+        # through the document is not reliable either: the pass that decides
+        # what to fetch runs on a later frame than a scripted scroll, so the
+        # images stayed unfetched. Opt them in directly instead -- what this
+        # check is for is that every image resolves at real dimensions, which
+        # is what the full-page screenshots depend on.
+        page.eval_on_selector_all(
+            "img[loading=lazy]", "els => els.forEach(el => { el.loading = 'eager'; })"
+        )
         page.wait_for_function(
             """() => [...document.images].every(
                 image => image.complete && image.naturalWidth > 0
@@ -390,6 +400,90 @@ def contact_thirds(page: Page) -> set[int]:
     return thirds
 
 
+PROBE_FOOTPRINTS = {
+    "star": {"clipped": True, "vertices": 10},
+    "triangle": {"clipped": True, "vertices": 3},
+    "quad": {"clipped": True, "vertices": 4},
+    "round": {"clipped": False, "vertices": 0},
+}
+
+
+def check_probe_footprints(browser) -> None:
+    """Every probe in the picker must reshape the camera footprint to match."""
+    context = browser.new_context(viewport=VIEWPORTS["desktop"])
+    page = context.new_page()
+    block_media(page)
+    issues = collect_runtime_issues(page)
+    navigate(page, "/concept-03/")
+
+    buttons = page.locator(".probe-options button")
+    if buttons.count() != len(PROBE_FOOTPRINTS):
+        raise AssertionError(
+            f"signal: expected {len(PROBE_FOOTPRINTS)} probes, "
+            f"found {buttons.count()}"
+        )
+
+    page.locator("#signal-pressure").fill("70")
+    page.locator("#signal-pressure").dispatch_event("input")
+    page.wait_for_timeout(120)
+
+    for name, expected in PROBE_FOOTPRINTS.items():
+        button = page.locator(f'.probe-options button[data-probe="{name}"]')
+        if button.count() != 1:
+            raise AssertionError(f"signal: no picker button for probe {name}")
+        button.click()
+        page.wait_for_timeout(120)
+
+        pressed = [
+            page.locator(f'.probe-options button[data-probe="{other}"]')
+            .get_attribute("aria-pressed")
+            for other in PROBE_FOOTPRINTS
+        ]
+        if pressed.count("true") != 1:
+            raise AssertionError(
+                f"signal: probe {name} did not leave exactly one button pressed: "
+                f"{pressed}"
+            )
+
+        loaded = page.locator(".camera-contact").get_attribute("data-probe")
+        if loaded != name:
+            raise AssertionError(
+                f"signal: picked probe {name}, camera reports {loaded}"
+            )
+
+        clip = page.locator(".camera-contact").evaluate(
+            "element => getComputedStyle(element).clipPath"
+        )
+        clipped = clip not in ("none", "", None)
+        if clipped != expected["clipped"]:
+            raise AssertionError(
+                f"signal: probe {name} footprint clip is {clip!r}, "
+                f"expected clipped={expected['clipped']}"
+            )
+        if expected["clipped"]:
+            vertices = clip.count("%") // 2
+            if vertices != expected["vertices"]:
+                raise AssertionError(
+                    f"signal: probe {name} footprint has {vertices} vertices, "
+                    f"expected {expected['vertices']}"
+                )
+        # An SVG <text> is not an HTMLElement, so inner_text() refuses it.
+        label = page.locator("#macro-indenter-label").evaluate(
+            "element => element.textContent.trim()"
+        )
+        if not label.lower().startswith(name):
+            raise AssertionError(
+                f"signal: probe {name} selected but the section labels the "
+                f"indenter {label!r}"
+            )
+
+    page.locator('.probe-options button[data-probe="star"]').click()
+    page.wait_for_timeout(120)
+    if issues:
+        raise AssertionError(f"probe footprints: {'; '.join(issues)}")
+    context.close()
+
+
 def check_signal_interactions(browser) -> None:
     context = browser.new_context(
         viewport=VIEWPORTS["desktop"], device_scale_factor=2
@@ -673,12 +767,18 @@ def check_signal_interactions(browser) -> None:
     if camera_shape is None:
         raise AssertionError("signal: camera contact-shape metric is missing")
     camera_rx, camera_ry = [float(value) for value in camera_shape.split(",")]
+    # The response is inscribed in a circle of this span whatever the probe --
+    # the probe cuts the footprint out of it, so the span itself stays square.
     circularity_error = abs(camera_rx - camera_ry) / max(camera_rx, camera_ry)
     if circularity_error > 0.12:
         raise AssertionError(
-            f"signal: cylinder-indenter camera response should be circular; "
+            f"signal: camera response span should be isotropic; "
             f"shape={camera_shape}, circularity_error={circularity_error:.3f}"
         )
+    # Which probe is loaded decides the footprint. This used to assert a circle
+    # unconditionally, which was right only while the one indenter was a
+    # cylinder; the probe-aware invariant lives in check_probe_footprints,
+    # which drives the picker and so needs a page of its own.
     curved_caps = page.locator(".micro-contact-segment[data-cap-curvature]")
     if curved_caps.count() != len(plateau_widths):
         raise AssertionError("signal: 2D contact marks do not expose curved cap metrics")
@@ -1350,6 +1450,32 @@ def check_results_region(browser) -> None:
         "clip's still would show until playback starts"
     )
 
+    # 5. The loading strategy is a measured optimisation (6.0 MB -> 1.34 MB on
+    #    first load); without an assertion it silently regresses the next time
+    #    someone copies an existing <img> or <video> as a template.
+    loading = page.evaluate(
+        """() => ({
+            eager: [...document.images]
+              .filter((i) => i.loading !== 'lazy')
+              .map((i) => (i.currentSrc || i.src).split('/').pop()),
+            preloaded: [...document.querySelectorAll('.recon-spin')]
+              .filter((v) => v.preload !== 'none')
+              .map((v) => (v.currentSrc || '').split('/').pop()),
+            autoplaying: [...document.querySelectorAll('.recon-spin[autoplay]')].length,
+        })"""
+    )
+    assert loading["eager"] == ["hero-teaser.jpg"], (
+        "exactly one image should load eagerly -- the hero, which is the LCP "
+        f"element; found {loading['eager']}"
+    )
+    assert not loading["preloaded"], (
+        f"reconstruction clips must not preload: {loading['preloaded']}"
+    )
+    assert loading["autoplaying"] == 0, (
+        "reconstruction clips must not carry autoplay; the visibility observer "
+        "starts them, and autoplay fetches every file on load"
+    )
+
     # 5. The scope footnote is the part a reviewer checks first; it must exist
     #    on every module rather than only on the ones that felt risky.
     modules = page.eval_on_selector_all(
@@ -1377,6 +1503,7 @@ def main() -> int:
             check_optical_interactions(browser)
             check_atlas_interactions(browser)
             check_signal_interactions(browser)
+            check_probe_footprints(browser)
             check_keyboard_focus(browser)
             check_reduced_motion(browser)
         if MODE in {"all", "design"}:

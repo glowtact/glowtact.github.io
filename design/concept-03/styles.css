@@ -559,6 +559,58 @@ main {
   letter-spacing: 0.12em;
 }
 
+/*
+ * Probe picker. The ten-probe loading set is the page's own hardware, so the
+ * footprint is a real choice rather than decoration: every probe here is a
+ * flat-faced post, which is why only the camera footprint and the label
+ * change and the side section stays exactly as it was.
+ */
+.probe-control {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+
+.probe-control > span {
+  color: var(--readout-dim);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.12em;
+}
+
+.probe-options {
+  display: flex;
+  gap: 4px;
+}
+
+.probe-options button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--optic-ring);
+  color: var(--readout-secondary);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    color 140ms var(--ease-out),
+    border-color 140ms var(--ease-out),
+    background-color 140ms var(--ease-out);
+}
+
+.probe-options button:hover {
+  color: var(--readout);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.probe-options button[aria-pressed="true"] {
+  color: var(--camera-black);
+  border-color: var(--signal-amber-bright);
+  background: var(--signal-amber-bright);
+  font-weight: 700;
+}
+
 .toolbar-status {
   text-align: right;
 }
@@ -1225,6 +1277,7 @@ main {
     0 0 0 1px rgba(255, 255, 255, calc(var(--camera-response-opacity) * 0.08));
   opacity: var(--camera-response-opacity);
   transform: translate(-50%, -50%);
+  clip-path: var(--probe-clip, none);
   transition: background-color 100ms linear, box-shadow 100ms linear, opacity 120ms linear;
 }
 

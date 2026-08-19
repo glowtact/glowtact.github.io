@@ -34,6 +34,8 @@ const macroCouplingGlow = document.querySelector("#macro-coupling-glow");
 const macroFieldOfView = document.querySelector("#macro-field-of-view");
 const macroCameraAperture = document.querySelector(".macro-camera-aperture");
 const macroIndenter = document.querySelector("#macro-indenter");
+const macroIndenterLabel = document.querySelector("#macro-indenter-label");
+const probeButtons = [...document.querySelectorAll(".probe-options button")];
 
 const microSurfaceFill = document.querySelector("#micro-surface-fill");
 const microSvg = document.querySelector("#micro-svg");
@@ -314,6 +316,60 @@ function sectionDisplayHeight(height) {
   const normalized = (height - sectionLow) / sectionSpan;
   if (normalized <= 0) return 0;
   return Math.pow(normalized, SECTION_DISPLAY_GAMMA);
+}
+
+
+/**
+ * The controlled-loading probe set, as flown on the CNC rig: star, triangle,
+ * quad and round. Every one is a flat-faced post, so swapping probes changes
+ * what the camera sees and nothing about the side section -- the tip still
+ * lands on the membrane at the same height, and the asperity model underneath
+ * is a property of the texture, not of the probe.
+ *
+ * `clip` is applied to the square contact element, so the polygons are all
+ * inscribed in it. `areaRatio` is the footprint's share of the circle it is
+ * inscribed in, which is why a star at the same span reads so much smaller.
+ */
+const PROBES = {
+  star: {
+    label: "STAR PROBE",
+    clip:
+      "polygon(50.0% 2.0%, 61.5% 34.2%, 95.7% 35.2%, 68.5% 56.0%, 78.2% 88.8%, " +
+      "50.0% 69.5%, 21.8% 88.8%, 31.5% 56.0%, 4.3% 35.2%, 38.5% 34.2%)",
+    areaRatio: 0.38
+  },
+  triangle: {
+    label: "TRIANGLE PROBE",
+    clip: "polygon(50% 4%, 96% 88%, 4% 88%)",
+    areaRatio: 0.534
+  },
+  quad: {
+    label: "QUAD PROBE",
+    clip: "polygon(9% 9%, 91% 9%, 91% 91%, 9% 91%)",
+    areaRatio: 0.929
+  },
+  round: { label: "ROUND PROBE", clip: "none", areaRatio: 1 }
+};
+
+let activeProbe = "star";
+
+function setActiveProbe(name) {
+  if (!PROBES[name]) return;
+  activeProbe = name;
+  const probe = PROBES[name];
+  root.style.setProperty("--probe-clip", probe.clip);
+  if (macroIndenterLabel) macroIndenterLabel.textContent = probe.label;
+  probeButtons.forEach((button) => {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.probe === name)
+    );
+  });
+  if (cameraContact) {
+    cameraContact.dataset.probe = name;
+    cameraContact.dataset.probeAreaRatio = probe.areaRatio.toFixed(3);
+  }
+  render(currentPressure);
 }
 
 /**
@@ -1460,6 +1516,8 @@ function render(value) {
     cameraContact.dataset.contactArea = contactModel.area.toFixed(6);
     cameraContact.dataset.contactCentroid = `${contactModel.centerX.toFixed(4)},${contactModel.centerY.toFixed(4)}`;
     cameraContact.dataset.contactShape = `${cameraSpan.toFixed(2)},${cameraSpan.toFixed(2)}`;
+    cameraContact.dataset.probe = activeProbe;
+    cameraContact.dataset.probeAreaRatio = PROBES[activeProbe].areaRatio.toFixed(3);
   }
 
   if (pressureInput) pressureInput.value = String(percent);
@@ -1686,6 +1744,11 @@ reduceMotion.addEventListener("change", (event) => {
   setReconPlayback(!event.matches);
 });
 
+probeButtons.forEach((button) => {
+  button.addEventListener("click", () => setActiveProbe(button.dataset.probe));
+});
+
+setActiveProbe(activeProbe);
 render(currentPressure);
 setActiveMicroView("2d");
 if (microContext) canvasFallback?.setAttribute("hidden", "");
