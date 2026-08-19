@@ -112,5 +112,32 @@ Findings:
    coherence badly (0.2974 → 0.2055). It is a phase-correlation-specific
    option, not a general improvement.
 
+### Per-clip breakdown — which reverses the recommendation
+
+Averages hid a split, so both candidates were re-scored clip by clip. Counting
+how many of the five clips each variant actually improves:
+
+| | coherence (higher better) | indent intrusion (lower better) |
+|---|---|---|
+| clahe 5.0/8 vs 3.0/8 | **5 / 5 improved** | **0 / 5 improved** |
+| local norm vs clahe 3.0/8 | **5 / 5 improved** | **1 / 5 improved** |
+
+The coherence gain is real and uniform — not an outlier. But so is the cost:
+raising the clip limit worsens indentation intrusion on every single clip
+(+0.001 to +0.031), and local normalisation worsens it on four of five, by as
+much as +0.10 on the fingertip clip.
+
+**So the trade is systematic in both directions, and `clip=3.0` is defensible
+precisely because it sits at the conservative end of it.** The module exists to
+stop a straight-down press reading as shear; both "improvements" buy field
+coherence with exactly that. An earlier note in this ledger called `clip=5.0`
+a near-free win on the strength of the averaged intrusion figure — that was
+wrong, and the per-clip counts are why.
+
+Which constant is right therefore depends on what the shear output feeds. For a
+slip detector, intrusion is the failure that matters and 3.0 should stay. For a
+figure where field legibility is the goal, 5.0 is better and the intrusion cost
+is cosmetic.
+
 Caveats: all metrics are ground-truth free; five clips from one session; no
 change has been made to the pipeline, which lives in another repository.
