@@ -1636,6 +1636,11 @@ const reconVisible = new WeakSet();
 
 function syncReconVideo(video) {
   if (reconWanted && reconVisible.has(video)) {
+    // The markup carries preload="none" and no autoplay, so nothing is
+    // fetched until a card actually scrolls into view. Measured: with
+    // autoplay + preload="metadata" the browser pulled all seven turntables
+    // in full on first load -- 4.1 MB of a 6.0 MB page, six of them below
+    // the fold and most never looked at. play() performs the load itself.
     const started = video.play();
     if (started) started.catch(() => {});
     return;
