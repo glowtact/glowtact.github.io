@@ -13,16 +13,22 @@ edit figures and slides, or to work on the paper.
 ## Layout
 
 ```text
-materials/                        452 files, 467 MiB
+materials/                        451 files, 467 MiB
 ├── paper/
-│   └── paper.pdf                 the manuscript
-├── figures/                       14 files,  33 MiB
+│   ├── paper.pdf                 the manuscript
+│   └── GlowTact-2026-08-14.pdf   a later revision; differs from paper.pdf,
+│                                 so both are kept
+├── figures/                       15 files,  34 MiB
 │   ├── teaser.png / .pdf          hero figure
 │   ├── fingerprints.png / .pdf    fingerprint pressure series
 │   ├── 3d_recon.png / .pdf        reconstruction overview
 │   ├── glowtact_h.png             humanoid contact geometry
 │   ├── data collection.png
 │   ├── mechanism-contact-states.png   optical coupling, no-contact vs in-contact
+│   ├── SNR.png                    Fig. 10, the sensitivity panels. The site
+│                                  chart is digitized from this file by
+│                                  design/tools/digitize_snr.py, which
+│                                  therefore needs the materials tree to re-run
 │   └── ... (side view, exploded view, gelsight_and_9dtact, humanoid finger)
 ├── slides/                        14 files, 233 MiB
 │   └── *.pptx sources plus GlowTact_video.mp4 (76 MiB, the rendered talk video)
@@ -40,10 +46,7 @@ materials/                        452 files, 467 MiB
 │   ├── premiere-autosave/         Premiere auto-save copies
 │   └── session_20260728_010530/   6 recorded episodes; per episode:
 │                                  streams/gelsight, gelsight_diff, hx711_force
-├── _session/                       3 files,   3 MiB
-│                                  Claude Code transcripts (raw .jsonl plus a
-│                                  readable .md), kept out of the public repo;
-│                                  see _session/README.md
+│                                  (there is no _session/ -- see below)
 └── _archives/                      3 files,  38 MiB
     ├── single_meshes_gt.zip       redundant: identical to meshes/flat/
     ├── single_meshes_h.zip        redundant: identical to meshes/humanoid/
@@ -53,6 +56,13 @@ materials/                        452 files, 467 MiB
 
 `MANIFEST.sha256` sits at the top of `materials/` and lists a SHA-256 for
 every file. It is generated, and travels with the data.
+
+**The Claude Code transcripts did not make the move.** Earlier revisions of
+this document describe a `_session/` folder holding them; it is absent from
+this copy, and absent from `materials.zip`, which was built before
+`save_session.py` ran. Nothing else is missing -- `materials_check.py
+--verify` passes on all 451 files -- but if you want the session history from
+the old machine, it is still only on the old machine.
 
 ### What changed from the older layout
 

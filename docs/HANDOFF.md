@@ -104,8 +104,12 @@ assuming symmetry.
 
 ## Session transcript
 
-The full Claude Code transcript for the session that produced the above is
-saved at `materials/_session/` and travels with the material tree. It is
-deliberately **not** committed: this repository is public, and the transcript
-contains local paths and environment detail. See the README in that folder
-for how to resume the session itself.
+The full Claude Code transcript for that session was meant to travel at
+`materials/_session/`. **It did not arrive.** The folder is absent from the
+transferred tree and from `materials.zip`, which was built before
+`save_session.py` ran, so the transcripts remain on the old machine only.
+Everything else transferred intact: `materials_check.py --verify` passes on
+all 451 files.
+
+The transcripts were deliberately never committed -- this repository is
+public, and they contain local paths and environment detail.
