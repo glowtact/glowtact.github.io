@@ -1274,6 +1274,21 @@ def check_design_system(browser) -> None:
                     raise AssertionError(
                         f"{route_name}@{vp_name}: eyebrow labels wrap past two lines: {tall}"
                     )
+                # Nothing pokes past the viewport, even inside a scroll box:
+                # the BibTeX <code> once ran to 583px in a 375px viewport and
+                # the page-level overflow number never saw it. Published page
+                # only: the review hub's comparison table scrolls by design.
+                poking = [] if route_name != "signal" else page.evaluate(
+                    """() => [...document.querySelectorAll('body *')]
+                        .filter(el => el.getBoundingClientRect().right > innerWidth + 1
+                                      && getComputedStyle(el).display !== 'none'
+                                      && !el.closest('.skip-link') && !el.classList.contains('skip-link'))
+                        .map(el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + ' right=' + Math.round(el.getBoundingClientRect().right))"""
+                )
+                if poking:
+                    raise AssertionError(
+                        f"{route_name}@{vp_name}: elements past the viewport edge: {poking[:4]}"
+                    )
             limit = MAX_DISTINCT_FONT_SIZES[route_name]
             if len(data["sizes"]) > limit:
                 raise AssertionError(
