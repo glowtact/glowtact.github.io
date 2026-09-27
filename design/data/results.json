@@ -30,8 +30,6 @@
     "fps_global_scalar": {"value": 60, "unit": "fps", "source": "README.md: global scalar alone, approximate"},
     "peak_contact_min": {"value": 5, "unit": "%", "source": "params.json objects[2_coin].peak_contact_area = 0.0486"},
     "peak_contact_max": {"value": 32, "unit": "%", "source": "params.json objects[1_fingertip].peak_contact_area = 0.3239"},
-    "phasecorr_overshoot_low": {"value": 1.5, "unit": "x", "source": "README.md: phase correlation reports 1.5-2x the peak shear displacement, the reason it was not adopted"},
-    "phasecorr_overshoot_high": {"value": 2, "unit": "x", "source": "README.md, same sentence"},
     "clip_count": {"value": 5, "unit": "", "source": "05_shear_field/videos/color_tuned, re-encoded to H.264 yuv420p CRF 20"}
   },
   "force": {

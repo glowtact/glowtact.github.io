@@ -865,18 +865,12 @@
 
         <article class="result-module" id="shear" aria-labelledby="shear-title">
           <header class="module-header" data-reveal>
-            <p class="signal-label"><span>DAT / 03</span> One scalar image cannot give you direction</p>
+            <p class="signal-label"><span>DAT / 03</span> Shear</p>
             <h3 id="shear-title">It reads the sideways pull.</h3>
             <p class="module-claim">
-              A dense tangential field recovered from the tactile image alone —
-              no markers printed in the gel, nothing tracked but the speckle
-              already in it. Dense Farnebäck flow on a
-              <span data-metric="shear.grid_spacing">26</span>&nbsp;px grid, gated by
-              texture confidence and neighbour coherence, yields a usable field
-              over <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;%
-              of the gel (<span data-metric="shear.usable_field_clahe">72.0</span>&nbsp;%
-              under plain CLAHE), with a forward–backward consistency of
-              <strong data-metric="shear.fb_error_median">0.037</strong>&nbsp;px median.
+              Dense Farnebäck flow on the gel&#8217;s own speckle yields a usable field over
+              <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the pad,
+              <strong data-metric="shear.fb_error_median">0.037</strong>&nbsp;px forward–backward.
             </p>
           </header>
 
@@ -922,13 +916,7 @@
                 </figcaption>
               </figure>
               <p class="shear-legend">
-                Arrow direction and colour give the local displacement; the red
-                outline is the contact region. The strip along the bottom reports
-                four readouts per frame: slide (mean tangential shift, px), twist
-                (rotation ×10³), spread (push-out ×10³, the signature of a normal
-                press) and slip (the residual after one affine fit; it rises when
-                part of the patch breaks away). The backdrop is denoised and faded
-                for legibility; the field is computed on the untouched frame.
+                Readouts per frame: slide, twist, spread, slip; the red outline is the contact.
               </p>
             </div>
 
@@ -958,16 +946,7 @@
           </div>
 
           <p class="module-scope">
-            Not part of the paper: later work, shown here because it bears on
-            the same question. Every figure above is self-supervised and taken
-            from one reference press rather than averaged over the five clips,
-            and there is no measured displacement to score against, so they
-            indicate reliability, not accuracy. Phase correlation, which scores
-            higher on internal consistency, was not adopted: it reports
-            <span data-metric="shear.phasecorr_overshoot_low">1.5</span> to
-            <span data-metric="shear.phasecorr_overshoot_high">2</span> times the
-            peak displacement. These are optical shear estimates in pixels, not
-            calibrated shear forces.
+            Self-supervised consistency on one reference press; no ground truth; pixels, not calibrated force.
           </p>
         </article>
         <article class="result-module" id="force" aria-labelledby="force-title">
