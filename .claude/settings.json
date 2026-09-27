@@ -1,0 +1,41 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/design/tools/audit_slop.py\" --session",
+            "timeout": 10,
+            "statusMessage": "Loading DESIGN.md context"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/design/tools/audit_slop.py\" --hook",
+            "timeout": 10,
+            "statusMessage": "Checking the design edit against DESIGN.md"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/design/tools/audit_slop.py\" --stop",
+            "timeout": 20,
+            "statusMessage": "Design deep pass over the files touched this session"
+          }
+        ]
+      }
+    ]
+  }
+}

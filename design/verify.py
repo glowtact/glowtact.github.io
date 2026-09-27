@@ -104,7 +104,25 @@ if metrics.returncode != 0:
         line.removeprefix("FAIL ") for line in metrics.stdout.strip().splitlines()
     )
 
+# The source must not reach for generated-page patterns or drift from
+# DESIGN.md. Rules DESIGN.md lists as known_open (acknowledged, dated, with a
+# reason) print as WARN and do not fail the gate, so a defect that is waiting
+# on a decision stays visible in every run without switching the gate off.
+slop = subprocess.run(
+    [sys.executable, str(ROOT / "tools" / "audit_slop.py"), "--gate"],
+    capture_output=True,
+    text=True,
+)
+slop_lines = slop.stdout.strip().splitlines()
+failures.extend(
+    line.removeprefix("FAIL ") for line in slop_lines if line.startswith("FAIL ")
+)
+for line in slop_lines:
+    if line.startswith("WARN "):
+        print(line)
+slop_summary = slop_lines[-1] if slop_lines else "slop: not run"
+
 if failures:
     print("\n".join(f"FAIL {item}" for item in failures))
     sys.exit(1)
-print(f"PASS: audited {len(ROUTES)} routes, {metrics.stdout.strip()}")
+print(f"PASS: audited {len(ROUTES)} routes, {metrics.stdout.strip()}, {slop_summary}")

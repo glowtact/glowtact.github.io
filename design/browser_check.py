@@ -1235,6 +1235,56 @@ def check_design_system(browser) -> None:
             page.close()
 
 
+MIN_HEADING_STEP = 1.15
+
+
+def check_type_hierarchy(browser) -> None:
+    """Adjacent heading levels must read as different sizes.
+
+    A generated page tends to flatten its hierarchy -- an h2 and an h3 a
+    pixel apart, both leaning on weight -- and the distinct-size ceiling in
+    check_design_system cannot see it: fewer sizes looks like discipline.
+    Measure the median rendered size per level on every route and viewport
+    and require a step of at least MIN_HEADING_STEP between adjacent levels
+    from h2 down -- the reading hierarchy. The h1 only has to be no smaller
+    than the h2: it is one hero display already sized by the viewport (58px
+    is 15% of a phone's width), and demanding a further step over the h2
+    there would shrink the section titles, not sharpen the hierarchy. The
+    static detector (audit_slop.py) cannot do this; only computed styles
+    know what a clamp() resolved to.
+    """
+    for route_name, path in ROUTES.items():
+        for vp_name, viewport in AUDIT_VIEWPORTS.items():
+            page = browser.new_page(viewport=viewport)
+            block_media(page)
+            navigate(page, path)
+            page.wait_for_timeout(250)
+            levels = page.evaluate(
+                """() => {
+                    const out = {};
+                    for (const level of ['h1', 'h2', 'h3', 'h4']) {
+                        const sizes = [...document.querySelectorAll(level)]
+                            .filter(h => h.getClientRects().length > 0)
+                            .map(h => parseFloat(getComputedStyle(h).fontSize))
+                            .sort((a, b) => a - b);
+                        if (sizes.length) out[level] = sizes[Math.floor(sizes.length / 2)];
+                    }
+                    return out;
+                }"""
+            )
+            present = [lvl for lvl in ("h1", "h2", "h3", "h4") if lvl in levels]
+            for upper, lower in zip(present, present[1:]):
+                ratio = levels[upper] / levels[lower]
+                need = 1.0 if upper == "h1" else MIN_HEADING_STEP
+                if ratio < need:
+                    raise AssertionError(
+                        f"{route_name}@{vp_name}: {upper} {levels[upper]:.1f}px vs "
+                        f"{lower} {levels[lower]:.1f}px is a {ratio:.2f}x step; "
+                        f"flat type hierarchy (need >= {need}x)"
+                    )
+            page.close()
+
+
 def check_media_scaling(browser) -> None:
     """The mechanism animation must stay proportioned and crisp everywhere."""
     for vp_name, viewport in AUDIT_VIEWPORTS.items():
@@ -1550,6 +1600,7 @@ def main() -> int:
             check_media_scaling(browser)
             check_coupling_readability(browser)
             check_results_region(browser)
+            check_type_hierarchy(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
@@ -1558,7 +1609,7 @@ def main() -> int:
     if MODE in {"all", "design"}:
         print(
             "PASS: contrast, touch targets, type scale, overflow, "
-            "media scaling, coupling readability, results region"
+            "media scaling, coupling readability, results region, type hierarchy"
         )
     return 0
 

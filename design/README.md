@@ -4,7 +4,8 @@ This pack contains the specifications needed to build the interactive GlowTact p
 
 Files:
 - PROJECT_PLAN.md
-- design.md
+- `../DESIGN.md` (was `design.md` here; moved to the repository root on 2026-09-26 and
+  rewritten as the live design system — tokens in frontmatter, rationale in the body)
 - MECHANISM_SPEC.md
 - CONTENT.md
 - ASSET_MANIFEST.md
@@ -23,7 +24,7 @@ Initial Codex prompt:
 
 Create a production-ready website for the robotics paper “GlowTact: Simple and Compact Vision-Based Tactile Sensing with High Sensitivity and Spatial Resolution.”
 
-Read and follow PROJECT_PLAN.md, design.md, MECHANISM_SPEC.md, CONTENT.md, ASSET_MANIFEST.md, and SCIENTIFIC_CONSTRAINTS.md.
+Read and follow PROJECT_PLAN.md, DESIGN.md, MECHANISM_SPEC.md, CONTENT.md, ASSET_MANIFEST.md, and SCIENTIFIC_CONSTRAINTS.md.
 
 Use https://younghyopark.me/tune-to-learn/ only as a broad visual reference for hierarchy, whitespace, large research visuals, responsive layout, and interactive scientific storytelling. Do not copy its design.
 

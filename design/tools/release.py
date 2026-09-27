@@ -23,7 +23,7 @@ ROOT = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 )
 SERVER_URL = os.environ.get("GLOWTACT_BASE_URL", "http://127.0.0.1:4173")
-TRAILER = "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+TRAILER = "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 
 def run(cmd: list[str], env: dict[str, str] | None = None) -> None:
@@ -31,6 +31,17 @@ def run(cmd: list[str], env: dict[str, str] | None = None) -> None:
     result = subprocess.run(cmd, cwd=ROOT, env=merged)
     if result.returncode != 0:
         raise SystemExit(f"release aborted: {' '.join(cmd)} failed")
+
+
+def report(cmd: list[str]) -> None:
+    """Run a check whose findings are for the eye, not the gate.
+
+    The detector's deep tier is taste and cadence; verify.py already gates
+    the immediate tier. Printing the deep findings here, right before the
+    commit, is the last moment they are cheap to act on.
+    """
+    print(f"release: report from {' '.join(cmd[1:])}")
+    subprocess.run(cmd, cwd=ROOT)
 
 
 def ensure_server() -> subprocess.Popen | None:
@@ -65,6 +76,7 @@ def main() -> None:
 
     if not args.skip_checks:
         run([sys.executable, os.path.join("design", "verify.py")])
+        report([sys.executable, os.path.join("design", "tools", "audit_slop.py"), "--deep"])
         server = ensure_server()
         try:
             run(
