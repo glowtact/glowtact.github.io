@@ -1600,8 +1600,8 @@ def check_results_region(browser) -> None:
             gelsight: document.querySelector('#sensitivity').textContent.toLowerCase().includes('gelsight'),
         })"""
     )
-    assert passive["clips"] == [["none", True, False], ["none", True, False]], (
-        f"sensitivity clips must be two, preload=none, with posters, no autoplay: {passive['clips']}"
+    assert passive["clips"] == [["none", True, False], ["none", True, False], ["none", True, False]], (
+        f"sensitivity clips must be three (M&M, M2, fingerprint progression), preload=none, with posters, no autoplay: {passive['clips']}"
     )
     assert passive["masses"] == 2, (
         f"expected the two masses in the sensitivity claim, found {passive['masses']}"

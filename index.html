@@ -64,9 +64,6 @@
             <span class="figure-corner figure-corner--top" aria-hidden="true"></span>
             <span class="figure-corner figure-corner--bottom" aria-hidden="true"></span>
           </div>
-          <figcaption>
-            <span>PAPER TEASER</span>
-          </figcaption>
         </figure>
       </section>
 
@@ -91,10 +88,10 @@
             <div class="probe-control" role="group" aria-labelledby="probe-control-label">
               <span id="probe-control-label">INDENTER PROBE</span>
               <div class="probe-options">
-                <button type="button" data-probe="star" aria-pressed="true">Star</button>
+                <button type="button" data-probe="star" aria-pressed="false">Star</button>
                 <button type="button" data-probe="triangle" aria-pressed="false">Triangle</button>
                 <button type="button" data-probe="quad" aria-pressed="false">Quad</button>
-                <button type="button" data-probe="round" aria-pressed="false">Round</button>
+                <button type="button" data-probe="round" aria-pressed="true">Sphere</button>
               </div>
             </div>
 
@@ -499,6 +496,24 @@
         </div>
       </section>
 
+      <section class="principles" aria-labelledby="principles-title">
+        <header class="section-header" data-reveal>
+          <div>
+            <h2 id="principles-title">Why simple.</h2>
+          </div>
+        </header>
+        <dl class="principles-list" data-reveal>
+          <dt>Single-color light</dt>
+          <dd>One LED, no RGB channels.</dd>
+          <dt>Monochrome camera</dt>
+          <dd>Greyscale sensor; no photometric stereo.</dd>
+          <dt>No coatings</dt>
+          <dd>Gel and membrane alone; no markers, no calibration.</dd>
+          <dt>Durable membrane</dt>
+          <dd>Medical-grade nitrile; resists wear and chemicals.</dd>
+        </dl>
+      </section>
+
       <section class="results" id="results" aria-labelledby="results-title">
         <header class="section-header results-header" data-reveal>
           <div>
@@ -551,6 +566,20 @@
               </figcaption>
             </figure>
           </div>
+
+          <figure class="evidence-figure evidence-figure--video" data-reveal>
+            <video controls muted playsinline preload="none"
+                   loop
+                   poster="./design/assets/images/fingerprint-progression-poster.jpg"
+                   aria-label="A fingertip pressed progressively harder, from 0.25 N to 3.0 N, showing increasing contact darkness">
+              <source src="./design/assets/video/fingerprint-progression.mp4" type="video/mp4">
+              Your browser does not support embedded video.
+            </video>
+            <figcaption>
+              <span>FINGERPRINT / 0.25–3.0 N</span>
+              Ridge pattern legible from the lightest touch to full pressure.
+            </figcaption>
+          </figure>
 
           <p class="module-scope">
             Controlled threshold test:
@@ -708,20 +737,6 @@
 
           </div>
 
-          <figure class="evidence-figure recon-fingerprints" data-reveal>
-            <div class="press-series" aria-label="A fingertip pressed harder, left to right">
-              <img loading="lazy" decoding="async" src="./design/assets/images/fingerprints/press-1.jpg" alt="GlowTact tactile image of a fingertip at the lightest press: a small dark patch with ridges">
-              <img loading="lazy" decoding="async" src="./design/assets/images/fingerprints/press-2.jpg" alt="The fingertip pressed a little harder: a larger patch, ridges legible">
-              <img loading="lazy" decoding="async" src="./design/assets/images/fingerprints/press-3.jpg" alt="The fingertip at about one newton: ridges dark and clear across the contact">
-              <img loading="lazy" decoding="async" src="./design/assets/images/fingerprints/press-4.jpg" alt="The fingertip at about two newtons: the contact fills more of the pad">
-              <img loading="lazy" decoding="async" src="./design/assets/images/fingerprints/press-5.jpg" alt="The fingertip at the hardest press: the largest, darkest contact">
-            </div>
-            <figcaption>
-              <span>MEASURED / FLAT PAD</span>
-              Force rises left to right; ridge pattern legible from 0.3 to 2.0 N.
-            </figcaption>
-          </figure>
-
           <p class="module-scope" id="reconstruction-disclosure">
             Relief recovered from a single tactile frame.
           </p>
@@ -753,18 +768,8 @@
               <button type="button" role="tab" id="shear-tab-2"
                       aria-controls="shear-stage" aria-selected="false"
                       tabindex="-1"
-                      data-clip="3_go_piece" data-label="Go piece" data-note="A smooth glass go stone, low friction"
-                      data-duration="13.6 s">Go piece</button>
-              <button type="button" role="tab" id="shear-tab-3"
-                      aria-controls="shear-stage" aria-selected="false"
-                      tabindex="-1"
                       data-clip="4_phillips_head_screw_M5" data-label="M5 Phillips head" data-note="A cross recess under tangential load"
                       data-duration="13.6 s">M5 Phillips head</button>
-              <button type="button" role="tab" id="shear-tab-4"
-                      aria-controls="shear-stage" aria-selected="false"
-                      tabindex="-1"
-                      data-clip="5_pan_head_screw_M2" data-label="M2 pan head" data-note="A 2 mm head, the smallest contact of the set"
-                      data-duration="8.8 s">M2 pan head</button>
               </div>
               <figure class="shear-stage" id="shear-stage">
                 <video id="shear-video" controls loop muted playsinline preload="metadata"

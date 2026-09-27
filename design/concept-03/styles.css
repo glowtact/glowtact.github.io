@@ -427,6 +427,7 @@ main {
    2026-09-27; the bands carry their own head room instead. */
 .mechanism,
 .forms,
+.principles,
 .results {
   padding-top: clamp(124px, 15vw, 240px);
 }
@@ -1765,20 +1766,22 @@ main {
 
 .recon-card figcaption {
   display: grid;
-  /* object photograph, tactile input, title */
-  grid-template-columns: 52px 52px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-  min-height: 54px;
+  /* object photograph, tactile input, title spanning below */
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   padding: 12px 4px 2px;
 }
 
 .recon-object,
 .recon-input {
-  width: 52px;
+  width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   box-shadow: 0 0 0 1px var(--optic-ring);
+}
+
+.recon-caption-text {
+  grid-column: 1 / -1;
 }
 
 .recon-caption-text {
@@ -2836,4 +2839,28 @@ main {
   .passive-object {
     grid-column: 1 / -1;
   }
+}
+
+.principles-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  max-width: 880px;
+  color: var(--readout-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  letter-spacing: 0.08em;
+}
+
+.principles-list dt {
+  font-size: var(--text-label);
+  font-weight: 550;
+  color: var(--readout);
+  margin-bottom: 6px;
+}
+
+.principles-list dd {
+  margin: 0;
+  font-size: var(--text-fine);
+  line-height: 1.4;
 }
