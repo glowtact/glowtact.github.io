@@ -2006,6 +2006,18 @@ main {
   font-size: var(--text-label);
 }
 
+/* A bare text link in the record shipped at 86 x 16 px; the design gate
+ * wants 44 px on touch. Grow the hit area without moving the row. */
+.research-meta dd a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -14px 0;
+  color: var(--readout);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .research-meta pre {
   max-width: 100%;
   margin: 0;
