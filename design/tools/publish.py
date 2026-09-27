@@ -45,6 +45,9 @@ REWRITES = [
     ('src="./app.js"', f'src="./{SOURCE_DIR}/app.js"'),
     ('"../assets/', '"./design/assets/'),
     ('href="../concept-02/"', 'href="./design/concept-02/"'),
+    # The paper lives at the repository root so its public URL stays
+    # https://glowtact.github.io/GlowTact.pdf; swap for the arXiv link later.
+    ('href="../../GlowTact.pdf"', 'href="./GlowTact.pdf"'),
     ('href="../"', 'href="./"'),
 ]
 
