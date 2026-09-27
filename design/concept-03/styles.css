@@ -3083,22 +3083,8 @@ main {
   font-weight: 620;
 }
 
-.endurance-layout {
-  display: grid;
-  gap: clamp(20px, 2.4vw, 36px);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.endurance-slot {
-  margin: 0;
-  background: var(--optic-surface-1);
-  border: 1px solid var(--optic-ring-soft);
-}
-
 /* Placeholder holds the final aspect ratio so the module does not reflow
- * when the footage lands. No <video> element until a file exists, so the
- * link checker stays green. */
-.endurance-frame {
+ * when the footage lands. No <video> element until a file exists {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3112,36 +3098,8 @@ main {
     var(--optic-surface-2);
 }
 
-.endurance-state {
-  padding: 10px 16px;
-  border: 1px solid var(--optic-ring);
-  color: var(--readout-secondary);
-  background: var(--optic-surface-1);
-  font-family: var(--font-mono);
-  font-size: var(--text-fine);
-  letter-spacing: 0.16em;
-}
-
-.endurance-slot figcaption {
-  padding: 16px 20px 18px;
-  color: var(--readout-secondary);
-  font-size: var(--text-label);
-  line-height: 1.6;
-}
-
-.endurance-slot figcaption > span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--readout-tertiary);
-  font-family: var(--font-mono);
-  font-size: var(--text-fine);
-  letter-spacing: 0.14em;
-}
-
 @media (max-width: 900px) {
-.endurance-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
+
 }
 
 .passive-rows {

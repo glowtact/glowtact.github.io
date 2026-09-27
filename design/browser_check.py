@@ -1561,7 +1561,7 @@ def check_results_region(browser) -> None:
         ".result-module",
         "els => els.map(el => [el.id, !!el.querySelector('.module-scope')])",
     )
-    assert len(modules) == 5, f"expected 5 result modules, found {len(modules)}"
+    assert len(modules) == 4, f"expected 4 result modules, found {len(modules)}"
     missing = [name for name, has in modules if not has]
     assert not missing, f"result modules without a scope footnote: {missing}"
 
