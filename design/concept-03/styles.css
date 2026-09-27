@@ -3033,19 +3033,19 @@ main {
   line-height: 1.6;
 }
 
-.tracker-table h4 {
+.shear-numbers h4 {
   margin: 0 0 16px;
   font-size: var(--text-title);
   font-weight: 620;
 }
 
-.tracker-table table {
+.shear-numbers table {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--text-label);
 }
 
-.tracker-table caption {
+.shear-numbers caption {
   margin-bottom: 14px;
   color: var(--readout-tertiary);
   font-size: var(--text-label);
@@ -3053,8 +3053,8 @@ main {
   text-align: left;
 }
 
-.tracker-table th,
-.tracker-table td {
+.shear-numbers th,
+.shear-numbers td {
   padding: 12px 10px;
   border-bottom: 1px solid var(--optic-ring-soft);
   color: var(--readout-secondary);
@@ -3062,7 +3062,7 @@ main {
   font-variant-numeric: tabular-nums;
 }
 
-.tracker-table thead th {
+.shear-numbers thead th {
   color: var(--readout-tertiary);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
@@ -3070,14 +3070,14 @@ main {
   text-transform: uppercase;
 }
 
-.tracker-table tbody th {
+.shear-numbers tbody th {
   text-align: left;
   color: var(--readout);
   font-weight: 500;
 }
 
-.tracker-table tr.is-best th,
-.tracker-table tr.is-best td {
+.shear-numbers tr.is-best th,
+.shear-numbers tr.is-best td {
   color: var(--signal-amber-bright);
   font-weight: 620;
 }

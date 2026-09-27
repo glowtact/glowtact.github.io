@@ -242,3 +242,25 @@ the verification works regardless of how the bytes got there.
 - **PowerPoint and Premiere Pro** to open `slides/` and `video/Glowtact.prproj`.
   The Premiere project references media by path and will ask you to relink
   after the move.
+
+## Shear clips (re-sourced 2026-09-26)
+
+The five DAT/03 clips and their posters under `design/assets/video/shear/`
+and `design/assets/images/shear/` are derived from a **second, newer material
+tree** that this document does not yet describe: `~/glowtact_stuff`, packed
+2026-09-25 (894 files, 763 MiB, with a README per folder). Its
+`05_shear_field/` is the current marker-free shear package (session
+`20260809_022437`, Farnebäck flow with LCN + CLAHE); the clips previously in
+the site came from the superseded pre-2026-08-19 package and showed a
+different tracker's field. Reconciling `~/glowtact_stuff` with `materials/`
+is an open item.
+
+| Committed asset | Source | How |
+|---|---|---|
+| `design/assets/video/shear/<name>.mp4` (5) | `~/glowtact_stuff/05_shear_field/videos/color_tuned/<name>.mp4` | `ffmpeg -an -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 20 -preset slow -movflags +faststart` (three of the five masters were MPEG-4 Simple Profile) |
+| `design/assets/images/shear/<name>-poster.jpg` (5) | the re-encoded clip above | one frame at `peak_frame / fps` from `05_shear_field/params.json` (peak contact), `-q:v 3` |
+
+The numbers the module quotes come from `05_shear_field/params.json`
+(`preprocess_stats`, `objects[].peak_contact_area`) and its `README.md`;
+`design/data/results.json` records the exact key for each. The folder's
+`eval/metrics.json` is an earlier tracker-comparison run and is not quoted.

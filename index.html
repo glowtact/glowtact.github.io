@@ -938,13 +938,14 @@
             <h3 id="shear-title">It reads the sideways pull.</h3>
             <p class="module-claim">
               A dense tangential field recovered from the tactile image alone —
-              no markers printed in the gel, nothing tracked but the texture
-              itself. Of four estimators scored on the same clips, phase
-              correlation leads at
-              <strong data-metric="shear.score_phasecorr">0.79</strong>
-              against <span data-metric="shear.score_lk">0.42</span>,
-              <span data-metric="shear.score_dis">0.39</span> and
-              <span data-metric="shear.score_farneback">0.37</span>.
+              no markers printed in the gel, nothing tracked but the speckle
+              already in it. Dense Farnebäck flow on a
+              <span data-metric="shear.grid_spacing">26</span>&nbsp;px grid, gated by
+              texture confidence and neighbour coherence, yields a usable field
+              over <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;%
+              of the gel (<span data-metric="shear.usable_field_clahe">72.0</span>&nbsp;%
+              under plain CLAHE), with a forward–backward consistency of
+              <strong data-metric="shear.fb_error_median">0.037</strong>&nbsp;px median.
             </p>
           </header>
 
@@ -991,41 +992,50 @@
               </figure>
               <p class="shear-legend">
                 Arrow direction and colour give the local displacement; the red
-                outline is the contact region, excluded from the bulk estimate.
-                The strip along the bottom of each frame reports shear, rotation,
-                divergence and a slip index for that frame.
+                outline is the contact region. The strip along the bottom reports
+                four readouts per frame: slide (mean tangential shift, px), twist
+                (rotation ×10³), spread (push-out ×10³, the signature of a normal
+                press) and slip (the residual after one affine fit; it rises when
+                part of the patch breaks away). The backdrop is denoised and faded
+                for legibility; the field is computed on the untouched frame.
               </p>
             </div>
 
-            <div class="tracker-table" data-reveal>
-              <h4>Four estimators, one set of clips</h4>
+            <div class="shear-numbers" data-reveal>
+              <h4>One parameter set, five objects</h4>
               <table>
                 <caption>
-                  Ground-truth-free scoring over five clips. Higher is better;
-                  coherence is the share of the field moving together.
+                  Self-supervised reliability of the flow field, measured on the
+                  M5 Phillips-head reference press. No ground-truth displacement
+                  exists for these clips, so these are consistency figures, not
+                  accuracy.
                 </caption>
                 <thead>
-                  <tr><th scope="col">Estimator</th><th scope="col">Score</th><th scope="col">Coherence</th></tr>
+                  <tr><th scope="col">Measure</th><th scope="col">Value</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="is-best">
-                    <th scope="row">Phase correlation</th>
-                    <td data-metric="shear.score_phasecorr">0.79</td>
-                    <td data-metric="shear.coherence_phasecorr">0.54</td>
-                  </tr>
-                  <tr><th scope="row">Lucas–Kanade</th><td data-metric="shear.score_lk">0.42</td><td>0.29</td></tr>
-                  <tr><th scope="row">DIS optical flow</th><td data-metric="shear.score_dis">0.39</td><td>0.31</td></tr>
-                  <tr><th scope="row">Farnebäck</th><td data-metric="shear.score_farneback">0.37</td><td>0.30</td></tr>
+                  <tr><th scope="row">Usable field, LCN + CLAHE</th><td><span data-metric="shear.usable_field_lcn_clahe">97.8</span>&nbsp;%</td></tr>
+                  <tr><th scope="row">Usable field, CLAHE alone</th><td><span data-metric="shear.usable_field_clahe">72.0</span>&nbsp;%</td></tr>
+                  <tr><th scope="row">Forward–backward consistency</th><td><span data-metric="shear.fb_error_median">0.037</span>&nbsp;px median, <span data-metric="shear.fb_error_p90">0.16</span>&nbsp;px at p90</td></tr>
+                  <tr><th scope="row">Flow score, self-supervised</th><td><span data-metric="shear.flow_score">74</span>&nbsp;/ 100</td></tr>
+                  <tr><th scope="row">Full field, one core, 0.23 MP</th><td><span data-metric="shear.fps_full_field">13</span>&nbsp;fps</td></tr>
+                  <tr><th scope="row">Global scalar alone</th><td>about <span data-metric="shear.fps_global_scalar">60</span>&nbsp;fps</td></tr>
+                  <tr><th scope="row">Peak contact, coin to fingertip</th><td><span data-metric="shear.peak_contact_min">5</span>&nbsp;% to <span data-metric="shear.peak_contact_max">32</span>&nbsp;%</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <p class="module-scope">
-            Not part of the paper — later work, shown here because it bears on
-            the same question. The evaluation is ground-truth free: it scores
-            each estimator on internal consistency, not against a measured
-            displacement. These are optical shear estimates in pixels, not
+            Not part of the paper: later work, shown here because it bears on
+            the same question. Every figure above is self-supervised and taken
+            from one reference press rather than averaged over the five clips,
+            and there is no measured displacement to score against, so they
+            indicate reliability, not accuracy. Phase correlation, which scores
+            higher on internal consistency, was not adopted: it reports
+            <span data-metric="shear.phasecorr_overshoot_low">1.5</span> to
+            <span data-metric="shear.phasecorr_overshoot_high">2</span> times the
+            peak displacement. These are optical shear estimates in pixels, not
             calibrated shear forces.
           </p>
         </article>
@@ -1187,7 +1197,7 @@
       <a href="./design/concept-02/"><span aria-hidden="true">←</span> Contact Atlas</a>
       <p><span class="status-lamp" aria-hidden="true"></span> GLOWTACT / SIGNAL CHAMBER</p>
       <a href="./">All concepts <span aria-hidden="true">↗</span></a>
-      <span class="build-stamp" aria-hidden="true">2026-08-18 · da09e4d</span>
+      <span class="build-stamp" aria-hidden="true">2026-08-18 · a96db64</span>
     </footer>
   </body>
 </html>

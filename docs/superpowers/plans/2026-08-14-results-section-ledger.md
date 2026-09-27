@@ -141,3 +141,10 @@ is cosmetic.
 
 Caveats: all metrics are ground-truth free; five clips from one session; no
 change has been made to the pipeline, which lives in another repository.
+
+## 2026-09-26: DAT/03 re-sourced
+
+| found | evidence | fix | verified by |
+|---|---|---|---|
+| The module's headline was a tracker ranking (phase correlation 0.79) for a method the pipeline does not use; Farnebäck flow, the shipped method, sat last in that table at 0.37 | `~/glowtact_stuff/05_shear_field/README.md`: `eval/metrics.json` is an earlier run under a different contact threshold (fingertip 52% vs 32%), "quote the deck"; phase correlation was rejected for reporting 1.5-2x the peak displacement | claim, table and scope footnote rewritten around the shipped pipeline's own reliability figures: 97.8% usable field (72.0% CLAHE alone), 0.037 px median / 0.16 px p90 forward-backward, 74/100 flow score, 13 fps full field, peak contact 5-32%; the rejected tracker is named once with the reason; `results.json` `shear.*` keys replaced with sources to the exact `params.json` field | `audit_metrics.py` binds the new keys; `verify.py` PASS |
+| The five clips on the site were rendered by the superseded package (pre-2026-08-19), so the arrows on screen came from a different tracker and preprocessing than the copy now describes | same durations and fps as the current `videos/color_tuned/`, different frame heights and readout rows (`shear/rot/div/slip` vs `slide/twist/spread/slip`) | clips replaced from `color_tuned`, re-encoded to H.264 yuv420p CRF 20 (three masters were MPEG-4 Simple Profile); posters cut at each object's `peak_frame`; legend rewritten for the four readouts | ffprobe: all five `h264,High,yuv420p`; design + behavior modes; selector still swaps source and poster together |

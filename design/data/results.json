@@ -19,12 +19,20 @@
     "object_count": {"value": 7, "unit": "", "source": "3d_recon_pad/gallery"}
   },
   "shear": {
-    "score_phasecorr": {"value": 0.79, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
-    "score_lk": {"value": 0.42, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
-    "score_dis": {"value": 0.39, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
-    "score_farneback": {"value": 0.37, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
-    "coherence_phasecorr": {"value": 0.54, "unit": "", "source": "shear_tracking/eval/metrics.json aggregate"},
-    "clip_count": {"value": 5, "unit": "", "source": "shear_tracking/hicolor_mp4"}
+    "_note": "Source is ~/glowtact_stuff/05_shear_field (params.json, README.md): session 20260809_022437, method flow (Farneback) with lcn_clahe preprocessing. eval/metrics.json in the same folder is an earlier tracker-comparison run under a different contact threshold and is NOT quoted; the phase-correlation ranking it reports (0.79 vs 0.42/0.39/0.37) was carried here until 2026-09-26 and was never the shipped method.",
+    "grid_spacing": {"value": 26, "unit": "px", "source": "params.json params.spacing"},
+    "usable_field_lcn_clahe": {"value": 97.8, "unit": "%", "source": "params.json preprocess_stats.lcn_clahe.reliable_frac = 0.9782"},
+    "usable_field_clahe": {"value": 72.0, "unit": "%", "source": "params.json preprocess_stats.clahe.reliable_frac = 0.7198"},
+    "fb_error_median": {"value": 0.037, "unit": "px", "source": "params.json preprocess_stats.lcn_clahe.fb_error = 0.03735"},
+    "fb_error_p90": {"value": 0.16, "unit": "px", "source": "params.json preprocess_stats.lcn_clahe.fb_error_p90 = 0.1579"},
+    "flow_score": {"value": 74, "unit": "/100", "source": "params.json preprocess_stats.lcn_clahe.score = 74.2"},
+    "fps_full_field": {"value": 13, "unit": "fps", "source": "README.md: full field, one core, 0.23 MP (494x471)"},
+    "fps_global_scalar": {"value": 60, "unit": "fps", "source": "README.md: global scalar alone, approximate"},
+    "peak_contact_min": {"value": 5, "unit": "%", "source": "params.json objects[2_coin].peak_contact_area = 0.0486"},
+    "peak_contact_max": {"value": 32, "unit": "%", "source": "params.json objects[1_fingertip].peak_contact_area = 0.3239"},
+    "phasecorr_overshoot_low": {"value": 1.5, "unit": "x", "source": "README.md: phase correlation reports 1.5-2x the peak shear displacement, the reason it was not adopted"},
+    "phasecorr_overshoot_high": {"value": 2, "unit": "x", "source": "README.md, same sentence"},
+    "clip_count": {"value": 5, "unit": "", "source": "05_shear_field/videos/color_tuned, re-encoded to H.264 yuv420p CRF 20"}
   },
   "force": {
     "rmse_glowtact": {"value": 0.276, "unit": "N", "source": "Table I-a"},
