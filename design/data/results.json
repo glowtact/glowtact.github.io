@@ -2,7 +2,6 @@
   "_comment": "Single source of truth for every published number. Values are transcribed from glowtact_materails/GlowTact.pdf (now materials/paper/GlowTact-2026-08-14.pdf) and from the shear evaluation artifact. design/tools/audit_metrics.py asserts the markup agrees with this file; design/verify.py gates on it.",
   "sensitivity": {
     "min_detectable_force_median_glowtact": {"value": 0.12, "unit": "N", "source": "Fig. 10c"},
-    "min_detectable_force_median_gelsight": {"value": 0.23, "unit": "N", "source": "Fig. 10c"},
     "snr_threshold": {"value": 3, "unit": "", "source": "Sec. V-C"},
     "probe_count": {"value": 10, "unit": "", "source": "Sec. V-A"},
     "force_range_max": {"value": 20, "unit": "N", "source": "Sec. V-A"},
@@ -11,7 +10,9 @@
     "passive_m6_mass": {"value": 2.0, "unit": "g", "source": "Fig. 9"},
     "passive_m6_force": {"value": 20.0, "unit": "mN", "source": "Fig. 9"},
     "passive_m5_mass": {"value": 2.4, "unit": "g", "source": "Fig. 9"},
-    "passive_m5_force": {"value": 23.5, "unit": "mN", "source": "Fig. 9"}
+    "passive_m5_force": {"value": 23.5, "unit": "mN", "source": "Fig. 9"},
+    "passive_m2_mass": {"value": 0.2, "unit": "g", "source": "main deck slide 6: M2x6 screw 0.2 g / 1.96 mN"},
+    "passive_m2_force": {"value": 1.96, "unit": "mN", "source": "main deck slide 6"}
   },
   "reconstruction": {
     "finest_thread_pitch": {"value": 0.25, "unit": "mm", "source": "Sec. V-B"},

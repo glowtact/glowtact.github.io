@@ -562,131 +562,77 @@
 
         <article class="result-module" id="sensitivity" aria-labelledby="sensitivity-title">
           <header class="module-header" data-reveal>
-            <p class="signal-label"><span>DAT / 01</span> Strip it to one colour and it should go numb</p>
-            <h3 id="sensitivity-title">It resolves a gram.</h3>
+            <p class="signal-label"><span>DAT / 01</span> Light touch</p>
+            <h3 id="sensitivity-title">It sees two millinewtons.</h3>
             <p class="module-claim">
-              It detects contact at about half the force a GelSight Mini needs on
-              the same apparatus, measured across
-              <span data-metric="sensitivity.probe_count">10</span> probe geometries
-              at a detection threshold of SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>.
+              An M&amp;M at <strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g
+              (<span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw at
+              <strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g
+              (<span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN) both show in the
+              raw frame under their own weight.
             </p>
           </header>
 
-          <div class="sensitivity-layout">
-            <dl class="stat-pair" data-reveal>
-              <div class="stat stat--glowtact">
-                <dt>GlowTact</dt>
-                <dd><strong data-metric="sensitivity.min_detectable_force_median_glowtact">0.12</strong><span>N</span></dd>
-                <p>median minimum detectable force</p>
-              </div>
-              <div class="stat stat--gelsight">
-                <dt>GelSight Mini</dt>
-                <dd><strong data-metric="sensitivity.min_detectable_force_median_gelsight">0.23</strong><span>N</span></dd>
-                <p>same rig, same protocol</p>
-              </div>
-            </dl>
-
-            <figure class="chart-figure" data-reveal>
-              <figcaption class="chart-title">
-                GlowTact holds a usable signal two decades below GelSight Mini
-              </figcaption>
-              <div class="chart-frame">
-                <svg id="snr-chart" viewBox="0 0 920 470" role="img"
-                     aria-label="Signal-to-noise ratio against normal force on
-                     logarithmic axes. The GlowTact curve stays above 2800 across
-                     the whole 0.08 to 16 newton range, while the GelSight Mini
-                     curve starts near 9 at 0.09 newtons and rises to about 4900.
-                     Both remain above the detection threshold of 3."></svg>
-              </div>
-              <details class="chart-table">
-                <summary>Chart data (271 digitized points)</summary>
-                <div class="chart-table__scroll"><table id="snr-table">
-                  <caption>SNR against normal force, sampled every tenth digitized column.</caption>
-                </table></div>
-              </details>
-              <p class="chart-note">
-                Redrawn from Fig. 10b. The curves are digitized from the published
-                figure: SNR is measured against the unloaded-frame standard
-                deviation, and those unloaded references are not in the released
-                data, so the values cannot be recomputed from source.
-              </p>
-            </figure>
-
-            <figure class="passive-grid" data-reveal>
-              <figcaption class="chart-title">
-                Under an object&#8217;s own weight, the raw GlowTact frame already
-                shows the contact — the GelSight Mini frame barely moves
-              </figcaption>
-              <div class="passive-rows">
-                <div class="passive-head" aria-hidden="true">
-                  <span></span><span>GlowTact</span><span>GelSight Mini</span>
-                </div>
-                <div class="passive-row">
-                  <span class="passive-object">M&amp;M<br><small><span data-metric="sensitivity.passive_mm_mass">1.0</span> g · <span data-metric="sensitivity.passive_mm_force">9.8</span> mN</small></span>
-                  <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/mm-glowtact.jpg"
-                       alt="Raw GlowTact frame with a small dark mark where an M and M rests">
-                  <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/mm-gelsight.jpg"
-                       alt="Raw GelSight Mini frame under the same M and M, showing a nearly uniform field">
-                </div>
-                <div class="passive-row">
-                  <span class="passive-object">M8 nut<br><small>passive placement</small></span>
-                  <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/m8-nut-glowtact.jpg"
-                       alt="Raw GlowTact frame showing the ring-shaped contact of an M8 nut">
-                  <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/m8-nut-gelsight.jpg"
-                       alt="Raw GelSight Mini frame under the same M8 nut, showing a nearly uniform field">
-                </div>
-                <div class="passive-row">
-                  <span class="passive-object">M5 screw<br><small>resting on its side</small></span>
-                  <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/m5-screw-glowtact.jpg"
-                       alt="Raw GlowTact frame showing the head and thread of an M5 screw lying on its side">
-                  <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/m5-screw-gelsight.jpg"
-                       alt="Raw GelSight Mini frame under the same M5 screw, showing a nearly uniform field">
-                </div>
-              </div>
-              <p class="chart-note">
-                Raw camera output from both sensors — no differencing, no
-                amplification, no contrast stretch, and the same treatment on
-                each side. Each object rests under its own weight with no applied
-                load. The paper&#8217;s Fig. 9 pairs the M&amp;M with an M6 nut and an
-                M5&#215;6 screw; the released matched set carries an M8 nut, so
-                that is what is shown, and no mass is claimed for it.
-              </p>
-            </figure>
-            <figure class="evidence-figure" data-reveal>
-              <img loading="lazy" decoding="async" src="./design/assets/images/fingerprint-pressure.jpg"
-                   alt="Three GlowTact tactile images of a fingertip pressed at 0.3, 1.0 and 2.0 newtons, darkening and spreading as force rises">
-              <figcaption>
-                <span>MEASURED / FLAT SENSOR</span>
-                A finger at 0.3, 1.0 and 2.0 N. The contact darkens and spreads
-                with load while the ridge pattern stays legible throughout.
-              </figcaption>
-            </figure>
-
-            <figure class="evidence-figure evidence-figure--video" data-reveal>
-              <video controls muted playsinline preload="metadata"
+          <div class="passive-pair" data-reveal>
+            <figure class="evidence-figure evidence-figure--video">
+              <video controls muted playsinline preload="none"
                      poster="./design/assets/images/mms-contact-poster.jpg"
-                     aria-label="An M and M sweet resting on a GlowTact sensor under its own weight">
+                     aria-label="An M and M resting on the GlowTact pad under its own weight, with the tactile image inset">
                 <source src="./design/assets/video/mms-contact.mp4" type="video/mp4">
                 Your browser does not support embedded video.
               </video>
               <figcaption>
-                <span>MEASURED / PASSIVE CONTACT</span>
-                An M&amp;M at <span data-metric="sensitivity.passive_mm_mass">1.0</span> g
-                — <span data-metric="sensitivity.passive_mm_force">9.8</span> mN — resting
-                under its own weight, with no applied load.
+                <span>M&amp;M / 9.8 mN</span>
+                Resting under its own weight; tactile frame inset.
+              </figcaption>
+            </figure>
+            <figure class="evidence-figure evidence-figure--video">
+              <video controls muted playsinline preload="none"
+                     poster="./design/assets/images/sensitivity/screw-m2-poster.jpg"
+                     aria-label="An M2 screw resting on the GlowTact pad under its own weight, with the tactile image inset">
+                <source src="./design/assets/video/sensitivity/screw-m2.mp4" type="video/mp4">
+                Your browser does not support embedded video.
+              </video>
+              <figcaption>
+                <span>M2×6 SCREW / 1.96 mN</span>
+                The lightest object in the set.
               </figcaption>
             </figure>
           </div>
 
+          <figure class="fig9-strip" data-reveal>
+            <div class="fig9-head" aria-hidden="true">
+              <span></span><span>raw</span><span>diff</span><span>3× diff</span>
+            </div>
+            <div class="fig9-row">
+              <span class="fig9-label">M&amp;M<small><span data-metric="sensitivity.passive_mm_mass">1.0</span> g · <span data-metric="sensitivity.passive_mm_force">9.8</span> mN</small></span>
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-mm-raw.jpg" alt="Raw GlowTact frame under an M and M">
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-mm-diff.jpg" alt="Difference image of the same frame">
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-mm-diff3.jpg" alt="The difference image amplified three times">
+            </div>
+            <div class="fig9-row">
+              <span class="fig9-label">M6 nut<small><span data-metric="sensitivity.passive_m6_mass">2.0</span> g · <span data-metric="sensitivity.passive_m6_force">20.0</span> mN</small></span>
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-m6-nut-raw.jpg" alt="Raw GlowTact frame under an M6 nut">
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-m6-nut-diff.jpg" alt="Difference image of the same frame">
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-m6-nut-diff3.jpg" alt="The difference image amplified three times">
+            </div>
+            <div class="fig9-row">
+              <span class="fig9-label">M5×6 screw<small><span data-metric="sensitivity.passive_m5_mass">2.4</span> g · <span data-metric="sensitivity.passive_m5_force">23.5</span> mN</small></span>
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-m5-screw-raw.jpg" alt="Raw GlowTact frame under an M5 screw">
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-m5-screw-diff.jpg" alt="Difference image of the same frame">
+              <img loading="lazy" decoding="async" src="./design/assets/images/sensitivity/fig9-m5-screw-diff3.jpg" alt="The difference image amplified three times">
+            </div>
+            <figcaption>Raw frame, difference, and 3× difference for three light objects (paper Fig. 9).</figcaption>
+          </figure>
+
           <p class="module-scope">
-            Passive placement is a demonstration, not a calibrated minimum-force
-            measurement. GelSight Mini appears here as a representative
-            geometry-based baseline recorded on the same apparatus and protocol;
-            the comparison is of these two units under these conditions.
+            Passive placement is a demonstration; the controlled threshold test gives a
+            <span data-metric="sensitivity.min_detectable_force_median_glowtact">0.12</span>&nbsp;N median
+            minimum detectable force at SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>
+            across <span data-metric="sensitivity.probe_count">10</span> probes.
           </p>
         </article>
 
-        <script type="application/json" id="snr-series">{"threshold":3,"series":[{"key":"glowtact","label":"GlowTact","points":[[0.0797,3781.6],[0.0829,3536.3],[0.0861,3381.6],[0.0896,3162.3],[0.0931,2990.4],[0.0968,2859.6],[0.1007,2891.8],[0.1046,3058.0],[0.1088,3270.1],[0.1131,3458.1],[0.1176,3656.8],[0.1223,3910.5],[0.1271,4089.3],[0.1322,4276.3],[0.1374,4471.8],[0.1429,4676.3],[0.1485,4890.1],[0.1544,5000.7],[0.1606,5229.3],[0.1669,5407.7],[0.1736,5529.9],[0.1804,5654.9],[0.1876,5654.9],[0.195,5782.8],[0.2028,5913.5],[0.2108,5913.5],[0.2192,5718.5],[0.2279,5468.4],[0.2369,5229.3],[0.2463,5113.7],[0.2561,4890.1],[0.2663,4728.9],[0.2769,4835.8],[0.2878,4945.1],[0.2993,5056.9],[0.3111,5171.2],[0.3235,5288.1],[0.3363,5407.7],[0.3497,5468.4],[0.3635,5468.4],[0.378,5468.4],[0.393,5468.4],[0.4086,5529.9],[0.4248,5529.9],[0.4416,5529.9],[0.4592,5592.1],[0.4774,5654.9],[0.4963,5782.8],[0.516,5782.8],[0.5365,5913.5],[0.5578,6047.2],[0.5799,6183.9],[0.603,6466.7],[0.6269,6762.3],[0.6518,7071.5],[0.6776,7312.7],[0.7045,7647.1],[0.7325,7907.8],[0.7615,8177.5],[0.7918,8362.4],[0.8232,8551.4],[0.8558,8744.8],[0.8898,8942.4],[0.9251,9144.6],[0.9618,9247.4],[1.0,9456.5],[1.0397,9456.5],[1.0809,9670.2],[1.1238,9670.2],[1.1684,9888.8],[1.2148,10000.0],[1.263,10226.1],[1.3131,10457.2],[1.3652,10693.7],[1.4194,10935.4],[1.4758,11182.6],[1.5343,11435.4],[1.5952,11308.3],[1.6585,11958.3],[1.7243,12092.7],[1.7928,12228.7],[1.8639,12505.1],[1.9379,12228.7],[2.0148,12505.1],[2.0947,12228.7],[2.1779,12366.1],[2.2643,12505.1],[2.3541,13522.8],[2.4476,13076.9],[2.5447,12505.1],[2.6457,12931.5],[2.7507,14300.1],[2.8598,14300.1],[2.9733,13828.6],[3.0913,13984.0],[3.214,14300.1],[3.3415,14460.9],[3.4741,14300.1],[3.612,14300.1],[3.7553,14460.9],[3.9044,15991.3],[4.0593,15463.9],[4.2204,15813.5],[4.3879,16722.5],[4.562,17487.1],[4.743,17882.5],[4.9313,18286.7],[5.127,18286.7],[5.3304,18083.5],[5.5419,18286.7],[5.7619,18492.3],[5.9905,19337.8],[6.2283,19122.9],[6.4754,19122.9],[6.7324,19122.9],[6.9996,19997.3],[7.2773,20449.4],[7.5661,20911.7],[7.8664,20679.2],[8.1785,21146.7],[8.5031,21384.4],[8.8405,21867.8],[9.1914,22362.2],[9.5561,22613.6],[9.9353,22613.6],[10.3296,23124.8],[10.7395,23913.4],[11.1657,24728.8],[11.6088,25006.8],[12.0695,25287.9],[12.5485,25572.1],[13.0465,25859.6],[13.5642,25859.6],[14.1025,26150.2],[14.6621,26150.2],[15.244,26741.4],[15.8489,27653.3],[16.0559,27653.3]]},{"key":"gelsight","label":"GelSight Mini","points":[[0.0943,9.4],[0.0981,9.5],[0.102,9.7],[0.106,10.0],[0.1102,10.3],[0.1146,10.7],[0.1191,11.1],[0.1239,11.4],[0.1288,11.8],[0.1339,12.2],[0.1392,12.5],[0.1447,13.1],[0.1505,13.4],[0.1564,14.0],[0.1627,15.1],[0.1691,16.4],[0.1758,18.3],[0.1828,20.9],[0.1901,23.4],[0.1976,26.7],[0.2054,28.9],[0.2136,30.6],[0.2221,30.9],[0.2309,31.3],[0.24,31.6],[0.2496,31.6],[0.2595,32.7],[0.2698,36.6],[0.2805,40.9],[0.2916,49.5],[0.3032,59.8],[0.3152,73.1],[0.3277,87.4],[0.3407,97.8],[0.3542,103.4],[0.3683,98.9],[0.3829,93.5],[0.3981,88.4],[0.4139,84.6],[0.4303,80.0],[0.4474,83.6],[0.4652,91.4],[0.4836,103.4],[0.5028,116.9],[0.5228,130.8],[0.5435,147.9],[0.5651,159.9],[0.5875,172.9],[0.6108,180.8],[0.6351,189.1],[0.6603,200.0],[0.6865,209.1],[0.7137,221.1],[0.742,231.2],[0.7715,241.8],[0.8021,252.9],[0.8339,264.4],[0.867,276.5],[0.9014,289.2],[0.9372,309.2],[0.9744,327.0],[1.0131,342.0],[1.0533,365.7],[1.0951,391.1],[1.1385,408.9],[1.1837,432.4],[1.2307,457.3],[1.2795,472.9],[1.3303,489.0],[1.3831,511.4],[1.438,534.8],[1.495,553.0],[1.5544,578.3],[1.616,604.7],[1.6802,632.4],[1.7468,676.2],[1.8162,707.2],[1.8882,739.5],[1.9632,782.0],[2.0411,817.8],[2.1221,845.6],[2.2063,874.5],[2.2938,914.5],[2.3849,945.6],[2.4795,988.9],[2.5779,1034.1],[2.6802,1081.4],[2.7866,1130.8],[2.8972,1182.5],[3.0121,1236.6],[3.1317,1307.7],[3.2559,1367.5],[3.3851,1430.0],[3.5195,1495.4],[3.6592,1563.8],[3.8044,1672.2],[3.9553,1691.0],[4.1123,1768.4],[4.2755,1828.7],[4.4452,1891.0],[4.6216,1955.5],[4.805,2044.9],[4.9956,2211.4],[5.1939,2211.4],[5.4,2186.8],[5.6143,2162.5],[5.8371,2286.8],[6.0687,2704.2],[6.3096,2704.2],[6.56,2765.3],[6.8203,2990.4],[7.0909,2859.6],[7.3723,2891.8],[7.6649,3197.8],[7.9691,3162.3],[8.2853,3270.1],[8.6141,3344.0],[8.956,3381.6],[9.3114,3458.1],[9.6809,3576.0],[10.0651,3698.0],[10.4645,3954.5],[10.8798,3910.5],[11.3115,3954.5],[11.7604,3998.9],[12.2271,4324.4],[12.7123,4422.1],[13.2168,4324.4],[13.7413,4324.4],[14.2866,4522.1],[14.8536,4624.3],[15.443,4728.9],[16.0559,4890.1]]}]}</script>
 
         <article
             class="result-module reconstruction"

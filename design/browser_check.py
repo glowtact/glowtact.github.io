@@ -1463,65 +1463,6 @@ def check_results_region(browser) -> None:
         )
         assert pix_fmt == "yuv420p", f"{src}: pix_fmt {pix_fmt} is not yuv420p"
 
-    # 2. The SNR chart's drawn geometry must agree with the data it plots.
-    #    Read the page's own scale functions so the test and the page share one
-    #    source of truth rather than re-deriving the mapping here.
-    #    The mapping is re-derived HERE from the page's constants rather than
-    #    by calling the page's own scale functions. Calling them compares a
-    #    function against itself: a bug inside snrScaleX moves the drawn path
-    #    and the expected value together and the assertion passes. Only the
-    #    axis constants are shared; the arithmetic is independent.
-    geometry = page.evaluate(
-        """() => {
-            const data = JSON.parse(document.querySelector('#snr-series').textContent);
-            const path = document.querySelector('#snr-chart path.chart-line');
-            const first = path.getAttribute('d').match(/M([\\d.]+) ([\\d.]+)/);
-            return {
-              drawnX: parseFloat(first[1]),
-              drawnY: parseFloat(first[2]),
-              point: data.series[0].points[0],
-              plot: SNR_PLOT, xDomain: SNR_X, yDomain: SNR_Y,
-            };
-        }"""
-    )
-    plot, xd, yd = geometry["plot"], geometry["xDomain"], geometry["yDomain"]
-    force, snr = geometry["point"]
-    span_x = plot["w"] - plot["left"] - plot["right"]
-    span_y = plot["h"] - plot["top"] - plot["bottom"]
-    expect_x = plot["left"] + span_x * (
-        (math.log10(force) - math.log10(xd["min"]))
-        / (math.log10(xd["max"]) - math.log10(xd["min"]))
-    )
-    expect_y = plot["h"] - plot["bottom"] - span_y * (
-        (math.log10(snr) - math.log10(yd["min"]))
-        / (math.log10(yd["max"]) - math.log10(yd["min"]))
-    )
-    assert abs(geometry["drawnX"] - expect_x) < 0.5, (
-        f"SNR chart x geometry drifted: drawn {geometry['drawnX']:.2f}, "
-        f"independently expected {expect_x:.2f}"
-    )
-    assert abs(geometry["drawnY"] - expect_y) < 0.5, (
-        f"SNR chart y geometry drifted: drawn {geometry['drawnY']:.2f}, "
-        f"independently expected {expect_y:.2f}"
-    )
-
-    # 3. The headline is generated from the series; assert it carries a ratio
-    #    consistent with the plotted data rather than a hand-typed number.
-    title = page.inner_text(".chart-title")
-    expected = page.evaluate(
-        """() => {
-            const data = JSON.parse(document.querySelector('#snr-series').textContent);
-            const read = (pts, f) => pts.reduce((b, p) =>
-              Math.abs(Math.log10(p[0]) - Math.log10(f)) <
-              Math.abs(Math.log10(b[0]) - Math.log10(f)) ? p : b)[1];
-            return Math.round(read(data.series[0].points, 0.1) /
-                              read(data.series[1].points, 0.1));
-        }"""
-    )
-    assert f"{expected}\u00d7" in title, (
-        f"chart headline {title!r} does not carry the plotted ratio {expected}x"
-    )
-
     # 4. The shear selector must move source AND poster together.
     before = page.evaluate(
         """() => ({src: document.querySelector('#shear-source').getAttribute('src'),
@@ -1538,6 +1479,28 @@ def check_results_region(browser) -> None:
         "shear selector changed the source but not the poster; the previous "
         "clip's still would show until playback starts"
     )
+
+    # 6. Sensitivity is a passive-placement demonstration: two clips, both
+    #    preload=none with posters and no autoplay, the two masses in the
+    #    claim bound to results.json, the nine Fig. 9 frames, and no second
+    #    sensor anywhere in the module.
+    passive = page.evaluate(
+        """() => ({
+            clips: [...document.querySelectorAll('#sensitivity video')]
+              .map(v => [v.preload, !!v.getAttribute('poster'), v.hasAttribute('autoplay')]),
+            masses: document.querySelectorAll('#sensitivity .module-claim [data-metric$="_mass"]').length,
+            frames: document.querySelectorAll('#sensitivity .fig9-strip img').length,
+            gelsight: document.querySelector('#sensitivity').textContent.toLowerCase().includes('gelsight'),
+        })"""
+    )
+    assert passive["clips"] == [["none", True, False], ["none", True, False]], (
+        f"sensitivity clips must be two, preload=none, with posters, no autoplay: {passive['clips']}"
+    )
+    assert passive["masses"] == 2, (
+        f"expected the two masses in the sensitivity claim, found {passive['masses']}"
+    )
+    assert passive["frames"] == 9, f"expected the nine Fig. 9 frames, found {passive['frames']}"
+    assert not passive["gelsight"], "GelSight must not appear in the sensitivity module"
 
     # 5. The loading strategy is a measured optimisation (6.0 MB -> 1.34 MB on
     #    first load); without an assertion it silently regresses the next time

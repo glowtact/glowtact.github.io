@@ -1,6 +1,6 @@
 ---
 name: GlowTact — Signal Chamber
-description: "Dark instrument-panel register for the GlowTact tactile-sensing paper site: camera-black ground, one amber signal, GelSight blue only for GelSight data, monospace readouts and tracked caps as the device vocabulary. Restraint everywhere except the mechanism, which is the subject."
+description: "Dark instrument-panel register for the GlowTact tactile-sensing paper site: camera-black ground, one amber signal, monospace readouts and tracked caps as the device vocabulary. Restraint everywhere except the mechanism, which is the subject."
 source_of_truth: design/concept-03/styles.css (:root)
 applies_to: design/concept-03/
 colors:
@@ -30,9 +30,6 @@ colors:
   signal-amber-dim: "#886421"
   signal-highlight: "#ffd077"      # literal in styles.css x3; candidate for a :root token
   focus: "#ffc04a"                 # focus ring only
-  # Comparison series (GelSight Mini). Never used for anything else.
-  gelsight-blue: "#2f95d0"
-  gelsight-blue-bright: "#6bbef0"
   # Gel and air
   gel: "#9db3ad"
   gel-deep: "#4f645d"
@@ -99,8 +96,9 @@ Chamber". The sensor images a black elastomer membrane through a clear
 microtextured gel under single-colour, non-directional light; contact
 darkens the image where the membrane couples to the gel. The site is the
 camera's view: camera-black ground, one amber signal, grey gel, hairline
-optics. Amber is GlowTact's colour in the paper. GelSight blue appears only
-where GelSight Mini data appears. Nothing decorative is added to that.
+optics. Amber is GlowTact's colour in the paper. Nothing decorative is added
+to that, and no second sensor is shown (decision of 2026-09-26: the site
+stands on GlowTact's own evidence), so there is no second hue.
 
 This file described a light editorial brief (white and `#F6F6F3` grounds,
 Inter or Geist, amber `#E9A000`) until 2026-09-26. That register survives in
@@ -120,7 +118,6 @@ other than the one shipped sends every agent the wrong way.
 | `--signal-amber` | `#d89122` | the accent; coupled-area ink; controls' active state |
 | `--signal-amber-bright` / `-dim` | `#f4b840` / `#886421` | highlight and recessed amber |
 | `--focus` | `#ffc04a` | focus ring, nothing else |
-| GelSight blue | `#2f95d0` / `#6bbef0` | GelSight Mini series only |
 | `--gel`, `--gel-deep` | `#9db3ad` / `#4f645d` | gel body and depth |
 | `--readout` … `--readout-dim` | `#edf1ea` → `#8b978c` | text, in four steps of emphasis |
 | rings and grids | `rgba(255,255,255, 0.05–0.12)` | hairline structure; alpha neutrals, never a new hue |
@@ -129,8 +126,9 @@ Rules:
 
 - Do not add unrelated decorative colours. A new hue is a design decision:
   add it to the frontmatter with a role before it appears in CSS.
-- Amber means GlowTact. Blue means GelSight. Neither is used for emphasis
-  elsewhere; emphasis is weight, size or the readout text steps.
+- Amber means signal: the numbers in claims and tables, the primary action,
+  the active state, the lamp. It is not used for emphasis elsewhere;
+  emphasis is weight, size or the readout text steps.
 - Amber ink equals the coupled fraction the readout prints, to 3 pp
   (`browser_check.py`, design mode). The picture and the number never disagree.
 - Semi-transparent white and black are the only overlays. Gradients exist
@@ -186,7 +184,7 @@ targets on touch (design mode measures them).
 ## Scientific presentation
 
 - Preserve axes, labels, units and log scales. SNR threshold stays at 3.
-- GlowTact remains amber; GelSight remains blue.
+- GlowTact remains amber; no comparison sensor is shown.
 - Distinguish measured from simulated imagery; label conceptual
   visualizations. Interactive plots use the exact data in
   `design/data/*.json`; published numbers carry `data-metric` and match
@@ -299,7 +297,7 @@ fired is not a rule.
 2. Page copy runs 1.09 em dashes per 100 words against the 0.5 budget
    (deep tier, `em-dash-density`).
 3. Seventeen colour literals live outside `:root` in `styles.css`
-   (`#ffd077` ×3, the two GelSight blues, the depth ramp). They are in the
+   (`#ffd077` ×3, the depth ramp). They are in the
    palette above so they are not findings; promoting them to tokens is the
    tidy fix.
 4. `applies_to` covers concept-03 only. The hub and concepts 01/02 get the
