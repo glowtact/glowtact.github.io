@@ -45,7 +45,7 @@ typography:
   fonts:
     ui: '"Bahnschrift", sans-serif'        # Windows-only and not shipped -- see Open issues
     mono: '"Cascadia Mono", monospace'     # same
-  scale: [12, 14, 16, 22, 58]     # px. 12 fine / 14 label / 16 title are the --text-* tokens; 22 (.form-comparison h3) and 58 (.hero-copy h1) are fixed breakpoint sizes
+  scale: [12, 14, 16, 22]         # px. 12 fine / 14 label / 16 title are the --text-* tokens; 22 is the form-card title's fixed floor
   fluid: clamp()                  # display and headline sizes interpolate; a clamp() is never a finding
   tracking: [0.08em, 0.12em, 0.14em, 0.16em]   # caps labels; display headings tighten -0.04 to -0.065em
 radius:
@@ -127,8 +127,10 @@ Rules:
 - Do not add unrelated decorative colours. A new hue is a design decision:
   add it to the frontmatter with a role before it appears in CSS.
 - Amber means signal: the numbers in claims and tables, the primary action,
-  the active state, the lamp. It is not used for emphasis elsewhere;
-  emphasis is weight, size or the readout text steps.
+  the active state, the lamp. Eyebrow, index and card labels are
+  `--readout-tertiary`, not amber (changed 2026-09-26: five roles on one hue
+  competed on a phone). Emphasis elsewhere is weight, size or the readout
+  text steps.
 - Amber ink equals the coupled fraction the readout prints, to 3 pp
   (`browser_check.py`, design mode). The picture and the number never disagree.
 - Semi-transparent white and black are the only overlays. Gradients exist
@@ -145,8 +147,11 @@ tighten to `-0.04…-0.065em`. These are the instrument-panel conventions the
 page is built on, not defaults.
 
 Scale: three tokens, `--text-fine` 12 px (annotations), `--text-label` 14 px
-(readouts, controls), `--text-title` 16 px (panel headings); fluid `clamp()`
-for display and headline sizes; two fixed breakpoint sizes, 22 px and 58 px.
+(readouts, controls), `--text-title` 16 px (panel headings); the hero h1 is
+the one uppercase display setting (`clamp(40px, 11vw, 48px)` on a phone,
+`clamp(58px, 6.5vw, 108px)` above); section h2 `clamp(34px, 4vw, 52px)` and
+module h3 `clamp(28px, 3.2vw, 44px)`, both sentence case; form-card titles
+`clamp(22px, 1.8vw, 24px)`.
 Every other literal `font-size` is a finding. `browser_check.py` (design mode)
 also caps the number of distinct rendered sizes per route; a new step is
 added here first, then there.
@@ -157,6 +162,8 @@ Reading measure stays narrow and figures stay wide: the old brief's
 ## Layout
 
 - Narrow text, wide figures; generous vertical space; no dashboard density.
+- Sections alternate two grounds, full-bleed: hero, forms and the record on
+  `--camera-black`; mechanism and results on `--nitrile`.
 - No card kit. Radius is `0`; `50%` for dots and lenses; a pill only on a
   glyph that is literally that shape (`.camera-contact i`, `.form-glyph`).
 - Structure is information: a hairline rule, a heading, a numbered state

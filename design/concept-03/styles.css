@@ -224,16 +224,22 @@ main {
 }
 
 .signal-label span {
-  color: var(--signal-amber);
+  color: var(--readout-tertiary);
 }
 
 .hero-copy h1,
 .section-header h2,
-.research-heading h2 {
+.research-heading h2,
+.module-header h3 {
   font-family: var(--font-ui);
   font-stretch: condensed;
-  text-transform: uppercase;
   text-wrap: balance;
+}
+
+/* The hero is the one uppercase display setting on the page; every other
+   heading is sentence case on one of two clamps (h2, h3). */
+.hero-copy h1 {
+  text-transform: uppercase;
 }
 
 .hero-copy h1 {
@@ -249,7 +255,7 @@ main {
   max-width: 590px;
   margin: 36px 0 0;
   color: var(--readout-secondary);
-  font-size: clamp(14px, 1.1vw, 17px);
+  font-size: 16px;
   line-height: 1.65;
   text-wrap: pretty;
 }
@@ -441,6 +447,17 @@ main {
 
 .mechanism,
 .forms,
+/* Sections alternate two grounds so a phone reads bands, not one black
+   field: hero, forms and record on camera-black; mechanism and results on
+   nitrile. The shadow + clip pair bleeds the band to the viewport edges
+   without changing the centred layout. */
+.mechanism,
+.results {
+  background: var(--nitrile);
+  box-shadow: 0 0 0 100vmax var(--nitrile);
+  clip-path: inset(0 -100vmax);
+}
+
 .results {
   padding-top: clamp(124px, 15vw, 240px);
 }
@@ -460,7 +477,7 @@ main {
 .section-header h2 {
   max-width: 940px;
   margin: 0;
-  font-size: clamp(42px, 4.7vw, 76px);
+  font-size: clamp(34px, 4vw, 52px);
   font-weight: 640;
   letter-spacing: -0.048em;
   line-height: 0.88;
@@ -1707,7 +1724,7 @@ main {
 
 .form-index {
   grid-column: 1 / -1;
-  color: var(--signal-amber);
+  color: var(--readout-tertiary);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
   letter-spacing: 0.12em;
@@ -1743,10 +1760,9 @@ main {
    * OMNIDIRECTIONAL whole everywhere. A soft hyphen in the markup lets it
    * break as OMNI-DIRECTIONAL only when the box is genuinely too narrow.
    */
-  font-size: clamp(22px, 2.2vw, 40px);
+  font-size: clamp(22px, 1.8vw, 24px);
   font-weight: 640;
   letter-spacing: -0.045em;
-  text-transform: uppercase;
   /*
    * overflow-wrap: anywhere licensed arbitrary mid-word breaks, and at
    * phone width OMNIDIRECTIONAL rendered as "OMNIDIRECTION AL". The floor
@@ -1843,7 +1859,7 @@ main {
 }
 
 .recon-card > header span:first-child {
-  color: var(--signal-amber);
+  color: var(--readout-tertiary);
 }
 
 .recon-stage {
@@ -1932,9 +1948,9 @@ main {
 
 .research-heading h2 {
   margin: 0;
-  font-size: clamp(54px, 6vw, 98px);
+  font-size: clamp(34px, 4vw, 52px);
   font-weight: 650;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.03em;
   line-height: 0.9;
 }
 
@@ -2316,10 +2332,6 @@ main {
     text-align: left;
   }
 
-  .section-header h2 {
-    font-size: clamp(32px, 8.5vw, 44px);
-  }
-
   .mechanism,
   .record,
   .forms,
@@ -2476,10 +2488,6 @@ main {
     grid-template-columns: 96px minmax(0, 1fr);
     gap: 10px 14px;
     padding: 22px 20px;
-  }
-
-  .form-comparison h3 {
-    font-size: 22px;
   }
 
   .recon-gallery {
@@ -2665,7 +2673,7 @@ main {
 .module-header h3 {
   max-width: 900px;
   margin: 0 0 24px;
-  font-size: clamp(32px, 3.4vw, 54px);
+  font-size: clamp(28px, 3.2vw, 44px);
   font-weight: 640;
   letter-spacing: -0.042em;
   line-height: 0.94;

@@ -1153,7 +1153,9 @@ MAX_DISTINCT_FONT_SIZES = {
     "review": 6,
     "optical": 11,
     "atlas": 10,
-    "signal": 8,
+    # 6 since the own-sensor pass: 12/14/16 tokens, the form-card floor, and
+    # the two heading clamps (measured at 375, 768, 1280 and 1920).
+    "signal": 6,
 }
 
 CONTRAST_JS = r"""
@@ -1259,6 +1261,19 @@ def check_design_system(browser) -> None:
                     f"{route_name}@{vp_name}: touch targets under 44px: "
                     f"{data['touch'][:4]}"
                 )
+            if vp_name == "phone":
+                # Eyebrow labels that wrap to three lines on a phone are the
+                # loudest symptom of copy written for a desktop.
+                tall = page.evaluate(
+                    """() => [...document.querySelectorAll('.signal-label')]
+                        .filter(el => el.getBoundingClientRect().height >
+                                      2.2 * parseFloat(getComputedStyle(el).lineHeight))
+                        .map(el => el.textContent.trim().replace(/\\s+/g, ' ').slice(0, 40))"""
+                )
+                if tall:
+                    raise AssertionError(
+                        f"{route_name}@{vp_name}: eyebrow labels wrap past two lines: {tall}"
+                    )
             limit = MAX_DISTINCT_FONT_SIZES[route_name]
             if len(data["sizes"]) > limit:
                 raise AssertionError(
