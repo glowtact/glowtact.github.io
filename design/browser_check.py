@@ -1517,6 +1517,18 @@ def check_results_region(browser) -> None:
     assert "9dtact" not in recon_text and "gelsight" not in recon_text, "no comparison sensor in reconstruction"
     phone.close()
 
+    # 8. Force is one GlowTact-only table: two columns, no chart, no second
+    #    sensor named.
+    force = page.evaluate(
+        """() => ({
+            tables: document.querySelectorAll('#force table').length,
+            cols: document.querySelectorAll('#force table thead th').length,
+            svg: document.querySelectorAll('#force svg').length,
+            gelsight: document.querySelector('#force').textContent.toLowerCase().includes('gelsight'),
+        })"""
+    )
+    assert force == {"tables": 1, "cols": 2, "svg": 0, "gelsight": False}, force
+
     # 5. The loading strategy is a measured optimisation (6.0 MB -> 1.34 MB on
     #    first load); without an assertion it silently regresses the next time
     #    someone copies an existing <img> or <video> as a template.

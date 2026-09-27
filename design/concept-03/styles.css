@@ -3012,29 +3012,6 @@ main {
   }
 }
 
-/* ------------------------------------------------------------------ *
- * DAT / 04 -- force prediction   |   DAT / 05 -- endurance
- * ------------------------------------------------------------------ */
-
-.force-layout {
-  display: grid;
-  gap: clamp(28px, 3vw, 48px);
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
-  align-items: start;
-}
-
-.force-bar {
-  stroke: var(--optic-surface-1);
-  stroke-width: 2;
-}
-
-.force-value {
-  fill: var(--readout-secondary);
-  font-family: var(--font-mono);
-  font-size: var(--text-fine);
-  font-variant-numeric: tabular-nums;
-}
-
 .force-objects h4 {
   margin: 0 0 16px;
   font-size: var(--text-title);
@@ -3078,8 +3055,25 @@ main {
   font-weight: 500;
 }
 
-.force-objects td.is-best {
-  color: var(--signal-amber-bright);
+.force-objects tr.force-total th,
+.force-objects tr.force-total td {
+  color: var(--readout);
+  font-weight: 620;
+}
+
+.force-objects tr.force-group th {
+  padding-top: 22px;
+  color: var(--readout-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-fine);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.force-objects {
+  max-width: 560px;
 }
 
 .force-objects tfoot th,
@@ -3087,13 +3081,6 @@ main {
   border-bottom: 0;
   border-top: 1px solid var(--optic-ring);
   font-weight: 620;
-}
-
-.force-method {
-  margin: 18px 0 0;
-  color: var(--readout-tertiary);
-  font-size: var(--text-label);
-  line-height: 1.6;
 }
 
 .endurance-layout {
@@ -3152,8 +3139,7 @@ main {
 }
 
 @media (max-width: 900px) {
-  .force-layout,
-  .endurance-layout {
+.endurance-layout {
     grid-template-columns: minmax(0, 1fr);
   }
 }

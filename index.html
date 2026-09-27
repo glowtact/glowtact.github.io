@@ -956,91 +956,42 @@
         </article>
         <article class="result-module" id="force" aria-labelledby="force-title">
           <header class="module-header" data-reveal>
-            <p class="signal-label"><span>DAT / 04</span> Darkening is qualitative; you cannot get newtons</p>
+            <p class="signal-label"><span>DAT / 04</span> Normal force</p>
             <h3 id="force-title">Darkness carries the load.</h3>
             <p class="module-claim">
-              Across four everyday objects, a learned regressor reads normal
-              force from a GlowTact frame to
-              <strong data-metric="force.macro_mae_glowtact">0.106</strong> N
-              mean absolute error, against
-              <strong data-metric="force.macro_mae_gelsight">0.145</strong> N
-              for GelSight Mini — identical architecture, identical protocol,
-              held-out contact locations.
+              A learned regressor reads normal force from the frame:
+              <strong data-metric="force.macro_mae_glowtact">0.106</strong>&nbsp;N mean error on everyday objects,
+              <strong data-metric="force.rmse_glowtact">0.276</strong>&nbsp;N RMSE on controlled probes.
             </p>
           </header>
 
-          <div class="force-layout">
-            <figure class="chart-figure" data-reveal>
-              <figcaption class="chart-title">
-                The advantage is a low-force advantage — and it reverses above 2 N
-              </figcaption>
-              <div class="chart-frame">
-                <svg id="force-chart" viewBox="0 0 920 400" role="img"
-                     aria-label="Mean absolute error by force bin for both sensors.
-                     GlowTact is lower in the 0 to 0.5 newton bin, 0.056 against
-                     0.067, and in the 0.5 to 2 newton bin, 0.058 against 0.088.
-                     In the 2 to 20 newton bin GlowTact is higher, 0.209 against
-                     0.185."></svg>
-              </div>
-              <p class="chart-note">
-                Controlled-probe validation, Table I(a). Lower is better. The
-                third bin is the one where GlowTact loses: above 2 N its error
-                is <span data-metric="force.mae_high_glowtact">0.209</span> N
-                against GelSight Mini&#8217;s
-                <span data-metric="force.mae_high_gelsight">0.185</span> N.
-              </p>
-            </figure>
-
-            <div class="force-objects" data-reveal>
-              <h4>Everyday objects, held-out locations</h4>
-              <table>
-                <caption>Table I(b). Mean absolute error in newtons; lower is better.</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Object</th>
-                    <th scope="col">GlowTact</th>
-                    <th scope="col">GelSight Mini</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><th scope="row">Balloon</th><td class="is-best">0.087</td><td>0.134</td></tr>
-                  <tr><th scope="row">Light bulb</th><td class="is-best">0.093</td><td>0.151</td></tr>
-                  <tr><th scope="row">Pipe</th><td class="is-best">0.127</td><td>0.142</td></tr>
-                  <tr><th scope="row">Rope</th><td class="is-best">0.117</td><td>0.153</td></tr>
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th scope="row">Macro average</th>
-                    <td class="is-best" data-metric="force.macro_mae_glowtact">0.106</td>
-                    <td data-metric="force.macro_mae_gelsight">0.145</td>
-                  </tr>
-                </tfoot>
-              </table>
-              <p class="force-method">
-                Identical ResNet-18 regressors, ImageNet-pretrained, trained
-                independently per sensor on
-                <span data-metric="force.frames_per_sensor">14716</span> frames —
-                <span data-metric="force.frames_controlled">13116</span> from ten
-                probe geometries and
-                <span data-metric="force.frames_objects">1600</span> from the four
-                objects. Ninety per cent of spatial locations train, ten validate,
-                with every depth from one indentation kept on the same side of the
-                split so no loading trajectory leaks across it.
-              </p>
-            </div>
+          <div class="force-objects" data-reveal>
+            <table>
+              <caption>Mean absolute error in newtons; lower is better (paper Table I).</caption>
+              <thead>
+                <tr><th scope="col">Object</th><th scope="col">MAE, N</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Balloon</th><td data-metric="force.mae_balloon">0.087</td></tr>
+                <tr><th scope="row">Light bulb</th><td data-metric="force.mae_light_bulb">0.093</td></tr>
+                <tr><th scope="row">Pipe</th><td data-metric="force.mae_pipe">0.127</td></tr>
+                <tr><th scope="row">Rope</th><td data-metric="force.mae_rope">0.117</td></tr>
+                <tr class="force-total"><th scope="row">Macro average</th><td data-metric="force.macro_mae_glowtact">0.106</td></tr>
+              </tbody>
+              <tbody>
+                <tr class="force-group"><th scope="colgroup" colspan="2">Controlled probes, by force range</th></tr>
+                <tr><th scope="row">0 – 0.5 N</th><td data-metric="force.mae_low_glowtact">0.056</td></tr>
+                <tr><th scope="row">0.5 – 2 N</th><td data-metric="force.mae_mid_glowtact">0.058</td></tr>
+                <tr><th scope="row">2 – 20 N</th><td data-metric="force.mae_high_glowtact">0.209</td></tr>
+              </tbody>
+            </table>
           </div>
 
           <p class="module-scope">
-            Force is estimated by a learned model from the image, not measured by
-            the camera. The gain is concentrated below 2 N, which is where the
-            optical response is strongest and where the sensor is designed to
-            work; above 2 N GelSight Mini is the more accurate of the two. Overall
-            RMSE across the controlled probes is
-            <span data-metric="force.rmse_glowtact">0.276</span> N against
-            <span data-metric="force.rmse_gelsight">0.285</span> N.
+            Estimated by a model from the image, not measured by the camera;
+            <span data-metric="force.frames_per_sensor">14716</span> frames, held-out contact locations.
           </p>
         </article>
-        <script type="application/json" id="force-bins">{"bins":[{"label":"0 – 0.5 N","glowtact":{"value":0.056,"metric":"force.mae_low_glowtact"},"gelsight":{"value":0.067,"metric":"force.mae_low_gelsight"}},{"label":"0.5 – 2 N","glowtact":{"value":0.058,"metric":"force.mae_mid_glowtact"},"gelsight":{"value":0.088,"metric":"force.mae_mid_gelsight"}},{"label":"2 – 20 N","glowtact":{"value":0.209,"metric":"force.mae_high_glowtact"},"gelsight":{"value":0.185,"metric":"force.mae_high_gelsight"}}]}</script>
         <article class="result-module" id="endurance" aria-labelledby="endurance-title">
           <header class="module-header" data-reveal>
             <p class="signal-label"><span>DAT / 05</span> A nitrile membrane must be fragile</p>
