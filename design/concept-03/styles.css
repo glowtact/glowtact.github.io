@@ -1766,7 +1766,8 @@ main {
 }
 
 .research-heading sup {
-  font-size: 0.7em;
+  /* On the scale: 0.7em made 8.4px and 9.8px, two sizes the census rejects. */
+  font-size: var(--text-fine);
   line-height: 0;
 }
 
