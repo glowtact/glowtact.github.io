@@ -264,3 +264,16 @@ The numbers the module quotes come from `05_shear_field/params.json`
 (`preprocess_stats`, `objects[].peak_contact_area`) and its `README.md`;
 `design/data/results.json` records the exact key for each. The folder's
 `eval/metrics.json` is an earlier tracker-comparison run and is not quoted.
+
+## Own-sensor pass (2026-09-26)
+
+| Committed asset | Source | Recipe |
+|---|---|---|
+| `design/assets/video/sensitivity/screw-m2.mp4` | `~/glowtact_stuff/03_sensitivity/videos/screw_1.mp4` (the M2×6 screw, 0.2 g / 1.96 mN; main deck slide 6) | `ffmpeg -an -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 20 -preset slow -movflags +faststart` |
+| `design/assets/images/sensitivity/screw-m2-poster.jpg` | frame at 3.5 s of the clip above | `-frames:v 1 -q:v 3` |
+| `design/assets/images/sensitivity/fig9-{mm,m6-nut,m5-screw}-{raw,diff,diff3}.jpg` (9) | `~/glowtact_stuff/01_decks/light_objects.pptx` slide 2, GlowTact half: rows y≈1.6 / 3.7 / 5.0 = M&M (image3/2/4), M6 nut (image31/30/32), M5×6 (image5/6/7); identified by content against `02_figures/light_objects.pdf` | Pillow, JPEG q88, ≤ 760 px |
+| `design/assets/images/forms/flat-exploded.jpg` | `GlowTact_main_deck.pptx` slide 5 `image16.png` (Flat exploded CAD) | Pillow, JPEG q88, ≤ 1200 px |
+| `design/assets/images/forms/tip-exploded.jpg` | slide 5 `image14.png` (dome fingertip exploded CAD) | same |
+| `design/assets/images/forms/tips-in-hand.jpg` | slide 5 `image10.png` (two fingertip sensors held) | same |
+| removed | `design/assets/images/sensitivity/{mm,m8-nut,m5-screw}-{glowtact,gelsight}.jpg` | superseded by the Fig. 9 triplets; the site no longer shows GelSight |
+| unused, kept | `design/data/snr-curves.json`, `design/tools/digitize_snr.py` | the SNR chart left the page on 2026-09-26; the digitisation stays as a documented derivation |
