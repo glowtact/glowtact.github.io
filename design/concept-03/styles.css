@@ -1003,6 +1003,19 @@ main {
   background: var(--signal-amber-bright);
 }
 
+/* The Camera tab exists for the phone layout only; the desktop grid shows
+ * the sensor output beside the microscope. */
+.micro-tab--phone {
+  display: none;
+}
+
+.micro-window-label,
+.camera-coordinate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .micro-panel {
   position: relative;
   min-height: 244px;
@@ -2188,6 +2201,20 @@ main {
   .mechanism-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
+  }
+
+  .micro-tab--phone {
+    display: inline-flex;
+  }
+
+  /* One stage on a phone: Camera hides the microscope's panels and readout,
+     and the sensor-output article shows only while Camera is selected. */
+  .mechanism-grid[data-micro-view="camera"] .microscope-view .micro-scale {
+    display: none;
+  }
+
+  .mechanism-grid:not([data-micro-view="camera"]) .output-view {
+    display: none;
   }
 
   .macro-view {

@@ -315,6 +315,17 @@
                   >
                     3D
                   </button>
+                  <button
+                    id="micro-tab-camera"
+                    class="micro-tab--phone"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="output-view"
+                    tabindex="-1"
+                  >
+                    Camera
+                  </button>
                 </div>
               </header>
 
@@ -398,12 +409,12 @@
               </div>
 
               <footer class="microscope-readout">
-                <span class="micro-window-label">LOCAL WINDOW / ~100 UM / QUALITATIVE</span>
+                <span class="micro-window-label">WINDOW ~100 µm</span>
                 <output id="contact-fraction">24%</output>
     </footer>
             </article>
 
-            <article class="instrument-view output-view" aria-labelledby="output-title">
+            <article class="instrument-view output-view" id="output-view" aria-labelledby="output-title">
               <header class="view-header">
                 <div>
                   <span>VIEW C / SENSOR OUTPUT / DEVICE FOV</span>
@@ -420,7 +431,7 @@
                 </span>
                 <span class="camera-reticle camera-reticle--x"></span>
                 <span class="camera-reticle camera-reticle--y"></span>
-                <span class="camera-coordinate">DEVICE FOV / ROI 320 × 240</span>
+                <span class="camera-coordinate">FOV 320 × 240</span>
               </div>
               <footer class="camera-readout">
                 <span>LOCAL INTENSITY</span>
@@ -440,7 +451,7 @@
 
             <div class="pressure-control">
               <label for="signal-pressure">
-                <span>QUALITATIVE INDENTATION</span>
+                <span>INDENTATION</span>
                 <output id="pressure-percent" for="signal-pressure">0%</output>
               </label>
               <input

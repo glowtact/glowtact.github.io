@@ -1062,6 +1062,39 @@ def check_signal_interactions(browser) -> None:
     context.close()
 
 
+def check_micro_toggle_phone(browser) -> None:
+    """Below 900px the camera view is a third microscope tab. Selecting it
+    shows the camera stage and hides both microscope panels; switching back
+    must not disturb the model readout; keyboard wrap includes the tab only
+    where it is visible."""
+    context = browser.new_context(viewport={"width": 375, "height": 812})
+    page = context.new_page()
+    block_media(page)
+    navigate(page, "/concept-03/")
+    page.locator("#signal-pressure").fill("60")
+    page.wait_for_timeout(300)
+    readout_before = page.locator("#contact-fraction").inner_text()
+    page.click("#micro-tab-camera")
+    page.wait_for_timeout(200)
+    state = page.evaluate(
+        """() => ({
+            camera: getComputedStyle(document.querySelector('.output-view')).display !== 'none',
+            panels: [...document.querySelectorAll('.micro-panel')].every(p => p.hidden),
+            selected: document.querySelector('#micro-tab-camera').getAttribute('aria-selected'),
+        })"""
+    )
+    if state != {"camera": True, "panels": True, "selected": "true"}:
+        raise AssertionError(f"signal@phone: camera tab did not take over the stage: {state}")
+    page.keyboard.press("ArrowRight")
+    if page.locator("#micro-tab-2d").get_attribute("aria-selected") != "true":
+        raise AssertionError("signal@phone: ArrowRight from Camera did not wrap to 2D")
+    if page.locator("#contact-fraction").inner_text() != readout_before:
+        raise AssertionError("signal@phone: switching views changed the model readout")
+    if page.evaluate("getComputedStyle(document.querySelector('.output-view')).display") != "none":
+        raise AssertionError("signal@phone: camera stage still shown after returning to 2D")
+    context.close()
+
+
 def check_keyboard_focus(browser) -> None:
     for route_name, path in ROUTES.items():
         page = browser.new_page(viewport=VIEWPORTS["desktop"])
@@ -1610,6 +1643,7 @@ def main() -> int:
             check_optical_interactions(browser)
             check_atlas_interactions(browser)
             check_signal_interactions(browser)
+            check_micro_toggle_phone(browser)
             check_probe_footprints(browser)
             check_keyboard_focus(browser)
             check_reduced_motion(browser)
@@ -1624,7 +1658,7 @@ def main() -> int:
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
     if MODE in {"all", "behavior"}:
-        print("PASS: interactions, keyboard focus, reduced motion, console, network")
+        print("PASS: interactions, phone view toggle, keyboard focus, reduced motion, console, network")
     if MODE in {"all", "design"}:
         print(
             "PASS: contrast, touch targets, type scale, overflow, "

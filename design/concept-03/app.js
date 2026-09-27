@@ -1444,6 +1444,19 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
   );
 }
 
+/**
+ * Views are "2d", "3d" and, below 900px, "camera": the sensor-output article
+ * becomes a third tab so the three stages share one screen on a phone. The
+ * camera stage is shown or hidden by CSS off data-micro-view; nothing is
+ * re-created and the model is untouched.
+ */
+const mechanismGrid = document.querySelector(".mechanism-grid");
+const phoneLayout = window.matchMedia("(max-width: 900px)");
+
+function visibleMicroTabs() {
+  return microTabs.filter((tab) => tab.offsetParent !== null);
+}
+
 function setActiveMicroView(view, focus = false) {
   activeMicroView = view;
   microTabs.forEach((tab) => {
@@ -1455,10 +1468,17 @@ function setActiveMicroView(view, focus = false) {
   microPanels.forEach((panel) => {
     panel.hidden = panel.id !== `micro-panel-${view}`;
   });
+  if (mechanismGrid) mechanismGrid.dataset.microView = view;
   if (view === "3d") {
     requestAnimationFrame(() => renderMicro3D(currentPressure));
   }
 }
+
+// Widening past the phone layout hides the Camera tab; a camera selection
+// left behind would blank the microscope, so fall back to 2D.
+phoneLayout.addEventListener("change", () => {
+  if (!phoneLayout.matches && activeMicroView === "camera") setActiveMicroView("2d");
+});
 
 function render(value) {
   const pressure = Math.min(Math.max(Number(value), 0), 1);
@@ -1647,22 +1667,23 @@ function revealContent() {
 
 microTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
-    const view = tab.id.endsWith("3d") ? "3d" : "2d";
-    setActiveMicroView(view);
+    setActiveMicroView(tab.id.replace("micro-tab-", ""));
   });
 
   tab.addEventListener("keydown", (event) => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
-    const currentIndex = microTabs.indexOf(event.currentTarget);
+    // Wrap over the tabs that are actually on screen: Camera exists only
+    // below 900px, and a hidden tab must not swallow a keystroke.
+    const tabs = visibleMicroTabs();
+    const currentIndex = tabs.indexOf(event.currentTarget);
     let targetIndex =
       event.key === "ArrowLeft"
-        ? (currentIndex - 1 + microTabs.length) % microTabs.length
-        : (currentIndex + 1) % microTabs.length;
+        ? (currentIndex - 1 + tabs.length) % tabs.length
+        : (currentIndex + 1) % tabs.length;
     if (event.key === "Home") targetIndex = 0;
-    if (event.key === "End") targetIndex = microTabs.length - 1;
-    const target = microTabs[targetIndex].id.endsWith("3d") ? "3d" : "2d";
-    setActiveMicroView(target, true);
+    if (event.key === "End") targetIndex = tabs.length - 1;
+    setActiveMicroView(tabs[targetIndex].id.replace("micro-tab-", ""), true);
   });
 });
 
