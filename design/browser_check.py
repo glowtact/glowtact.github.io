@@ -483,6 +483,45 @@ def check_probe_footprints(browser) -> None:
         raise AssertionError(f"probe footprints: {'; '.join(issues)}")
     context.close()
 
+    # The picker first shipped as one flex row, which pushed Quad and Round
+    # past the right edge of a 390px viewport -- inside a clipping ancestor,
+    # so the page-level overflow check never saw it and two probes were simply
+    # unreachable on a phone. Measure the buttons themselves.
+    for width in (390, 768):
+        context = browser.new_context(viewport={"width": width, "height": 900})
+        page = context.new_page()
+        block_media(page)
+        navigate(page, "/concept-03/")
+        page.locator(".mechanism-shell").scroll_into_view_if_needed()
+        page.wait_for_timeout(200)
+        escaped = page.evaluate(
+            """() => [...document.querySelectorAll('.probe-options button')]
+                .map(button => {
+                    const rect = button.getBoundingClientRect();
+                    return {
+                        probe: button.dataset.probe,
+                        right: Math.round(rect.right),
+                        left: Math.round(rect.left)
+                    };
+                })
+                .filter(item => item.right > innerWidth + 1 || item.left < -1)"""
+        )
+        if escaped:
+            raise AssertionError(
+                f"probe footprints @{width}px: probes outside the viewport: "
+                f"{escaped}"
+            )
+        for name in PROBE_FOOTPRINTS:
+            page.locator(f'.probe-options button[data-probe="{name}"]').click()
+            page.wait_for_timeout(90)
+            loaded = page.locator(".camera-contact").get_attribute("data-probe")
+            if loaded != name:
+                raise AssertionError(
+                    f"probe footprints @{width}px: {name} is not selectable "
+                    f"(camera reports {loaded})"
+                )
+        context.close()
+
 
 def check_signal_interactions(browser) -> None:
     context = browser.new_context(

@@ -525,8 +525,9 @@ main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 0 22px;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 6px 22px;
   background: var(--nitrile);
   box-shadow: inset 0 -1px var(--optic-ring);
 }
@@ -566,9 +567,11 @@ main {
  * change and the side section stays exactly as it was.
  */
 .probe-control {
-  display: grid;
-  gap: 6px;
-  justify-items: center;
+  /* Inline label, not stacked: the desktop mechanism shell has a hard height
+     budget, and a second row inside the toolbar spends 14px of it. */
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .probe-control > span {
@@ -580,11 +583,15 @@ main {
 
 .probe-options {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 4px;
 }
 
 .probe-options button {
-  min-height: 44px;
+  /* 38px here, 44px from the tablet breakpoint down, where the picker gets a
+     row of its own and the target has to take a thumb. */
+  min-height: 38px;
   padding: 0 12px;
   border: 1px solid var(--optic-ring);
   color: var(--readout-secondary);
@@ -1279,6 +1286,25 @@ main {
   transform: translate(-50%, -50%);
   clip-path: var(--probe-clip, none);
   transition: background-color 100ms linear, box-shadow 100ms linear, opacity 120ms linear;
+}
+
+/*
+ * Annular dimming for a clipped footprint. The disk gets its soft outer ring
+ * from a radial gradient, which a polygon clip cuts away -- so the star and
+ * the triangle would lose the halo the round probe keeps. This is that ring,
+ * drawn as a slightly larger copy of the same footprint and blurred on its
+ * own layer, where the blur cannot touch the speckle texture.
+ */
+.camera-contact::after {
+  position: absolute;
+  inset: -7%;
+  clip-path: var(--probe-clip, none);
+  border-radius: inherit;
+  background: rgba(46, 57, 49, calc(var(--annulus-strength) * 0.42));
+  filter: blur(5px);
+  opacity: var(--camera-response-opacity);
+  content: "";
+  z-index: -1;
 }
 
 .camera-reference {
@@ -2102,6 +2128,27 @@ main {
   }
 
   /*
+   * Below the desktop layout the picker takes the full strip: four probes in
+   * one flex row push the last two off a 390px viewport, and the targets have
+   * to take a thumb rather than a cursor from here down.
+   */
+  .probe-control {
+    order: 3;
+    flex: 1 0 100%;
+    justify-content: center;
+  }
+
+  .probe-options {
+    flex: 1 1 auto;
+  }
+
+  .probe-options button {
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 0 8px;
+  }
+
+  /*
    * Stacked layout: the 4:3 camera stage at full column width became a
    * ~550px gray monolith that dwarfed every other panel. Cap and centre it.
    */
@@ -2324,6 +2371,32 @@ main {
     align-items: flex-start;
     padding-block: 14px;
   }
+
+  /*
+   * At phone width the inline label wraps beside the buttons and pushes Round
+   * onto a row of its own. Stack the label and give the four probes one even
+   * grid row instead.
+   */
+  .probe-control {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .probe-control > span {
+    text-align: center;
+  }
+
+  .probe-options {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .probe-options button {
+    padding: 0 4px;
+  }
+
+
 
   .toolbar-status {
     max-width: 140px;
