@@ -2339,8 +2339,10 @@ main {
   }
 
   .macro-stage {
-    min-height: 380px;
-    padding: 10px 6px 50px;
+    /* The schematic renders about 200px tall at 375px; a fixed floor left
+       130px of empty well around it. */
+    min-height: 0;
+    padding: 10px 6px 42px;
   }
 
   .macro-label {
@@ -2469,6 +2471,10 @@ main {
     width: 36px;
   }
 
+  .recon-caption-text > span {
+    display: none;
+  }
+
   .recon-control {
     flex-direction: column;
     align-items: stretch;
@@ -2568,7 +2574,7 @@ main {
 
 .results-index {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   margin: 0 0 clamp(64px, 7vw, 116px);
   padding: 1px;
@@ -2735,14 +2741,11 @@ main {
 
 @media (max-width: 560px) {
   .results-index {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .results-index a {
-    min-height: 64px;
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
+    min-height: 56px;
   }
 }
 

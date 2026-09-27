@@ -1376,6 +1376,31 @@ def check_hero_actions(browser) -> None:
     page.close()
 
 
+# Screens of scroll the published page may take. Measured after the
+# own-sensor pass (2026-09-26): 21.6 -> 13.2 on a phone, 14.2 -> 12.4 on a
+# laptop, with the interactive mechanism and four evidence modules intact.
+# A section that grows past this is a regression; ratchet the number down
+# when something is removed, never up to make a build pass.
+PAGE_BUDGET_SCREENS = {"phone": 13.4, "laptop": 12.6}
+
+
+def check_page_budget(browser) -> None:
+    """The page fits its screen budget on a phone and a laptop."""
+    for vp_name, limit in PAGE_BUDGET_SCREENS.items():
+        vp = AUDIT_VIEWPORTS[vp_name]
+        page = browser.new_page(viewport=vp)
+        block_media(page)
+        navigate(page, "/concept-03/")
+        activate_reveals(page)
+        page.wait_for_timeout(300)
+        screens = page.evaluate("document.documentElement.scrollHeight") / vp["height"]
+        if screens > limit:
+            raise AssertionError(
+                f"signal@{vp_name}: {screens:.1f} screens exceeds the budget of {limit}"
+            )
+        page.close()
+
+
 def check_media_scaling(browser) -> None:
     """The mechanism animation must stay proportioned and crisp everywhere."""
     for vp_name, viewport in AUDIT_VIEWPORTS.items():
@@ -1684,6 +1709,7 @@ def main() -> int:
             check_results_region(browser)
             check_type_hierarchy(browser)
             check_hero_actions(browser)
+            check_page_budget(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
@@ -1692,7 +1718,7 @@ def main() -> int:
     if MODE in {"all", "design"}:
         print(
             "PASS: contrast, touch targets, type scale, overflow, "
-            "media scaling, coupling readability, results region, type hierarchy, hero actions"
+            "media scaling, coupling readability, results region, type hierarchy, hero actions, page budget"
         )
     return 0
 
