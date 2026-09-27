@@ -1,5 +1,27 @@
 # GlowTact Website Content
 
+> **Live copy, 2026-09-26.** The results region now carries four one-sentence
+> claims, each with its numbers bound to `design/data/results.json`; the
+> sections below that describe a GelSight or 9DTact comparison
+> ("Conventional VBTS Comparison", the GelSight rows under Sensitivity and
+> Force Estimation) no longer apply. The claims as published:
+>
+> - **Light touch** — An M&M at 1.0 g (9.8 mN) and an M2 screw at 0.2 g
+>   (1.96 mN) both show in the raw frame under their own weight. *Scope:*
+>   passive placement is a demonstration; the controlled threshold test gives
+>   a 0.12 N median minimum detectable force at SNR = 3 across 10 probes.
+> - **Geometry** — Relief from a single frame's darkening resolves M1 threads
+>   at 0.25 mm pitch. *Scope:* qualitative relief from one tactile frame, not
+>   validated against measured heights.
+> - **Shear** — Dense Farnebäck flow on the gel's own speckle yields a usable
+>   field over 97.8 % of the pad, 0.037 px forward–backward. *Scope:*
+>   self-supervised consistency on one reference press; no ground truth;
+>   pixels, not calibrated force.
+> - **Normal force** — A learned regressor reads normal force from the frame:
+>   0.106 N mean error on everyday objects, 0.276 N RMSE on controlled
+>   probes. *Scope:* estimated by a model from the image, not measured by the
+>   camera; 14 716 frames, held-out contact locations.
+
 ## Title
 **GlowTact: Simple and Compact Vision-Based Tactile Sensing with High Sensitivity and Spatial Resolution**
 

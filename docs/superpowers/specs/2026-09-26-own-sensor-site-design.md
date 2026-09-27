@@ -248,3 +248,16 @@ lands); Code and Hardware-guide destinations.
 Per task: `verify.py`, then design + behaviour modes, then screenshots at
 375 and 1280 looked at. At the end: `audit_slop.py --deep`, the height
 budget, the word count (`audit_text.py`), `release.py`.
+
+## Outcome (2026-09-26, same day)
+
+Implemented in fourteen tasks (`docs/superpowers/plans/2026-09-26-own-sensor-site.md`);
+the found-to-fix trail is in `2026-09-26-own-sensor-site-ledger.md`.
+
+| Target | Measured after |
+|---|---|
+| no GelSight on the page | 0 mentions; 0 `*_gelsight` keys; blues retired from CSS, script and DESIGN.md |
+| page ≈ 800 words, results ≈ 450 | 818 and 433 (from 1 588 and 1 171) |
+| phone ≤ 9 screens, desktop ≤ 7 | **not met as written**: 13.1 screens at 375 × 812 and 12.4 at 1 280 × 800 under the guard's block-media measurement (from 21.6 and 14.2 by the same method). The 9 / 7 figures were estimates before the content was settled; with the interactive mechanism and four evidence modules kept, the measured floor is frozen as `PAGE_BUDGET_SCREENS` (13.4 / 12.6) and ratchets down when something is removed. |
+| first load | 0.33 MB, no video bytes (hero the only eager image) |
+| distinct font sizes | 6 at every viewport (ceiling ratcheted 8 → 6) |

@@ -54,6 +54,11 @@ Mandatory note:
 - do not smooth curves in a way that changes results
 
 ## GelSight Mini
+
+> **Superseded 2026-09-26.** The site shows no head-to-head with any other
+> sensor (`docs/superpowers/specs/2026-09-26-own-sensor-site-design.md`).
+> The rules below still govern any future mention; today there is none.
+
 Allowed:
 - representative geometry-based VBTS baseline
 - same controlled apparatus and acquisition protocol
@@ -67,6 +72,11 @@ Avoid:
 - all GelSight systems require heavy computation
 
 ## 9DTact
+
+> **Superseded 2026-09-26.** Same decision as above: 9DTact is not named on
+> the site. The reconstruction module states its own result (M1 threads at
+> 0.25 mm) without a comparison.
+
 - qualitative context only unless matched data exist
 - state that implementations and object sets differ
 - do not claim a controlled quantitative comparison
