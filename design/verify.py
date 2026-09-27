@@ -71,6 +71,58 @@ def audit(route: Path) -> list[str]:
     return errors
 
 
+def stylesheet_syntax(path: Path) -> list[str]:
+    """Comment- and string-aware brace scan. A comment that loses its closer
+    swallows every rule up to the next `*/` and leaves a stray brace that
+    eats the rule after it; browsers report neither (2026-09-27: 67 lines of
+    retired CSS hid `.principles-list`)."""
+    text = path.read_text(encoding="utf-8")
+    issues: list[str] = []
+    depth = 0
+    line = 1
+    state = "code"
+    opened = 0
+    i = 0
+    while i < len(text):
+        char = text[i]
+        pair = text[i:i + 2]
+        if char == "\n":
+            line += 1
+        if state == "code":
+            if pair == "/*":
+                state, opened, i = "comment", line, i + 2
+                continue
+            if char in "\"'":
+                state = char
+            elif char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+                if depth < 0:
+                    issues.append(f"stray closing brace at line {line}")
+                    depth = 0
+        elif state == "comment":
+            if pair == "*/":
+                if line - opened > 20:
+                    issues.append(
+                        f"comment of {line - opened} lines at line {opened}; a lost closer?"
+                    )
+                state, i = "code", i + 2
+                continue
+        else:
+            if char == "\\":
+                i += 2
+                continue
+            if char == state or char == "\n":
+                state = "code"
+        i += 1
+    if state == "comment":
+        issues.append(f"unclosed comment opened at line {opened}")
+    if depth:
+        issues.append(f"{depth} unclosed block(s) at end of file")
+    return issues
+
+
 failures: list[str] = []
 for route in ROUTES:
     if not route.exists():
@@ -84,6 +136,9 @@ css_text = "\n".join(
 )
 if "@media (prefers-reduced-motion: reduce)" not in css_text:
     failures.append("styles: missing reduced-motion handling")
+for path in sorted(ROOT.rglob("*.css")):
+    for issue in stylesheet_syntax(path):
+        failures.append(f"{path.relative_to(ROOT)}: {issue}")
 
 js_text = "\n".join(
     path.read_text(encoding="utf-8") for path in ROOT.rglob("*.js")

@@ -400,118 +400,44 @@ def contact_thirds(page: Page) -> set[int]:
     return thirds
 
 
-PROBE_FOOTPRINTS = {
-    "star": {"clipped": True, "vertices": 10},
-    "triangle": {"clipped": True, "vertices": 3},
-    "quad": {"clipped": True, "vertices": 4},
-    "round": {"clipped": False, "vertices": 0},
-}
+DEFAULT_PROBE = "round"
 
 
 def check_probe_footprints(browser) -> None:
-    """Every probe in the picker must reshape the camera footprint to match."""
+    """The picker was removed on 2026-09-27: the demo loads the round probe,
+    nothing on the page can change it, and the camera footprint is the
+    unclipped disc."""
     context = browser.new_context(viewport=VIEWPORTS["desktop"])
     page = context.new_page()
     block_media(page)
     issues = collect_runtime_issues(page)
     navigate(page, "/concept-03/")
 
-    buttons = page.locator(".probe-options button")
-    if buttons.count() != len(PROBE_FOOTPRINTS):
+    picker = page.locator(
+        ".probe-control, .probe-options, [data-probe]:not(.camera-contact)"
+    ).count()
+    if picker:
         raise AssertionError(
-            f"signal: expected {len(PROBE_FOOTPRINTS)} probes, "
-            f"found {buttons.count()}"
+            f"signal: {picker} probe picker element(s) remain; the demo ships one probe"
         )
 
     page.locator("#signal-pressure").fill("70")
     page.locator("#signal-pressure").dispatch_event("input")
     page.wait_for_timeout(120)
 
-    for name, expected in PROBE_FOOTPRINTS.items():
-        button = page.locator(f'.probe-options button[data-probe="{name}"]')
-        if button.count() != 1:
-            raise AssertionError(f"signal: no picker button for probe {name}")
-        button.click()
-        page.wait_for_timeout(120)
-
-        pressed = [
-            page.locator(f'.probe-options button[data-probe="{other}"]')
-            .get_attribute("aria-pressed")
-            for other in PROBE_FOOTPRINTS
-        ]
-        if pressed.count("true") != 1:
-            raise AssertionError(
-                f"signal: probe {name} did not leave exactly one button pressed: "
-                f"{pressed}"
-            )
-
-        loaded = page.locator(".camera-contact").get_attribute("data-probe")
-        if loaded != name:
-            raise AssertionError(
-                f"signal: picked probe {name}, camera reports {loaded}"
-            )
-
-        clip = page.locator(".camera-contact").evaluate(
-            "element => getComputedStyle(element).clipPath"
+    loaded = page.locator(".camera-contact").get_attribute("data-probe")
+    if loaded != DEFAULT_PROBE:
+        raise AssertionError(
+            f"signal: camera reports probe {loaded!r}, expected {DEFAULT_PROBE!r}"
         )
-        clipped = clip not in ("none", "", None)
-        if clipped != expected["clipped"]:
-            raise AssertionError(
-                f"signal: probe {name} footprint clip is {clip!r}, "
-                f"expected clipped={expected['clipped']}"
-            )
-        if expected["clipped"]:
-            vertices = clip.count("%") // 2
-            if vertices != expected["vertices"]:
-                raise AssertionError(
-                    f"signal: probe {name} footprint has {vertices} vertices, "
-                    f"expected {expected['vertices']}"
-                )
-
-    page.locator('.probe-options button[data-probe="star"]').click()
-    page.wait_for_timeout(120)
+    clip = page.locator(".camera-contact").evaluate(
+        "element => getComputedStyle(element).clipPath"
+    )
+    if clip not in ("none", "", None):
+        raise AssertionError(f"signal: round probe footprint is clipped: {clip!r}")
     if issues:
         raise AssertionError(f"probe footprints: {'; '.join(issues)}")
     context.close()
-
-    # The picker first shipped as one flex row, which pushed Quad and Round
-    # past the right edge of a 390px viewport -- inside a clipping ancestor,
-    # so the page-level overflow check never saw it and two probes were simply
-    # unreachable on a phone. Measure the buttons themselves.
-    for width in (390, 768):
-        context = browser.new_context(viewport={"width": width, "height": 900})
-        page = context.new_page()
-        block_media(page)
-        navigate(page, "/concept-03/")
-        page.locator(".mechanism-shell").scroll_into_view_if_needed()
-        page.wait_for_timeout(200)
-        escaped = page.evaluate(
-            """() => [...document.querySelectorAll('.probe-options button')]
-                .map(button => {
-                    const rect = button.getBoundingClientRect();
-                    return {
-                        probe: button.dataset.probe,
-                        right: Math.round(rect.right),
-                        left: Math.round(rect.left)
-                    };
-                })
-                .filter(item => item.right > innerWidth + 1 || item.left < -1)"""
-        )
-        if escaped:
-            raise AssertionError(
-                f"probe footprints @{width}px: probes outside the viewport: "
-                f"{escaped}"
-            )
-        for name in PROBE_FOOTPRINTS:
-            page.locator(f'.probe-options button[data-probe="{name}"]').click()
-            page.wait_for_timeout(90)
-            loaded = page.locator(".camera-contact").get_attribute("data-probe")
-            if loaded != name:
-                raise AssertionError(
-                    f"probe footprints @{width}px: {name} is not selectable "
-                    f"(camera reports {loaded})"
-                )
-        context.close()
 
 
 def check_signal_interactions(browser) -> None:
@@ -1595,6 +1521,8 @@ def check_results_region(browser) -> None:
         """() => ({
             clips: [...document.querySelectorAll('#sensitivity video')]
               .map(v => [v.preload, !!v.getAttribute('poster'), v.hasAttribute('autoplay')]),
+            row: [...document.querySelectorAll('#sensitivity .passive-pair video')]
+              .map(v => { const r = v.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.height)]; }),
             masses: document.querySelectorAll('#sensitivity .module-claim [data-metric$="_mass"]').length,
             strip: document.querySelectorAll('#sensitivity .fig9-strip').length,
             gelsight: document.querySelector('#sensitivity').textContent.toLowerCase().includes('gelsight'),
@@ -1602,6 +1530,14 @@ def check_results_region(browser) -> None:
     )
     assert passive["clips"] == [["none", True, False], ["none", True, False], ["none", True, False]], (
         f"sensitivity clips must be three (M&M, M2, fingerprint progression), preload=none, with posters, no autoplay: {passive['clips']}"
+    )
+    # The fingerprint clip first landed outside the pair and rendered 1216px
+    # wide from a 434px source (2026-09-27): every sensitivity clip sits in
+    # the one row, level with the others.
+    tops = {top for top, _ in passive["row"]}
+    heights = {height for _, height in passive["row"]}
+    assert len(passive["row"]) == 3 and len(tops) == 1 and len(heights) == 1, (
+        f"sensitivity clips must share one level row on a laptop: {passive['row']}"
     )
     assert passive["masses"] == 2, (
         f"expected the two masses in the sensitivity claim, found {passive['masses']}"
@@ -1632,6 +1568,11 @@ def check_results_region(browser) -> None:
             object: (card.querySelector('.recon-object') || {}).getAttribute?.('src')?.split('/').pop(),
             header: card.querySelectorAll('header').length,
             text: card.querySelector('figcaption').innerText.trim().split('\\n').length,
+            square: (() => { const r = card.querySelector('.recon-object').getBoundingClientRect();
+                             return Math.round(r.width) === Math.round(r.height); })(),
+            overflow: Math.round(Math.max(card.querySelector('figcaption').getBoundingClientRect().right,
+                        ...[...card.querySelectorAll('figcaption img')].map(i => i.getBoundingClientRect().right))
+                      - card.getBoundingClientRect().right),
         }))"""
     )
     assert [c["poster"] for c in cards] == [
@@ -1639,7 +1580,23 @@ def check_results_region(browser) -> None:
         "cali-balls-spin-poster.jpg", "oreo-spin-poster.jpg",
     ], cards
     assert all(c["header"] == 0 and c["text"] == 1 and c["input"] and c["object"] for c in cards), cards
+    # Fixed 150px thumbnail columns overflowed the 303px card at 1280 and a
+    # stale phone override left them 36x150 (2026-09-27): thumbnails scale
+    # with the card, stay square, and neither they nor the caption box reach
+    # past the card's edge (a fixed-track caption grows wider than its card).
+    assert all(c["square"] and c["overflow"] <= 0 for c in cards), cards
     phone.close()
+    captions = page.evaluate(
+        """() => [...document.querySelectorAll('.recon-card')].map(card => {
+            const cap = card.querySelector('figcaption');
+            const r = card.querySelector('.recon-object').getBoundingClientRect();
+            const right = Math.max(cap.getBoundingClientRect().right, ...[...cap.querySelectorAll('img')].map(i => i.getBoundingClientRect().right));
+            return {overflow: Math.round(right - card.getBoundingClientRect().right), w: Math.round(r.width), h: Math.round(r.height)};
+        })"""
+    )
+    assert all(c["overflow"] <= 0 and c["w"] == c["h"] and c["w"] >= 100 for c in captions), (
+        f"reconstruction thumbnails on a laptop must be square, at least 100px, inside the caption: {captions}"
+    )
 
     # 8. The normal-force module was cancelled (2026-09-27): results are the
     #    three modules the index lists, and the shear module shows the clips
@@ -1658,6 +1615,22 @@ def check_results_region(browser) -> None:
         "modules": ["sensitivity", "reconstruction", "shear"],
         "shearTables": 0,
     }, modules
+
+    # 9. "Why simple" closes the mechanism band as a module (2026-09-27): four
+    #    wrapped dt/dd pairs on one row, not a band of its own on the forms
+    #    ground, and not a bare dl whose grid splits titles from their lines.
+    principles = page.evaluate(
+        """() => {
+            const list = document.querySelector('.mechanism .principles .principles-list');
+            if (!list) return null;
+            const pairs = [...list.children].map(el => el.tagName === 'DIV'
+                && el.querySelectorAll('dt').length === 1 && el.querySelectorAll('dd').length === 1);
+            return {pairs: pairs.length, wrapped: pairs.every(Boolean),
+                    columns: getComputedStyle(list).gridTemplateColumns.split(' ').length,
+                    standalone: document.querySelectorAll('section.principles').length};
+        }"""
+    )
+    assert principles == {"pairs": 4, "wrapped": True, "columns": 4, "standalone": 0}, principles
 
     # 5. The loading strategy is a measured optimisation (6.0 MB -> 1.34 MB on
     #    first load); without an assertion it silently regresses the next time

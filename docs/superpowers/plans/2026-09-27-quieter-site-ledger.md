@@ -26,6 +26,26 @@ unless the row says otherwise.
 | Copy: section eyebrows, capability tiles, card indices, badges, "how we did it" | user request; DESIGN.md's own rule on structure that encodes nothing | removed; badges, eyebrows, state and clip labels demoted from amber to `--readout-tertiary`; `Pause rotation` outline | slop gate 0 open; contrast pass |
 | Palette: green cast on every grey | `#171d18`, `#94a094`, sage gel `#9db3ad` | neutral greys, cool gel `#a3b4bf`; DESIGN.md mirrored in the same commit | `token-mirror` both ways, 15 -> 9 metrics still matching |
 
+## Second pass, same day
+
+The brief, in the user's words: no `PAPER TEASER` caption; the default
+indenter a sphere, not the star; a `Why simple` section under the mechanism;
+the fingerprint frames out of the geometry module, each with its force, as a
+clip; the object photographs larger; shear down to fingertip, coin and the
+M5 Phillips head; then "improve the colour" and the title hierarchy.
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| Fingerprint series: five stills in the geometry module, no force per frame | user: not a reconstruction, one force per picture | the five frames encoded as one H.264 clip (0.25 to 3 N, 0.8 s per step), `fingerprint-progression.mp4`, in the light-touch row beside the two passive clips; the square source is cropped to the contact (`object-position: 50% 63%`) in the row's 16:10 box | `ffprobe` yuv420p; design mode: three clips |
+| The clip first sat outside `.passive-pair` | 1216 px wide from a 434 px source at 1280 | moved into the pair; three columns | frozen: the three clips share one top and one height; red-greened with a two-column pair |
+| Reconstruction thumbnails: 52 px, then fixed 150 px columns | caption 320 px in a 303 px card at 1280; 36x150 on a phone from a stale override that set width only | two fluid columns, `aspect-ratio: 1 / 1`; the stale phone rules removed | 132 px on a laptop, 71 px on a phone, overflow 0; frozen: square, overflow 0, at least 100 px on a laptop; red-greened with fixed columns |
+| Probe picker: `Sphere` marked pressed while `app.js` loaded `star` | `.camera-contact` reported `star` | picker removed (one lonely pressed toggle is dead UI); `activeProbe = "round"`; the `PROBES` table stays for a future picker | frozen: no picker element, camera reports round, clip-path none; red-greened both ways |
+| `Why simple` shipped as a band on the same transparent ground as `.forms`; the bare `dl` grid split titles from their lines; its `display: grid` never reached the browser | `.principles-list` absent from `cssRules`; two black bands read as one | closing module of the mechanism band (`.module-header` h3), each dt/dd pair wrapped in a div, titles `--text-title` amber, lines `--text-label` | frozen: `.mechanism .principles`, four wrapped pairs, four columns on a laptop, no `section.principles`; red-greened by unwrapping a pair |
+| Latent since e5cb62d: a comment for the retired passive table had lost its closer and selector line, so the browser read 67 lines as one comment up to the next `*/` and the media block's `}` became a stray brace that ate the following rule | comment 2616 to 2682; harmless until a rule was appended after it | the dead block deleted | `verify.py` `stylesheet_syntax`: unclosed comment, stray brace, comment over 20 lines; red-greened with an unclosed `/*` |
+| Shear: five clips | user: keep three | Go piece and M2 pan head tabs and files removed | behaviour mode selector check; `verify.py` local references |
+| Colour and hierarchy | user: "improve the color", titles not prominent | `.signal-label` amber again for the three results eyebrows; h3 above its eyebrow in `.module-header`; DESIGN.md amber rule updated | contrast pass; slop gate 0 open |
+| `git add -A` in a local commit swept in `.impeccable/`, a screenshot, `webpage.jpg` and the forms re-renders | commit `f54a282`, unpushed | commit reset and redone with named files | `git show --stat` |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
@@ -34,3 +54,10 @@ Not done, on purpose:
   under `~/Desktop/glowtact_materials/gallery/` still holds them.
 - The deep slop tier reports two pre-existing concept-02 copy findings
   (`marketing-cadence`, `em-dash-density`); frozen review artifact, untouched.
+- `design/assets/images/forms/{flat-exploded,tip-exploded,tips-in-hand}.jpg`
+  are modified in the working tree (1200x900 re-renders of the exploded
+  views, from the untracked `.impeccable/`), not part of this brief and left
+  uncommitted; `.impeccable/`, `Screenshot from 2026-09-26 23-42-08.png` and
+  `webpage.jpg` stay untracked.
+- The `Code` and `Hardware guide` pending buttons in the hero were not
+  discussed and stay.

@@ -349,7 +349,7 @@ const PROBES = {
   round: { label: "ROUND PROBE", clip: "none", areaRatio: 1 }
 };
 
-let activeProbe = "star";
+let activeProbe = "round";
 
 function setActiveProbe(name) {
   if (!PROBES[name]) return;

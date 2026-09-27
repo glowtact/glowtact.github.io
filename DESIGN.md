@@ -132,11 +132,13 @@ Rules:
 - Do not add unrelated decorative colours. A new hue is a design decision:
   add it to the frontmatter with a role before it appears in CSS.
 - Amber means signal: the numbers in claims and tables, the primary action,
-  the active state, the lamp. Eyebrow, index, card, state and clip labels and
-  the view badges are `--readout-tertiary`, not amber (changed 2026-09-26 and
-  2026-09-27: five roles on one hue competed on a phone). One filled amber
-  button per surface: `Paper` on the page, `Run once` in the instrument.
-  Emphasis elsewhere is weight, size or the readout text steps.
+  the active state, the lamp, and, since 2026-09-27 at the author's request,
+  the three results eyebrows (`DAT / 01-03`) and the `Why simple` titles, so
+  each band has one amber entry point. Index, card, state and clip labels and
+  the view badges stay `--readout-tertiary` (2026-09-26: five roles on one
+  hue competed on a phone). One filled amber button per surface: `Paper` on
+  the page, `Run once` in the instrument. Emphasis elsewhere is weight, size
+  or the readout text steps.
 - Amber ink equals the coupled fraction the readout prints, to 3 pp
   (`browser_check.py`, design mode). The picture and the number never disagree.
 - Semi-transparent white and black are the only overlays. Gradients exist
