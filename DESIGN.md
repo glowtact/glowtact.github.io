@@ -1,16 +1,16 @@
 ---
 name: GlowTact — Signal Chamber
-description: "Dark instrument-panel register for the GlowTact tactile-sensing paper site: camera-black ground, one amber signal, monospace readouts and tracked caps as the device vocabulary. Restraint everywhere except the mechanism, which is the subject."
+description: "Dark instrument-panel register for the GlowTact tactile-sensing paper site: camera-black ground, neutral instrument greys, one amber signal, a cool grey-blue gel, monospace readouts and tracked caps as the device vocabulary. Restraint everywhere except the mechanism, which is the subject."
 source_of_truth: design/concept-03/styles.css (:root)
 applies_to: design/concept-03/
 colors:
   # Ground and surfaces: the camera well
   camera-black: "#070908"          # page ground
-  nitrile: "#121713"               # membrane, deepest panel
-  optic-surface-1: "#111612"
-  optic-surface-2: "#171d18"
-  optic-surface-3: "#202820"
-  optic-surface-4: "#2a342c"
+  nitrile: "#131515"               # membrane, deepest panel
+  optic-surface-1: "#121414"
+  optic-surface-2: "#1a1c1c"
+  optic-surface-3: "#242727"
+  optic-surface-4: "#2f3333"
   depth-ramp:                      # literal steps for the camera-well vignette and lens bodies
     - "#0a0c0a"
     - "#121612"
@@ -30,15 +30,14 @@ colors:
   signal-amber-dim: "#886421"
   signal-highlight: "#ffd077"      # literal in styles.css x3; candidate for a :root token
   focus: "#ffc04a"                 # focus ring only
-  # Gel and air
-  gel: "#9db3ad"
-  gel-deep: "#4f645d"
-  fov-guide: "#8ea29a"
+  # Gel and air: the one cool note, so the clear gel reads as glass against the amber light
+  gel: "#a3b4bf"
+  gel-deep: "#536270"
   # Text
-  readout: "#edf1ea"
-  readout-secondary: "#b4beb4"
-  readout-tertiary: "#94a094"
-  readout-dim: "#8b978c"
+  readout: "#eef0ee"
+  readout-secondary: "#c3c8c4"
+  readout-tertiary: "#9da39f"
+  readout-dim: "#939994"
   readout-paper: "#e9e9e5"         # literal x1
   readout-muted-green: "#7f8b80"   # literal x1
 typography:
@@ -100,6 +99,12 @@ optics. Amber is GlowTact's colour in the paper. Nothing decorative is added
 to that, and no second sensor is shown (decision of 2026-09-26: the site
 stands on GlowTact's own evidence), so there is no second hue.
 
+Until 2026-09-27 every grey carried a green cast (`#171d18`, `#94a094`, a sage
+gel `#9db3ad`), which muddied the amber and made the small labels read as
+olive on olive. The greys are now neutral and the gel is the one cool note
+(`#a3b4bf`), so the palette is three temperatures with three jobs: black
+membrane, amber light, cool clear gel.
+
 This file described a light editorial brief (white and `#F6F6F3` grounds,
 Inter or Geist, amber `#E9A000`) until 2026-09-26. That register survives in
 the review hub (`design/index.html`, `design/shared/review.css`) and in
@@ -113,13 +118,13 @@ other than the one shipped sends every agent the wrong way.
 | Token | Value | Role |
 |---|---|---|
 | `--camera-black` | `#070908` | page ground |
-| `--nitrile` | `#121713` | membrane, deepest panel |
-| `--optic-surface-1..4` | `#111612` → `#2a342c` | raised surfaces, in depth order |
+| `--nitrile` | `#131515` | membrane, deepest panel |
+| `--optic-surface-1..4` | `#121414` → `#2f3333` | raised surfaces, in depth order |
 | `--signal-amber` | `#d89122` | the accent; coupled-area ink; controls' active state |
 | `--signal-amber-bright` / `-dim` | `#f4b840` / `#886421` | highlight and recessed amber |
 | `--focus` | `#ffc04a` | focus ring, nothing else |
-| `--gel`, `--gel-deep` | `#9db3ad` / `#4f645d` | gel body and depth |
-| `--readout` … `--readout-dim` | `#edf1ea` → `#8b978c` | text, in four steps of emphasis |
+| `--gel`, `--gel-deep` | `#a3b4bf` / `#536270` | gel body and depth; the only cool hue |
+| `--readout` … `--readout-dim` | `#eef0ee` → `#939994` | text, in four steps of emphasis |
 | rings and grids | `rgba(255,255,255, 0.05–0.12)` | hairline structure; alpha neutrals, never a new hue |
 
 Rules:
@@ -127,10 +132,11 @@ Rules:
 - Do not add unrelated decorative colours. A new hue is a design decision:
   add it to the frontmatter with a role before it appears in CSS.
 - Amber means signal: the numbers in claims and tables, the primary action,
-  the active state, the lamp. Eyebrow, index and card labels are
-  `--readout-tertiary`, not amber (changed 2026-09-26: five roles on one hue
-  competed on a phone). Emphasis elsewhere is weight, size or the readout
-  text steps.
+  the active state, the lamp. Eyebrow, index, card, state and clip labels and
+  the view badges are `--readout-tertiary`, not amber (changed 2026-09-26 and
+  2026-09-27: five roles on one hue competed on a phone). One filled amber
+  button per surface: `Paper` on the page, `Run once` in the instrument.
+  Emphasis elsewhere is weight, size or the readout text steps.
 - Amber ink equals the coupled fraction the readout prints, to 3 pp
   (`browser_check.py`, design mode). The picture and the number never disagree.
 - Semi-transparent white and black are the only overlays. Gradients exist
@@ -167,8 +173,17 @@ Reading measure stays narrow and figures stay wide: the old brief's
 - No card kit. Radius is `0`; `50%` for dots and lenses; a pill only on a
   glyph that is literally that shape (`.camera-contact i`, `.form-glyph`).
 - Structure is information: a hairline rule, a heading, a numbered state
-  (`STATE 00 → 02`, `DAT/01 → 05`) encodes an actual sequence. Do not add
-  numbering, eyebrows, or dividers that encode nothing.
+  (`STATE 00 → 02`, `DAT/01 → 03`) encodes an actual sequence. Do not add
+  numbering, eyebrows, or dividers that encode nothing. The section eyebrows
+  (`SYS / 01`, `CFG / 01`, `DOC / 01`), the form-card indices and the hero
+  capability tiles were removed on 2026-09-27 for exactly this reason; only
+  the results index keeps its codes.
+- Diagram labels are HTML (`.stage-label`, `--text-label`) positioned over the
+  drawing in a `.stage-frame`, never SVG `<text>`: SVG text scales with the
+  viewBox and measured 8.7 px on the 1280 layout. Two labels per drawing
+  (membrane and gel; air gap and gel), the legend below carries the rest.
+  `browser_check.py` (design mode) fails on any `<text>` in the mechanism
+  drawings and on a label under 14 px.
 
 ## Motion
 
@@ -204,7 +219,12 @@ Required mechanism note, verbatim (checked by `verify.py`):
 
 ## Tone and copy
 
-Scientific, confident, restrained. Say the measured thing. `verify.py`'s
+Scientific, confident, restrained. Say the measured thing. The site sells
+the sensor (decision of 2026-09-27): every caveat that was copy became a
+positive, measured statement or was cut, and only the mandatory
+disclosures below and in `SCIENTIFIC_CONSTRAINTS.md` remain as caveats.
+Method explanations stay to one line; the page shows results, it does not
+explain how they were obtained. `verify.py`'s
 `PROHIBITED` list polices claims ("revolutionary", "pixel-wise pressure", …);
 the detector polices register: no "isn't just", "not just", "more than
 just", "seamless", "effortless", "unlock", "elevate", "empower", "delve",

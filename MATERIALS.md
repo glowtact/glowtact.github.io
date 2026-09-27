@@ -96,7 +96,9 @@ the mesh PNGs and the video are byte-for-byte copies.
 | Committed asset | Source |
 |---|---|
 | `design/assets/images/hero-teaser.jpg` | `materials/figures/teaser.png` |
-| `design/assets/images/fingerprint-pressure.jpg` | `materials/figures/fingerprints.png` |
+| `design/assets/images/fingerprints/press-1..5.jpg` | `~/tactile_data/glowtact/analysis/fingerprints/cropped/` tactile frames 000001, 000002, 000003, 000004, 000008 (the paper's three plus the lightest and hardest press of the same placement) |
+| `design/assets/video/shear/*.mp4`, `design/assets/images/shear/*-poster.jpg` | `~/Desktop/glowtact_materials/shear_field/videos/original/` re-encoded H.264 CRF 20; posters cut at each object's `peak_frame` in `shear_field/params.json` (the colour-tuned set was retired 2026-09-27) |
+| `design/assets/video/recon/*.mp4`, `design/assets/images/reconstruction/*` | `~/Desktop/glowtact_materials/gallery/gallery/<object>/` turntable GIFs and tactile frames, the paper's reconstruction parameters; `*-object.jpg` are the object photographs cropped from `materials/figures/3d_recon.png` (top row) and, for the Oreo, `slides/3d_recon.pptx` media image25 |
 | `design/assets/images/reconstruction-overview.jpg` | `materials/figures/3d_recon.png` |
 | `design/assets/images/contact-geometry.jpg` | `materials/figures/glowtact_h.png` |
 | `design/assets/images/thread-mesh.png` | `materials/meshes/flat/glowtact_1_steep_01_screw_threads_mesh.png` |

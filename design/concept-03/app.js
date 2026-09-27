@@ -31,10 +31,8 @@ const macroScaleMarker = document.querySelector("#macro-scale-marker");
 const macroAirGap = document.querySelector("#macro-air-gap");
 const macroCouplingLine = document.querySelector("#macro-coupling-line");
 const macroCouplingGlow = document.querySelector("#macro-coupling-glow");
-const macroFieldOfView = document.querySelector("#macro-field-of-view");
 const macroCameraAperture = document.querySelector(".macro-camera-aperture");
 const macroIndenter = document.querySelector("#macro-indenter");
-const macroIndenterLabel = document.querySelector("#macro-indenter-label");
 const probeButtons = [...document.querySelectorAll(".probe-options button")];
 
 const microSurfaceFill = document.querySelector("#micro-surface-fill");
@@ -358,7 +356,6 @@ function setActiveProbe(name) {
   activeProbe = name;
   const probe = PROBES[name];
   root.style.setProperty("--probe-clip", probe.clip);
-  if (macroIndenterLabel) macroIndenterLabel.textContent = probe.label;
   probeButtons.forEach((button) => {
     button.setAttribute(
       "aria-pressed",
@@ -1006,7 +1003,6 @@ function renderMacro(pressure, contactModel = microContactModel(couplingPressure
   );
   macroCouplingGlow?.setAttribute("rx", String(8 + contactChordWidth * 0.46));
   macroCouplingGlow?.setAttribute("ry", String(10 + Math.sqrt(ratio) * 18));
-  macroFieldOfView?.setAttribute("opacity", (0.18 + ratio * 0.72).toFixed(3));
   macroCameraAperture?.setAttribute("opacity", (0.48 + ratio * 0.52).toFixed(3));
 }
 
@@ -1319,8 +1315,8 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
     height * 0.46,
     width * 0.72
   );
-  background.addColorStop(0, "#1b211d");
-  background.addColorStop(1, "#0c0f0d");
+  background.addColorStop(0, "#1b1f22");
+  background.addColorStop(1, "#0c0e10");
   context.fillStyle = background;
   context.fillRect(0, 0, width, height);
 
@@ -1375,7 +1371,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
       context.closePath();
 
       const tone = Math.round(55 + average * 74);
-      const baseColor = [Math.round(tone * 0.75), tone, Math.round(tone * 0.91)];
+      const baseColor = [Math.round(tone * 0.86), Math.round(tone * 0.94), tone];
       // Same blend as the geometry: flattened extent and amber extent agree.
       const contactMix = flattenBlend;
       const color = baseColor.map((channel, index) =>
@@ -1388,7 +1384,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
       // has nothing left to delineate.
       context.strokeStyle = contactStrength
         ? `rgba(244, 184, 64, ${0.16 + contactStrength * 0.34})`
-        : `rgba(210, 228, 220, ${(0.07 * membraneVisibility).toFixed(3)})`;
+        : `rgba(214, 224, 232, ${(0.07 * membraneVisibility).toFixed(3)})`;
 
       context.fill();
       context.stroke();
@@ -1433,7 +1429,7 @@ function renderMicro3D(pressure, contactModel = microContactModel(couplingPressu
 
   const labelSize = Math.max(Math.round(width * 0.019), 11 * pixelRatio);
   context.font = `${labelSize}px "Cascadia Mono", Consolas, monospace`;
-  context.fillStyle = "rgba(222, 229, 222, 0.52)";
+  context.fillStyle = "rgba(224, 228, 232, 0.52)";
   context.textAlign = "left";
   context.fillText("P2500-INSPIRED HEIGHT FIELD", 18 * pixelRatio, 28 * pixelRatio);
   context.fillStyle = "rgba(227, 161, 40, 0.82)";
@@ -1702,7 +1698,7 @@ window.addEventListener("resize", () => {
 });
 
 /*
- * Turntable gallery. Seven looping reconstructions decode at once if left
+ * Turntable gallery. Four looping reconstructions decode at once if left
  * alone, so playback is gated three ways: a reduced-motion preference holds
  * every card on its poster frame, offscreen cards stay paused, and the
  * section control lets any visitor stop the motion outright.

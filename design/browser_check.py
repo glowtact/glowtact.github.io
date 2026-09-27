@@ -467,15 +467,6 @@ def check_probe_footprints(browser) -> None:
                     f"signal: probe {name} footprint has {vertices} vertices, "
                     f"expected {expected['vertices']}"
                 )
-        # An SVG <text> is not an HTMLElement, so inner_text() refuses it.
-        label = page.locator("#macro-indenter-label").evaluate(
-            "element => element.textContent.trim()"
-        )
-        if not label.lower().startswith(name):
-            raise AssertionError(
-                f"signal: probe {name} selected but the section labels the "
-                f"indenter {label!r}"
-            )
 
     page.locator('.probe-options button[data-probe="star"]').click()
     page.wait_for_timeout(120)
@@ -534,9 +525,7 @@ def check_signal_interactions(browser) -> None:
 
     for selector in (
         ".macro-camera-lens",
-        "#macro-field-of-view",
         ".macro-scale-marker",
-        ".macro-interface-note",
     ):
         count = page.locator(selector).count()
         if count != 1:
@@ -546,7 +535,6 @@ def check_signal_interactions(browser) -> None:
             raise AssertionError(
                 f"signal: {selector} has no non-empty rendered bounding box"
             )
-    assert_scale_label(page, ".macro-interface-note", 9)
     assert_scale_label(page, ".micro-window-label", 100)
 
     assert_horizontally_centered(
@@ -624,18 +612,20 @@ def check_signal_interactions(browser) -> None:
         raise AssertionError(
             f"signal: expected at most two primary font families, found {sorted(primary_families)}"
         )
-    fov_style = page.locator("#macro-field-of-view").evaluate(
-        "element => ({ stroke: getComputedStyle(element).stroke, fill: getComputedStyle(element).fill })"
-    )
-    fov_label = " ".join(
-        (page.locator(".macro-fov text").text_content() or "").split()
-    )
-    if fov_label != "CAMERA FOV GUIDE":
-        raise AssertionError(f"signal: unclear FOV label {fov_label!r}")
-    fov_stroke = parse_rgb_triplet(fov_style["stroke"])
-    if fov_stroke[0] > 200 and fov_stroke[1] > 140 and fov_stroke[2] < 100:
+    # Diagram labels are HTML at the label size, over the drawing. SVG <text>
+    # scaled with the viewBox and measured 8.7px on the 1280 layout, which is
+    # why the labels were unreadable (2026-09-27).
+    svg_text = page.locator("#macro-svg text, #micro-svg text").count()
+    if svg_text:
         raise AssertionError(
-            f"signal: camera FOV triangle still reads as amber coupling highlight: {fov_style}"
+            f"signal: {svg_text} SVG <text> label(s) remain in the mechanism drawings"
+        )
+    label_sizes = page.locator(".stage-label").evaluate_all(
+        "els => els.map(el => parseFloat(getComputedStyle(el).fontSize))"
+    )
+    if len(label_sizes) != 4 or min(label_sizes) < 14:
+        raise AssertionError(
+            f"signal: expected four stage labels at 14px or more, found {label_sizes}"
         )
 
     pressure.fill("20")
@@ -1598,14 +1588,15 @@ def check_results_region(browser) -> None:
 
     # 6. Sensitivity is a passive-placement demonstration: two clips, both
     #    preload=none with posters and no autoplay, the two masses in the
-    #    claim bound to results.json, the nine Fig. 9 frames, and no second
-    #    sensor anywhere in the module.
+    #    claim bound to results.json, no Fig. 9 strip (taken down 2026-09-27:
+    #    the clips carry the light-touch evidence), and no second sensor
+    #    anywhere in the module.
     passive = page.evaluate(
         """() => ({
             clips: [...document.querySelectorAll('#sensitivity video')]
               .map(v => [v.preload, !!v.getAttribute('poster'), v.hasAttribute('autoplay')]),
             masses: document.querySelectorAll('#sensitivity .module-claim [data-metric$="_mass"]').length,
-            frames: document.querySelectorAll('#sensitivity .fig9-strip img').length,
+            strip: document.querySelectorAll('#sensitivity .fig9-strip').length,
             gelsight: document.querySelector('#sensitivity').textContent.toLowerCase().includes('gelsight'),
         })"""
     )
@@ -1615,7 +1606,7 @@ def check_results_region(browser) -> None:
     assert passive["masses"] == 2, (
         f"expected the two masses in the sensitivity claim, found {passive['masses']}"
     )
-    assert passive["frames"] == 9, f"expected the nine Fig. 9 frames, found {passive['frames']}"
+    assert passive["strip"] == 0, "the Fig. 9 strip was taken down; the two clips are the evidence"
     assert not passive["gelsight"], "GelSight must not appear in the sensitivity module"
 
     # 7. Reconstruction: an h3 like the other modules, no comparison sensor,
@@ -1631,19 +1622,42 @@ def check_results_region(browser) -> None:
     assert phone.locator("h3#reconstruction-title").count() == 1, "reconstruction title must be an h3"
     recon_text = phone.locator("#reconstruction").inner_text().lower()
     assert "9dtact" not in recon_text and "gelsight" not in recon_text, "no comparison sensor in reconstruction"
+    # Four objects, the paper's reconstruction parameters (2026-09-27): the
+    # three Fig. 8 objects plus the Oreo, each card a turntable over the
+    # object photograph, its tactile input and a title, nothing else.
+    cards = phone.evaluate(
+        """() => [...document.querySelectorAll('.recon-card')].map(card => ({
+            poster: (card.querySelector('video').getAttribute('poster') || '').split('/').pop(),
+            input: (card.querySelector('.recon-input') || {}).getAttribute?.('src')?.split('/').pop(),
+            object: (card.querySelector('.recon-object') || {}).getAttribute?.('src')?.split('/').pop(),
+            header: card.querySelectorAll('header').length,
+            text: card.querySelector('figcaption').innerText.trim().split('\\n').length,
+        }))"""
+    )
+    assert [c["poster"] for c in cards] == [
+        "screw-threads-spin-poster.jpg", "philips-head-spin-poster.jpg",
+        "cali-balls-spin-poster.jpg", "oreo-spin-poster.jpg",
+    ], cards
+    assert all(c["header"] == 0 and c["text"] == 1 and c["input"] and c["object"] for c in cards), cards
     phone.close()
 
-    # 8. Force is one GlowTact-only table: two columns, no chart, no second
-    #    sensor named.
-    force = page.evaluate(
+    # 8. The normal-force module was cancelled (2026-09-27): results are the
+    #    three modules the index lists, and the shear module shows the clips
+    #    without the flow-reliability table.
+    modules = page.evaluate(
         """() => ({
-            tables: document.querySelectorAll('#force table').length,
-            cols: document.querySelectorAll('#force table thead th').length,
-            svg: document.querySelectorAll('#force svg').length,
-            gelsight: document.querySelector('#force').textContent.toLowerCase().includes('gelsight'),
+            force: document.querySelectorAll('#force').length,
+            index: [...document.querySelectorAll('.results-index a')].map(a => a.getAttribute('href')),
+            modules: [...document.querySelectorAll('.result-module')].map(m => m.id),
+            shearTables: document.querySelectorAll('#shear table').length,
         })"""
     )
-    assert force == {"tables": 1, "cols": 2, "svg": 0, "gelsight": False}, force
+    assert modules == {
+        "force": 0,
+        "index": ["#sensitivity", "#reconstruction", "#shear"],
+        "modules": ["sensitivity", "reconstruction", "shear"],
+        "shearTables": 0,
+    }, modules
 
     # 5. The loading strategy is a measured optimisation (6.0 MB -> 1.34 MB on
     #    first load); without an assertion it silently regresses the next time
@@ -1677,7 +1691,7 @@ def check_results_region(browser) -> None:
         ".result-module",
         "els => els.map(el => [el.id, !!el.querySelector('.module-scope')])",
     )
-    assert len(modules) == 4, f"expected 4 result modules, found {len(modules)}"
+    assert len(modules) == 3, f"expected 3 result modules, found {len(modules)}"
     missing = [name for name, has in modules if not has]
     assert not missing, f"result modules without a scope footnote: {missing}"
 

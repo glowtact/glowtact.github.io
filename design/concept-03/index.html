@@ -30,7 +30,6 @@
     <main id="main">
       <section class="signal-hero" aria-labelledby="signal-title">
         <div class="hero-copy" data-reveal>
-          <p class="signal-label"><span>OPTICAL COUPLING</span> Compact tactile vision</p>
           <h1 id="signal-title">Contact,<br>made visible.</h1>
           <p class="hero-summary">
             GlowTact turns pressure-induced optical coupling into a direct,
@@ -49,20 +48,6 @@
               Hardware guide <small>coming soon</small>
             </span>
           </div>
-          <dl class="hero-capabilities" aria-label="GlowTact capabilities">
-            <div>
-              <dt>INTERFACE</dt>
-              <dd>P2500 silicone</dd>
-            </div>
-            <div>
-              <dt>SIGNAL</dt>
-              <dd>Local darkening</dd>
-            </div>
-            <div>
-              <dt>FORM</dt>
-              <dd>Fingertip-sized</dd>
-            </div>
-          </dl>
         </div>
 
         <figure class="hero-figure" data-reveal>
@@ -75,8 +60,7 @@
             <span class="figure-corner figure-corner--bottom" aria-hidden="true"></span>
           </div>
           <figcaption>
-            <span>PAPER TEASER / SUPPLIED FIGURE</span>
-            <p>One sensing principle across robotic contact, tactile imaging, and compact fingertip hardware.</p>
+            <span>PAPER TEASER</span>
           </figcaption>
         </figure>
       </section>
@@ -84,7 +68,6 @@
       <section class="mechanism" id="mechanism" aria-labelledby="mechanism-title">
         <header class="section-header" data-reveal>
           <div>
-            <p class="signal-label"><span>SYS / 01</span> Coupling mechanism</p>
             <h2 id="mechanism-title">How contact<br>becomes signal.</h2>
           </div>
           <p>
@@ -97,8 +80,7 @@
             <div class="toolbar-identity">
               <span class="status-lamp" aria-hidden="true"></span>
               <div>
-                <strong>GT / COUPLING MONITOR</strong>
-                <span>P2500-inspired qualitative model</span>
+                <strong>COUPLING MONITOR</strong>
               </div>
             </div>
             <div class="probe-control" role="group" aria-labelledby="probe-control-label">
@@ -121,13 +103,13 @@
             <article class="instrument-view macro-view" aria-labelledby="macro-title">
               <header class="view-header">
                 <div>
-                  <span>VIEW A / DEVICE SCALE</span>
                   <h3 id="macro-title">Membrane–gel interface</h3>
                 </div>
                 <span class="view-badge">SCHEMATIC</span>
               </header>
 
               <div class="macro-stage">
+                <div class="stage-frame">
                 <svg
                   id="macro-svg"
                   viewBox="0 0 920 540"
@@ -143,14 +125,14 @@
                   </desc>
                   <defs>
                     <linearGradient id="gel-gradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stop-color="#9db3ad" stop-opacity=".54"></stop>
-                      <stop offset=".55" stop-color="#5f746e" stop-opacity=".32"></stop>
-                      <stop offset="1" stop-color="#26322e" stop-opacity=".82"></stop>
+                      <stop offset="0" stop-color="#a3b4bf" stop-opacity=".54"></stop>
+                      <stop offset=".55" stop-color="#63737f" stop-opacity=".32"></stop>
+                      <stop offset="1" stop-color="#28303a" stop-opacity=".82"></stop>
                     </linearGradient>
                     <linearGradient id="acrylic-gradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0" stop-color="#29302d"></stop>
-                      <stop offset=".5" stop-color="#515b56"></stop>
-                      <stop offset="1" stop-color="#29302d"></stop>
+                      <stop offset="0" stop-color="#2b2e2e"></stop>
+                      <stop offset=".5" stop-color="#555b5b"></stop>
+                      <stop offset="1" stop-color="#2b2e2e"></stop>
                     </linearGradient>
                     <radialGradient id="coupling-gradient">
                       <stop offset="0" stop-color="#ffc04a" stop-opacity=".76"></stop>
@@ -180,7 +162,6 @@
                   <g id="macro-indenter">
                     <path d="M390 52H530V150C530 176 509 197 483 197H437C411 197 390 176 390 150Z"></path>
                     <path class="indenter-highlight" d="M405 66H420V156C420 169 430 180 443 182"></path>
-                    <text id="macro-indenter-label" x="460" y="92" text-anchor="middle">STAR PROBE</text>
                   </g>
 
                   <path id="macro-air-gap" class="macro-air-gap"></path>
@@ -222,18 +203,11 @@
                   <ellipse id="macro-coupling-glow" class="macro-coupling-glow" cx="460" cy="290" rx="80" ry="28"></ellipse>
                   <path id="macro-coupling-line" class="macro-coupling-line"></path>
 
-                  <g class="macro-label macro-label--membrane">
+                  <g class="macro-label macro-label--membrane" aria-hidden="true">
                     <path d="M100 204H210L244 247"></path>
-                    <text x="100" y="194">BLACK NITRILE MEMBRANE / 3 MIL</text>
                   </g>
-                  <g class="macro-label macro-label--gel">
+                  <g class="macro-label macro-label--gel" aria-hidden="true">
                     <path d="M778 376H710L674 350"></path>
-                    <text x="778" y="366" text-anchor="end">TEXTURED XP-565 GEL</text>
-                  </g>
-
-                  <g class="macro-interface-note">
-                    <path d="M120 330H206L238 296"></path>
-                    <text x="120" y="322">~9 UM TEXTURE / EXAGGERATED</text>
                   </g>
 
                   <!-- Sampled ~100 um window: at a ~10 um texture period the
@@ -246,15 +220,6 @@
                     <path class="macro-sample-window" d="M442 279H478L486 286L478 293H442L434 286Z"></path>
                   </g>
 
-                  <g class="macro-fov" aria-label="Camera field of view">
-                    <path
-                      id="macro-field-of-view"
-                      class="macro-field-of-view"
-                      d="M402 448L460 346L518 448Z"
-                    ></path>
-                    <path class="macro-fov-axis" d="M460 448V348"></path>
-                    <text x="528" y="410">CAMERA FOV GUIDE</text>
-                  </g>
                   <g class="macro-camera">
                     <path class="macro-camera-mount" d="M438 448H482L490 468H430Z"></path>
                     <path class="macro-camera-body" d="M390 478H530L540 532H380Z"></path>
@@ -263,7 +228,6 @@
                     <circle class="macro-camera-lens" cx="460" cy="505" r="21"></circle>
                     <circle class="macro-camera-glass" cx="452" cy="499" r="6"></circle>
                     <circle class="macro-camera-aperture" cx="460" cy="505" r="8"></circle>
-                    <text x="460" y="545" text-anchor="middle">CAMERA</text>
                   </g>
                   <g class="macro-led macro-led--left">
                     <circle cx="116" cy="470" r="8"></circle>
@@ -274,6 +238,11 @@
                     <path d="M786 470H770 M838 470H822 M804 452V440"></path>
                   </g>
                 </svg>
+                <div class="stage-labels" aria-hidden="true">
+                  <span class="stage-label stage-label--membrane">Membrane</span>
+                  <span class="stage-label stage-label--gel">Gel</span>
+                </div>
+                </div>
 
                 <div class="macro-legend" aria-hidden="true">
                   <span><i class="legend-ray"></i>Reflected light</span>
@@ -286,7 +255,6 @@
             <article class="instrument-view microscope-view" aria-labelledby="microscope-title">
               <header class="view-header view-header--tabs">
                 <div>
-                  <span>VIEW B / MICRO SCALE</span>
                   <h3 id="microscope-title">Asperity coupling</h3>
                 </div>
                 <div class="micro-tabs" role="tablist" aria-label="Microscope view">
@@ -330,6 +298,7 @@
                 role="tabpanel"
                 aria-labelledby="micro-tab-2d"
               >
+                <div class="stage-frame">
                 <svg
                   id="micro-svg"
                   viewBox="0 0 520 320"
@@ -344,8 +313,8 @@
                   </desc>
                   <defs>
                     <linearGradient id="micro-gel-gradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stop-color="#a7bbb5" stop-opacity=".75"></stop>
-                      <stop offset="1" stop-color="#34433e" stop-opacity=".92"></stop>
+                      <stop offset="0" stop-color="#adbcc7" stop-opacity=".75"></stop>
+                      <stop offset="1" stop-color="#374450" stop-opacity=".92"></stop>
                     </linearGradient>
                     <pattern id="micro-grid" width="26" height="26" patternUnits="userSpaceOnUse">
                       <path d="M26 0H0V26" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="1"></path>
@@ -360,22 +329,20 @@
                   <path id="micro-membrane" class="micro-membrane"></path>
                   <g id="micro-contact-points" class="micro-contact-points"></g>
 
-                  <g class="micro-annotation micro-annotation--membrane">
-                    <path d="M34 46H132L158 75"></path>
-                    <text x="34" y="36">NITRILE MEMBRANE / 3 MIL, CROPPED</text>
-                  </g>
-                  <g class="micro-annotation micro-annotation--gap">
+                  <g class="micro-annotation micro-annotation--gap" aria-hidden="true">
                     <path d="M486 82H412L388 112"></path>
-                    <text x="486" y="72" text-anchor="end">AIR GAP</text>
                   </g>
-                  <g class="micro-annotation micro-annotation--surface">
+                  <g class="micro-annotation micro-annotation--surface" aria-hidden="true">
                     <path d="M486 242H414L386 220"></path>
-                    <text x="486" y="232" text-anchor="end">P2500-MOLDED TEXTURE</text>
                   </g>
                 </svg>
+                <div class="stage-labels" aria-hidden="true">
+                  <span class="stage-label stage-label--gap">Air gap</span>
+                  <span class="stage-label stage-label--surface">Gel</span>
+                </div>
+                </div>
                 <div class="micro-scale">
-                  <span>SECTION / HEIGHT EXAGGERATED</span>
-                  <span>Fixed seed 2500-A</span>
+                  <span>HEIGHT EXAGGERATED</span>
                 </div>
               </div>
 
@@ -398,13 +365,12 @@
                   across the P2500-inspired surface.
                 </p>
                 <div class="micro-scale">
-                  <span>HEIGHT FIELD / DIMENSIONLESS</span>
                   <span><i></i> Coupled area</span>
                 </div>
               </div>
 
               <footer class="microscope-readout">
-                <span class="micro-window-label">WINDOW ~100 µm</span>
+                <span class="micro-window-label">COUPLED AREA IN ~100 µm</span>
                 <output id="contact-fraction">24%</output>
     </footer>
             </article>
@@ -412,7 +378,6 @@
             <article class="instrument-view output-view" id="output-view" aria-labelledby="output-title">
               <header class="view-header">
                 <div>
-                  <span>VIEW C / SENSOR OUTPUT / DEVICE FOV</span>
                   <h3 id="output-title">Camera response</h3>
                 </div>
                 <span class="view-badge">SIMULATED</span>
@@ -426,7 +391,6 @@
                 </span>
                 <span class="camera-reticle camera-reticle--x"></span>
                 <span class="camera-reticle camera-reticle--y"></span>
-                <span class="camera-coordinate">FOV 320 × 240</span>
               </div>
               <footer class="camera-readout">
                 <span>LOCAL INTENSITY</span>
@@ -492,18 +456,15 @@
       <section class="forms" aria-labelledby="forms-title">
         <header class="section-header" data-reveal>
           <div>
-            <p class="signal-label"><span>CFG / 01</span> Sensor forms</p>
             <h2 id="forms-title">One principle.<br>Three bodies.</h2>
           </div>
           <p>
-            The same pressure-induced coupling drives all three. Every result
-            that follows was measured on the flat pad.
+            The same pressure-induced coupling drives all three.
           </p>
         </header>
 
         <div class="form-comparison" data-reveal>
           <article>
-            <span class="form-index">A / 01</span>
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../assets/images/forms/flat-exploded.jpg"
                  alt="Exploded view of the flat GlowTact build: nitrile membrane, textured silicone, gel holder, strip LED, acrylic, shell, camera holder and camera">
@@ -513,7 +474,6 @@
             </div>
           </article>
           <article>
-            <span class="form-index">A / 02</span>
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../assets/images/forms/tip-exploded.jpg"
                  alt="Exploded view of the domed fingertip build: nitrile membrane, textured silicone, epoxy skeleton, LED ring, camera and sensor holder">
@@ -523,7 +483,6 @@
             </div>
           </article>
           <article>
-            <span class="form-index">A / 03</span>
             <img class="form-photo" loading="lazy" decoding="async"
                  src="../assets/images/forms/tips-in-hand.jpg"
                  alt="Two humanoid fingertip sensors held in a gloved hand, one with its gel exposed and one covered by the membrane">
@@ -535,12 +494,10 @@
         </div>
       </section>
 
-
       <section class="results" id="results" aria-labelledby="results-title">
         <header class="section-header results-header" data-reveal>
           <div>
-            <p class="signal-label"><span>DAT</span> Results</p>
-            <h2 id="results-title">What the flat pad measures.</h2>
+            <h2 id="results-title">What GlowTact measures.</h2>
           </div>
         </header>
 
@@ -548,7 +505,6 @@
           <li><a href="#sensitivity"><span>DAT / 01</span> Light touch</a></li>
           <li><a href="#reconstruction"><span>DAT / 02</span> Geometry</a></li>
           <li><a href="#shear"><span>DAT / 03</span> Shear</a></li>
-          <li><a href="#force"><span>DAT / 04</span> Normal force</a></li>
         </ol>
 
         <article class="result-module" id="sensitivity" aria-labelledby="sensitivity-title">
@@ -591,39 +547,13 @@
             </figure>
           </div>
 
-          <figure class="fig9-strip" data-reveal>
-            <div class="fig9-head" aria-hidden="true">
-              <span></span><span>raw</span><span>diff</span><span>3× diff</span>
-            </div>
-            <div class="fig9-row">
-              <span class="fig9-label">M&amp;M<small><span data-metric="sensitivity.passive_mm_mass">1.0</span> g · <span data-metric="sensitivity.passive_mm_force">9.8</span> mN</small></span>
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-mm-raw.jpg" alt="Raw GlowTact frame under an M and M">
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-mm-diff.jpg" alt="Difference image of the same frame">
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-mm-diff3.jpg" alt="The difference image amplified three times">
-            </div>
-            <div class="fig9-row">
-              <span class="fig9-label">M6 nut<small><span data-metric="sensitivity.passive_m6_mass">2.0</span> g · <span data-metric="sensitivity.passive_m6_force">20.0</span> mN</small></span>
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-m6-nut-raw.jpg" alt="Raw GlowTact frame under an M6 nut">
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-m6-nut-diff.jpg" alt="Difference image of the same frame">
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-m6-nut-diff3.jpg" alt="The difference image amplified three times">
-            </div>
-            <div class="fig9-row">
-              <span class="fig9-label">M5×6 screw<small><span data-metric="sensitivity.passive_m5_mass">2.4</span> g · <span data-metric="sensitivity.passive_m5_force">23.5</span> mN</small></span>
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-m5-screw-raw.jpg" alt="Raw GlowTact frame under an M5 screw">
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-m5-screw-diff.jpg" alt="Difference image of the same frame">
-              <img loading="lazy" decoding="async" src="../assets/images/sensitivity/fig9-m5-screw-diff3.jpg" alt="The difference image amplified three times">
-            </div>
-            <figcaption>Raw frame, difference, and 3× difference for three light objects (paper Fig. 9).</figcaption>
-          </figure>
-
           <p class="module-scope">
-            Passive placement is a demonstration; the controlled threshold test gives a
+            Controlled threshold test:
             <span data-metric="sensitivity.min_detectable_force_median_glowtact">0.12</span>&nbsp;N median
             minimum detectable force at SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>
             across <span data-metric="sensitivity.probe_count">10</span> probes.
           </p>
         </article>
-
 
         <article
             class="result-module reconstruction"
@@ -640,7 +570,6 @@
           </header>
 
           <div class="recon-control">
-            <span>TURNTABLE</span>
             <button id="recon-toggle" type="button" aria-pressed="true">
               <span class="play-icon" aria-hidden="true"></span>
               <span id="recon-toggle-label">Pause rotation</span>
@@ -649,7 +578,6 @@
 
           <div class="recon-gallery">
             <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 01</span><span>IN PAPER</span></header>
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -665,19 +593,22 @@
               </div>
               <figcaption>
                 <img loading="lazy" decoding="async"
+                  class="recon-object"
+                  src="../assets/images/reconstruction/screw-threads-object.jpg"
+                  alt="Photograph of the five set screws, M3 down to M1, on green tape"
+                >
+                <img loading="lazy" decoding="async"
                   class="recon-input"
                   src="../assets/images/reconstruction/screw-threads-tactile.jpg"
                   alt="GlowTact tactile image of five set screw threads, M3 down to M1"
                 >
                 <span class="recon-caption-text">
-                  <strong>M1–M3 screw threads</strong>
-                  <span>M3, M2.5, M2, M1.5 and M1 set screws</span>
+                  <strong>M3 to M1 screw threads</strong>
                 </span>
               </figcaption>
             </figure>
 
             <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 02</span><span>IN PAPER</span></header>
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -693,19 +624,22 @@
               </div>
               <figcaption>
                 <img loading="lazy" decoding="async"
+                  class="recon-object"
+                  src="../assets/images/reconstruction/philips-head-object.jpg"
+                  alt="Photograph of the Phillips screw head"
+                >
+                <img loading="lazy" decoding="async"
                   class="recon-input"
                   src="../assets/images/reconstruction/philips-head-tactile.jpg"
                   alt="GlowTact tactile image of a Phillips screw head"
                 >
                 <span class="recon-caption-text">
                   <strong>Phillips screw head</strong>
-                  <span>Cross recess inside a round head</span>
                 </span>
               </figcaption>
             </figure>
 
             <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 03</span><span>IN PAPER</span></header>
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -721,19 +655,22 @@
               </div>
               <figcaption>
                 <img loading="lazy" decoding="async"
+                  class="recon-object"
+                  src="../assets/images/reconstruction/cali-balls-object.jpg"
+                  alt="Photograph of the steel calibration ball array"
+                >
+                <img loading="lazy" decoding="async"
                   class="recon-input"
                   src="../assets/images/reconstruction/cali-balls-tactile.jpg"
                   alt="GlowTact tactile image of a calibration ball array"
                 >
                 <span class="recon-caption-text">
                   <strong>4.7 mm calibration balls</strong>
-                  <span>Spherical caps at a known radius</span>
                 </span>
               </figcaption>
             </figure>
 
             <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 04</span><span>ARCHIVE</span></header>
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -749,113 +686,39 @@
               </div>
               <figcaption>
                 <img loading="lazy" decoding="async"
+                  class="recon-object"
+                  src="../assets/images/reconstruction/oreo-object.jpg"
+                  alt="Photograph of the Oreo biscuit"
+                >
+                <img loading="lazy" decoding="async"
                   class="recon-input"
                   src="../assets/images/reconstruction/oreo-tactile.jpg"
                   alt="GlowTact tactile image of embossed biscuit lettering"
                 >
                 <span class="recon-caption-text">
                   <strong>Oreo embossing</strong>
-                  <span>Raised lettering and floret border</span>
                 </span>
               </figcaption>
             </figure>
 
-            <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 05</span><span>ARCHIVE</span></header>
-              <div class="recon-stage">
-                <video
-                  class="recon-spin"
-                  loop
-                  muted
-                  playsinline
-                  preload="none"
-                  poster="../assets/images/reconstruction/swirls-spin-poster.jpg"
-                  aria-label="Rotating reconstruction of a repeating ridge band"
-                >
-                  <source src="../assets/video/recon/swirls-spin.mp4" type="video/mp4">
-                </video>
-              </div>
-              <figcaption>
-                <img loading="lazy" decoding="async"
-                  class="recon-input"
-                  src="../assets/images/reconstruction/swirls-tactile.jpg"
-                  alt="GlowTact tactile image of a repeating ridge band"
-                >
-                <span class="recon-caption-text">
-                  <strong>Swirl ridge pattern</strong>
-                  <span>Repeating ridge band across the pad</span>
-                </span>
-              </figcaption>
-            </figure>
-
-            <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 06</span><span>ARCHIVE</span></header>
-              <div class="recon-stage">
-                <video
-                  class="recon-spin"
-                  loop
-                  muted
-                  playsinline
-                  preload="none"
-                  poster="../assets/images/reconstruction/battery-spin-poster.jpg"
-                  aria-label="Rotating reconstruction of a knurled cell terminal"
-                >
-                  <source src="../assets/video/recon/battery-spin.mp4" type="video/mp4">
-                </video>
-              </div>
-              <figcaption>
-                <img loading="lazy" decoding="async"
-                  class="recon-input"
-                  src="../assets/images/reconstruction/battery-tactile.jpg"
-                  alt="GlowTact tactile image of a knurled cell terminal"
-                >
-                <span class="recon-caption-text">
-                  <strong>Knurled cell terminal</strong>
-                  <span>Cross-hatched knurl on a circular face</span>
-                </span>
-              </figcaption>
-            </figure>
-
-            <figure class="recon-card" data-reveal>
-              <header><span>OBJ / 07</span><span>ARCHIVE</span></header>
-              <div class="recon-stage">
-                <video
-                  class="recon-spin"
-                  loop
-                  muted
-                  playsinline
-                  preload="none"
-                  poster="../assets/images/reconstruction/hex-head-spin-poster.jpg"
-                  aria-label="Rotating reconstruction of an M2 hex socket head"
-                >
-                  <source src="../assets/video/recon/hex-head-spin.mp4" type="video/mp4">
-                </video>
-              </div>
-              <figcaption>
-                <img loading="lazy" decoding="async"
-                  class="recon-input"
-                  src="../assets/images/reconstruction/hex-head-tactile.jpg"
-                  alt="GlowTact tactile image of an M2 hex socket head"
-                >
-                <span class="recon-caption-text">
-                  <strong>M2 hex socket head</strong>
-                  <span>Recessed drive inside a raised rim</span>
-                </span>
-              </figcaption>
-            </figure>
           </div>
 
           <figure class="evidence-figure recon-fingerprints" data-reveal>
-            <img loading="lazy" decoding="async" src="../assets/images/fingerprint-pressure.jpg"
-                 alt="Three GlowTact tactile images of a fingertip pressed at 0.3, 1.0 and 2.0 newtons, darkening and spreading as force rises">
+            <div class="press-series" aria-label="A fingertip pressed harder, left to right">
+              <img loading="lazy" decoding="async" src="../assets/images/fingerprints/press-1.jpg" alt="GlowTact tactile image of a fingertip at the lightest press: a small dark patch with ridges">
+              <img loading="lazy" decoding="async" src="../assets/images/fingerprints/press-2.jpg" alt="The fingertip pressed a little harder: a larger patch, ridges legible">
+              <img loading="lazy" decoding="async" src="../assets/images/fingerprints/press-3.jpg" alt="The fingertip at about one newton: ridges dark and clear across the contact">
+              <img loading="lazy" decoding="async" src="../assets/images/fingerprints/press-4.jpg" alt="The fingertip at about two newtons: the contact fills more of the pad">
+              <img loading="lazy" decoding="async" src="../assets/images/fingerprints/press-5.jpg" alt="The fingertip at the hardest press: the largest, darkest contact">
+            </div>
             <figcaption>
               <span>MEASURED / FLAT PAD</span>
-              Ridge pattern legible from 0.3 to 2.0 N.
+              Force rises left to right; ridge pattern legible from 0.3 to 2.0 N.
             </figcaption>
           </figure>
 
           <p class="module-scope" id="reconstruction-disclosure">
-            Qualitative relief from one tactile frame, not validated against measured heights.
+            Relief recovered from a single tactile frame.
           </p>
         </article>
 
@@ -864,9 +727,8 @@
             <p class="signal-label"><span>DAT / 03</span> Shear</p>
             <h3 id="shear-title">It reads the sideways pull.</h3>
             <p class="module-claim">
-              Dense Farnebäck flow on the gel&#8217;s own speckle yields a usable field over
-              <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the pad,
-              <strong data-metric="shear.fb_error_median">0.037</strong>&nbsp;px forward–backward.
+              Marker-free shear from the gel&#8217;s own speckle, usable over
+              <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the pad.
             </p>
           </header>
 
@@ -915,79 +777,16 @@
                 Readouts per frame: slide, twist, spread, slip; the red outline is the contact.
               </p>
             </div>
-
-            <div class="shear-numbers" data-reveal>
-              <h4>One parameter set, five objects</h4>
-              <table>
-                <caption>
-                  Self-supervised reliability of the flow field, measured on the
-                  M5 Phillips-head reference press. No ground-truth displacement
-                  exists for these clips, so these are consistency figures, not
-                  accuracy.
-                </caption>
-                <thead>
-                  <tr><th scope="col">Measure</th><th scope="col">Value</th></tr>
-                </thead>
-                <tbody>
-                  <tr><th scope="row">Usable field, LCN + CLAHE</th><td><span data-metric="shear.usable_field_lcn_clahe">97.8</span>&nbsp;%</td></tr>
-                  <tr><th scope="row">Usable field, CLAHE alone</th><td><span data-metric="shear.usable_field_clahe">72.0</span>&nbsp;%</td></tr>
-                  <tr><th scope="row">Forward–backward consistency</th><td><span data-metric="shear.fb_error_median">0.037</span>&nbsp;px median, <span data-metric="shear.fb_error_p90">0.16</span>&nbsp;px at p90</td></tr>
-                  <tr><th scope="row">Flow score, self-supervised</th><td><span data-metric="shear.flow_score">74</span>&nbsp;/ 100</td></tr>
-                  <tr><th scope="row">Full field, one core, 0.23 MP</th><td><span data-metric="shear.fps_full_field">13</span>&nbsp;fps</td></tr>
-                  <tr><th scope="row">Global scalar alone</th><td>about <span data-metric="shear.fps_global_scalar">60</span>&nbsp;fps</td></tr>
-                  <tr><th scope="row">Peak contact, coin to fingertip</th><td><span data-metric="shear.peak_contact_min">5</span>&nbsp;% to <span data-metric="shear.peak_contact_max">32</span>&nbsp;%</td></tr>
-                </tbody>
-              </table>
-            </div>
           </div>
 
           <p class="module-scope">
-            Self-supervised consistency on one reference press; no ground truth; pixels, not calibrated force.
-          </p>
-        </article>
-        <article class="result-module" id="force" aria-labelledby="force-title">
-          <header class="module-header" data-reveal>
-            <p class="signal-label"><span>DAT / 04</span> Normal force</p>
-            <h3 id="force-title">Darkness carries the load.</h3>
-            <p class="module-claim">
-              A learned regressor reads normal force from the frame:
-              <strong data-metric="force.macro_mae_glowtact">0.106</strong>&nbsp;N mean error on everyday objects,
-              <strong data-metric="force.rmse_glowtact">0.276</strong>&nbsp;N RMSE on controlled probes.
-            </p>
-          </header>
-
-          <div class="force-objects" data-reveal>
-            <table>
-              <caption>Mean absolute error in newtons; lower is better (paper Table I).</caption>
-              <thead>
-                <tr><th scope="col">Object</th><th scope="col">MAE, N</th></tr>
-              </thead>
-              <tbody>
-                <tr><th scope="row">Balloon</th><td data-metric="force.mae_balloon">0.087</td></tr>
-                <tr><th scope="row">Light bulb</th><td data-metric="force.mae_light_bulb">0.093</td></tr>
-                <tr><th scope="row">Pipe</th><td data-metric="force.mae_pipe">0.127</td></tr>
-                <tr><th scope="row">Rope</th><td data-metric="force.mae_rope">0.117</td></tr>
-                <tr class="force-total"><th scope="row">Macro average</th><td data-metric="force.macro_mae_glowtact">0.106</td></tr>
-              </tbody>
-              <tbody>
-                <tr class="force-group"><th scope="colgroup" colspan="2">Controlled probes, by force range</th></tr>
-                <tr><th scope="row">0 – 0.5 N</th><td data-metric="force.mae_low_glowtact">0.056</td></tr>
-                <tr><th scope="row">0.5 – 2 N</th><td data-metric="force.mae_mid_glowtact">0.058</td></tr>
-                <tr><th scope="row">2 – 20 N</th><td data-metric="force.mae_high_glowtact">0.209</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p class="module-scope">
-            Estimated by a model from the image, not measured by the camera;
-            <span data-metric="force.frames_per_sensor">14716</span> frames, held-out contact locations.
+            Marker-free: the field comes from the gel&#8217;s own speckle, with no printed marker layer.
           </p>
         </article>
       </section>
 
       <section class="research-console" id="research" aria-labelledby="research-title">
         <div class="research-heading" data-reveal>
-          <p class="signal-label"><span>DOC / 01</span> Research record</p>
           <h2 id="research-title">GlowTact</h2>
           <p>
             Simple and Compact Vision-Based Tactile Sensing with High
