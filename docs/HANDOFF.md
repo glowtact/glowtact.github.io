@@ -87,7 +87,10 @@ assuming symmetry.
 
 ## Open items
 
-1. **Review-build chrome is public.** The published root still shows the
+1. **Review-build chrome is public.** *Closed 2026-09-26: the badge, the
+   review links, the status strip and the tab title left the concept page
+   itself (`feat(site)` commit of the own-sensor plan), so no rewrite rule was
+   needed.* Original note: The published root still shows the
    `CONCEPT 03` badge, the tab title "GlowTact — Signal Chamber", and footer
    links into `/design/`. That is internal review vocabulary now facing the
    public. Fixing it is a rewrite-rule change in `publish.py`, not a content

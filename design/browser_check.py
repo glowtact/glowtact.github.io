@@ -1285,6 +1285,34 @@ def check_type_hierarchy(browser) -> None:
             page.close()
 
 
+def check_hero_actions(browser) -> None:
+    """One live paper link, two pending actions that are not links, and none
+    of the review-build chrome (concept badge, status strip) on the page."""
+    page = browser.new_page(viewport=AUDIT_VIEWPORTS["phone"])
+    block_media(page)
+    navigate(page, "/concept-03/")
+    info = page.evaluate(
+        """() => ({
+            paper: [...document.querySelectorAll('.hero-actions a')].map(a => a.getAttribute('href')),
+            pending: [...document.querySelectorAll('.hero-actions .button--pending')]
+              .map(el => [el.tagName, el.hasAttribute('href'), el.getAttribute('aria-disabled')]),
+            heights: [...document.querySelectorAll('.hero-actions .button')]
+              .map(el => Math.round(el.getBoundingClientRect().height)),
+            status: !!document.querySelector('.hero-status'),
+            badge: !!document.querySelector('.concept-channel'),
+            title: document.title,
+        })"""
+    )
+    assert info["paper"] == ["../../GlowTact.pdf"], (
+        f"the hero must carry exactly the paper link: {info['paper']}"
+    )
+    assert info["pending"] == [["SPAN", False, "true"], ["SPAN", False, "true"]], info["pending"]
+    assert info["heights"] and min(info["heights"]) >= 44, info["heights"]
+    assert not info["status"] and not info["badge"], "review chrome must be gone from the public page"
+    assert "Signal Chamber" not in info["title"], f"review vocabulary in the tab title: {info['title']!r}"
+    page.close()
+
+
 def check_media_scaling(browser) -> None:
     """The mechanism animation must stay proportioned and crisp everywhere."""
     for vp_name, viewport in AUDIT_VIEWPORTS.items():
@@ -1591,6 +1619,7 @@ def main() -> int:
             check_coupling_readability(browser)
             check_results_region(browser)
             check_type_hierarchy(browser)
+            check_hero_actions(browser)
         browser.close()
     if MODE in {"all", "visual"}:
         print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
@@ -1599,7 +1628,7 @@ def main() -> int:
     if MODE in {"all", "design"}:
         print(
             "PASS: contrast, touch targets, type scale, overflow, "
-            "media scaling, coupling readability, results region, type hierarchy"
+            "media scaling, coupling readability, results region, type hierarchy, hero actions"
         )
     return 0
 
