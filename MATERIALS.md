@@ -16,8 +16,10 @@ edit figures and slides, or to work on the paper.
 materials/                        451 files, 467 MiB
 ├── paper/
 │   ├── paper.pdf                 the manuscript
-│   └── GlowTact-2026-08-14.pdf   a later revision; differs from paper.pdf,
-│                                 so both are kept
+│   ├── GlowTact-2026-08-14.pdf   a later revision; differs from paper.pdf,
+│   │                             so both are kept
+│   └── GlowTact-2026-09-27.pdf   the authored revision (2026-09-26 build),
+│                                 served as /GlowTact.pdf since 2026-09-27
 ├── figures/                       15 files,  34 MiB
 │   ├── teaser.png / .pdf          hero figure
 │   ├── fingerprints.png / .pdf    fingerprint pressure series

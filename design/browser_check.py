@@ -1447,6 +1447,28 @@ def check_coupling_readability(browser) -> None:
     page.close()
 
 
+def check_hero_height(browser) -> None:
+    """A phone in desktop mode lays the page out at about 980px on a viewport
+    over 2000px tall; 100svh stretched the hero to 2028px and floated the copy
+    880px below the header (2026-09-27). The hero is capped."""
+    for width, height in ((980, 2100), (1280, 2000)):
+        context = browser.new_context(viewport={"width": width, "height": height})
+        page = context.new_page()
+        block_media(page)
+        navigate(page, "/concept-03/")
+        hero = page.evaluate(
+            """() => ({
+                hero: Math.round(document.querySelector('.signal-hero').getBoundingClientRect().height),
+                copyTop: Math.round(document.querySelector('.hero-copy').getBoundingClientRect().top),
+            })"""
+        )
+        context.close()
+        if hero["hero"] > 900 or hero["copyTop"] > 360:
+            raise AssertionError(
+                f"hero @{width}x{height}: {hero} (hero over 900px or copy below 360px)"
+            )
+
+
 def check_results_region(browser) -> None:
     """Freeze the defect classes the results region introduced.
 
@@ -1668,6 +1690,16 @@ def check_results_region(browser) -> None:
     missing = [name for name, has in modules if not has]
     assert not missing, f"result modules without a scope footnote: {missing}"
 
+    # The paper was de-anonymised on 2026-09-27: the research record names
+    # the authors and the BibTeX key is theirs.
+    record = page.evaluate(
+        """() => ({
+            authors: (document.querySelector('.research-authors') || {}).textContent || '',
+            bibtex: (document.querySelector('.research-meta code') || {}).textContent || '',
+        })"""
+    )
+    assert "Adelson" in record["authors"] and "Anonymous" not in record["bibtex"], record
+
     page.close()
 
 
@@ -1692,6 +1724,7 @@ def main() -> int:
         if MODE in {"all", "design"}:
             check_design_system(browser)
             check_media_scaling(browser)
+            check_hero_height(browser)
             check_coupling_readability(browser)
             check_results_region(browser)
             check_type_hierarchy(browser)

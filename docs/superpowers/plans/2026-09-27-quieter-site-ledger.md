@@ -46,6 +46,19 @@ M5 Phillips head; then "improve the colour" and the title hierarchy.
 | Colour and hierarchy | user: "improve the color", titles not prominent | `.signal-label` amber again for the three results eyebrows; h3 above its eyebrow in `.module-header`; DESIGN.md amber rule updated | contrast pass; slop gate 0 open |
 | `git add -A` in a local commit swept in `.impeccable/`, a screenshot, `webpage.jpg` and the forms re-renders | commit `f54a282`, unpushed | commit reset and redone with named files | `git show --stat` |
 
+## Third pass: the authored paper and the phone hero
+
+The user's phone screenshot showed the hero floating in a 2000px void with a
+tiny header; the paper PDF was still the anonymous review build.
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| `/GlowTact.pdf` was the anonymous 2026-08-07 build | `pdftotext` diff against the supplied 2026-09-26 build: the author block and reflow only, 8 to 9 pages; every number the site quotes re-read on Figs. 5, 8, 9, 10 and Sec. V-B, unchanged | root PDF replaced; copy in `materials/paper/GlowTact-2026-09-27.pdf`, manifest rewritten (`materials_check.py --write`), MATERIALS.md tree updated | `materials_check.py --verify` OK |
+| No author information on the site; BibTeX `author = {Anonymous}` on all three concepts | user request | research record carries the seven authors, the two institutions and the equal-contribution mark; BibTeX key `ma2026glowtact` with the author list, on concept-03 and the two frozen concepts | `verify.py` PROHIBITED gains `author = {anonymous}`; design mode asserts `.research-authors` names Adelson and the BibTeX is not anonymous; both red-greened |
+| `.research-heading > p:last-child` styled the long title; the new author lines took it over | title lost its 580px measure | selector is `> h2 + p`; `.research-authors` at `--text-label`, affiliations at `--text-fine` tertiary | screenshots at 412 and 980 |
+| Hero empty on the phone: the screenshot lays out at about 980px (desktop-site mode or a wide layout viewport) on a 2100px-tall viewport, and `min-height: calc(100svh - 72px)` with a centred copy put the copy 883px below the header | Playwright 980x2100 reproduced it: hero 2028px, copy top 883px | `min-height: min(calc(100svh - 72px), 860px)`; at 1280x900 the value is unchanged (828px) | `check_hero_height` at 980x2100 and 1280x2000: hero at most 900px, copy top at most 360px; red-greened by removing the cap; after: hero 860px, copy top 299px |
+| True phone (412px): three stacked full-width buttons under the summary | 168px of buttons | Paper full width, the two pending items share a row with their `coming soon` on a second line | 412px screenshot |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
@@ -61,3 +74,6 @@ Not done, on purpose:
   `webpage.jpg` stay untracked.
 - The `Code` and `Hardware guide` pending buttons in the hero were not
   discussed and stay.
+- The phone screenshot's 980px layout is the browser's, not the page's: the
+  live page carries the viewport meta and lays out one column at 412px. The
+  hero cap makes desktop-site mode tolerable; it does not switch it off.

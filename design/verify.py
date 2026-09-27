@@ -22,6 +22,7 @@ PROHIBITED = (
     "calibrated pressure map",
     "indestructible",
     "maintenance-free",
+    "author = {anonymous}",
 )
 
 

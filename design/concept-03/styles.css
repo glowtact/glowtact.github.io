@@ -189,7 +189,9 @@ main {
 }
 
 .signal-hero {
-  min-height: calc(100svh - 72px);
+  /* Capped: a phone in desktop mode lays out at about 980px on a 2100px-tall
+     viewport, and 100svh floated the copy 880px below the header (2026-09-27). */
+  min-height: min(calc(100svh - 72px), 860px);
   display: grid;
   grid-template-columns: minmax(390px, 0.78fr) minmax(560px, 1.22fr);
   grid-template-rows: 1fr auto;
@@ -1740,12 +1742,32 @@ main {
   line-height: 0.9;
 }
 
-.research-heading > p:last-child {
+.research-heading > h2 + p {
   max-width: 580px;
   margin: 24px 0 0;
   color: var(--readout-secondary);
   font-size: var(--text-title);
   line-height: 1.6;
+}
+
+.research-authors,
+.research-affiliations {
+  max-width: 580px;
+  margin: 18px 0 0;
+  color: var(--readout-secondary);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.research-affiliations {
+  margin-top: 6px;
+  color: var(--readout-tertiary);
+  font-size: var(--text-fine);
+}
+
+.research-heading sup {
+  font-size: 0.7em;
+  line-height: 0;
 }
 
 .research-meta {
@@ -2022,7 +2044,19 @@ main {
   }
 
   .hero-actions {
+    /* Paper on its own row; the two pending items share the next one. */
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-actions .button--primary {
+    grid-column: 1 / -1;
+  }
+
+  .button--pending {
+    flex-direction: column;
+    gap: 2px;
+    padding-block: 8px;
   }
 
   .hero-capabilities {
