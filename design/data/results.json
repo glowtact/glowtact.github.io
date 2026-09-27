@@ -16,7 +16,6 @@
   },
   "reconstruction": {
     "finest_thread_pitch": {"value": 0.25, "unit": "mm", "source": "Sec. V-B"},
-    "ninedtact_limit_size": {"value": 0.7, "unit": "mm", "source": "Sec. V-B"},
     "object_count": {"value": 7, "unit": "", "source": "3d_recon_pad/gallery"}
   },
   "shear": {

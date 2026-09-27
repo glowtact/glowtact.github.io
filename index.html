@@ -639,25 +639,12 @@
             id="reconstruction"
             aria-labelledby="reconstruction-title"
           >
-          <header class="section-header" data-reveal>
-            <div>
-              <p class="signal-label"><span>DAT / 02</span> Drop photometric stereo and you lose geometry</p>
-              <h2 id="reconstruction-title">One dark image,<br>turned in three dimensions.</h2>
-            </div>
-            <p>
-              Every surface below is reconstructed from a single GlowTact tactile
-              frame — the darkening alone, with no second view and no marker
-              field. Each object turns through a full revolution so the relief can
-                be read from every angle.
-            </p>
+          <header class="module-header" data-reveal>
+            <p class="signal-label"><span>DAT / 02</span> Geometry</p>
+            <h3 id="reconstruction-title">One dark image, turned in three dimensions.</h3>
             <p class="module-claim">
-              GlowTact was not designed to recover shape — it was designed to
-              visualise pressure. The relief below comes from running
-              <em>9DTact&#8217;s</em> reconstruction pipeline on GlowTact frames,
-              and it resolves M1 threads at
-              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong> mm
-              pitch, where 9DTact&#8217;s own published results stop at M4 —
-              <span data-metric="reconstruction.ninedtact_limit_size">0.7</span> mm.
+              Relief from a single frame&#8217;s darkening resolves M1 threads at
+              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong>&nbsp;mm pitch.
             </p>
           </header>
 
@@ -867,14 +854,17 @@
             </figure>
           </div>
 
+          <figure class="evidence-figure recon-fingerprints" data-reveal>
+            <img loading="lazy" decoding="async" src="./design/assets/images/fingerprint-pressure.jpg"
+                 alt="Three GlowTact tactile images of a fingertip pressed at 0.3, 1.0 and 2.0 newtons, darkening and spreading as force rises">
+            <figcaption>
+              <span>MEASURED / FLAT PAD</span>
+              Ridge pattern legible from 0.3 to 2.0 N.
+            </figcaption>
+          </figure>
+
           <p class="module-scope" id="reconstruction-disclosure">
-            Every panel is GlowTact output. Relief is recovered from
-            pressure-induced darkening in one tactile frame and is not validated
-            against measured heights, so each surface should be read as spatial
-            structure rather than exact geometry. The small frame on each card is
-            the tactile image the reconstruction came from. The 9DTact figures
-            are qualitative context: implementations and object sets differ, and
-            no controlled quantitative comparison is claimed.
+            Qualitative relief from one tactile frame, not validated against measured heights.
           </p>
         </article>
 

@@ -1502,6 +1502,21 @@ def check_results_region(browser) -> None:
     assert passive["frames"] == 9, f"expected the nine Fig. 9 frames, found {passive['frames']}"
     assert not passive["gelsight"], "GelSight must not appear in the sensitivity module"
 
+    # 7. Reconstruction: an h3 like the other modules, no comparison sensor,
+    #    and the turntable gallery two columns wide on a phone (one column
+    #    ran 3573px there).
+    phone = browser.new_page(viewport={"width": 375, "height": 812})
+    block_media(phone)
+    navigate(phone, "/concept-03/")
+    cols = phone.evaluate(
+        "getComputedStyle(document.querySelector('.recon-gallery')).gridTemplateColumns.split(' ').length"
+    )
+    assert cols == 2, f"reconstruction gallery should be 2 columns at 375px, got {cols}"
+    assert phone.locator("h3#reconstruction-title").count() == 1, "reconstruction title must be an h3"
+    recon_text = phone.locator("#reconstruction").inner_text().lower()
+    assert "9dtact" not in recon_text and "gelsight" not in recon_text, "no comparison sensor in reconstruction"
+    phone.close()
+
     # 5. The loading strategy is a measured optimisation (6.0 MB -> 1.34 MB on
     #    first load); without an assertion it silently regresses the next time
     #    someone copies an existing <img> or <video> as a template.

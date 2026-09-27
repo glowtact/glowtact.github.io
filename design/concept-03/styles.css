@@ -1940,6 +1940,10 @@ main {
   font-weight: 550;
 }
 
+.recon-fingerprints {
+  margin-top: 18px;
+}
+
 .recon-note {
   padding: 16px;
   background: var(--optic-surface-1);
@@ -2525,7 +2529,20 @@ main {
   }
 
   .recon-gallery {
-    grid-template-columns: 1fr;
+    /* Seven turntables in one column ran 3573px on a phone; two columns keep
+       every clip above 160px wide and halve the scroll. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recon-card figcaption {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 4px 2px;
+  }
+
+  .recon-input {
+    width: 36px;
   }
 
   .recon-control {
