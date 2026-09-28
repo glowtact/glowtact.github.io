@@ -796,28 +796,16 @@
         </header>
 
         <div class="live-layout" data-reveal>
-          <div class="live-tabs" role="tablist" aria-label="Live clip version">
-            <button type="button" role="tab" id="live-tab-0"
-                    aria-controls="live-stage" aria-selected="true"
-                    tabindex="0"
-                    data-clip="live-stabilized" data-label="Stabilized" data-note="Locked to the tablet, cropped and upscaled"
-                    data-duration="30 s">Stabilized</button>
-            <button type="button" role="tab" id="live-tab-1"
-                    aria-controls="live-stage" aria-selected="false"
-                    tabindex="-1"
-                    data-clip="live-as-shot" data-label="As shot" data-note="The handheld clip as recorded"
-                    data-duration="30 s">As shot</button>
-          </div>
           <figure class="live-stage" id="live-stage">
             <video id="live-video" controls loop muted playsinline preload="none"
                    poster="../assets/images/live/live-stabilized-poster.jpg"
                    aria-label="Live GlowTact feed on a tablet: a fingertip, then a coin pressed through denim">
-              <source id="live-source" src="../assets/video/live/live-stabilized.mp4" type="video/mp4">
+              <source src="../assets/video/live/live-stabilized.mp4" type="video/mp4">
               Your browser does not support embedded video.
             </video>
             <figcaption>
-              <span id="live-clip-label">STABILIZED / 30 S</span>
-              <span id="live-clip-note">Locked to the tablet, cropped and upscaled</span>
+              <span>LOCKED VIEW / 27 S</span>
+              <span>The handheld camera is registered to the tablet frame by frame.</span>
             </figcaption>
           </figure>
         </div>

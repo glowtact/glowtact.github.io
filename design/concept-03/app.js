@@ -1774,7 +1774,7 @@ watchReconVisibility();
 setReconPlayback(reconWanted);
 
 /* ------------------------------------------------------------------ *
- * Clip selector (DAT / 03 shear, and the live clip at the end)
+ * Clip selector (DAT / 03 shear)
  *
  * Source and poster are swapped together and the element reloaded; swapping
  * only the source leaves the previous clip's poster behind, which reads as
@@ -1832,4 +1832,3 @@ function initClipSelector(prefix, describe) {
 }
 
 initClipSelector("shear", (clip) => `Marker-free shear field for ${clip.label}: ${clip.note}`);
-initClipSelector("live", (clip) => `Live GlowTact feed on a tablet, ${clip.label.toLowerCase()}: ${clip.note}`);

@@ -1534,23 +1534,15 @@ def check_results_region(browser) -> None:
         "clip's still would show until playback starts"
     )
 
-    # The live clip at the end (2026-09-27) uses the same selector: two
-    # versions of one 30 s handheld clip, nothing loaded until played.
-    live_before = page.evaluate(
-        """() => ({src: document.querySelector('#live-source').getAttribute('src'),
-                  poster: document.querySelector('#live-video').getAttribute('poster'),
-                  preload: document.querySelector('#live-video').preload})"""
+    # The live clip at the end (2026-09-28): one locked-view clip, no
+    # selector (the as-shot version was dropped), nothing loaded until played.
+    live = page.evaluate(
+        """() => ({videos: document.querySelectorAll('#live video').length,
+                  tabs: document.querySelectorAll('#live [role="tablist"], #live button').length,
+                  preload: document.querySelector('#live video').preload,
+                  poster: !!document.querySelector('#live video').getAttribute('poster')})"""
     )
-    page.click("#live-tab-1")
-    page.wait_for_timeout(250)
-    live_after = page.evaluate(
-        """() => ({src: document.querySelector('#live-source').getAttribute('src'),
-                  poster: document.querySelector('#live-video').getAttribute('poster')})"""
-    )
-    assert live_before["preload"] == "none", f"live clip must not preload: {live_before}"
-    assert live_before["src"] != live_after["src"] and live_before["poster"] != live_after["poster"], (
-        f"live selector must move source and poster together: {live_before} -> {live_after}"
-    )
+    assert live == {"videos": 1, "tabs": 0, "preload": "none", "poster": True}, live
 
     # 6. Sensitivity is a passive-placement demonstration: two clips, both
     #    preload=none with posters and no autoplay, the two masses in the

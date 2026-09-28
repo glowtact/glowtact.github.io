@@ -75,6 +75,19 @@ shake, with the resolution enhanced.
 | `release.py`'s `git add design index.html` swept the untracked 21 MB source `.MOV` into the stamp commit `a874f06` and pushed it; the later `git mv` into `materials/` kept it tracked there | `git log --stat --follow` | untracked with `git rm --cached` (file kept on disk, listed in the materials manifest); `release.py` now stages tracked files only (`git add -u`) | `git ls-files materials/` empty; the blob remains in the pushed history unless the branch is rewritten |
 | "Enhance resolution" | no super-resolution model on the machine (no torch, no `dnn_superres`) | a 1.1x lanczos resample with light sharpening, stated as such in `design/tools/live_clip.py`; the source stays in `materials/video/` with the manifest rewritten | `ffprobe` h264 yuv420p, 897 frames each; 5.7 MB and 6.7 MB, loaded only on play |
 
+## Fifth pass: the locked view
+
+The user kept only the stabilized version and asked for the zoom, and any
+other change of view, to be compensated too, and for the idle seconds at
+either end to go.
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| vidstab's tripod mode left the view breathing | homography scale across the clip 0.968 to 1.003 (a 3% zoom drift); tablet corners still moved +-3.5 px | every frame registered to frame 0 by a SIFT and RANSAC homography on the static scene (screen content and the hand zone masked); 897 frames, 0 fallbacks, inliers min 56, median 214 | tablet-corner tracking on the output: +-0.5 px, range 2 to 3 px |
+| Output window | the always-covered region is a perspective quadrilateral; a 16:9 window at (96, 63) left 39,840 uncovered pixels | the script picks the largest fully covered rectangle that keeps the tablet (x from 130) and the sensor (x to 1235) | asserted in `live_clip.py`; no black edge in the output |
+| Idle seconds at both ends | bright fraction of the hand zone: baseline 0.24, up from 1.0 s, back at 28.0 s; screen contact from 1.7 s to 27.8 s | trimmed to 0.9 to 28.1 s (27.2 s) | frame count in `ffprobe` |
+| The as-shot version and its selector | user: the stabilized one only | as-shot clip and poster removed, the page shows one figure, `initClipSelector` serves shear alone again | design mode: one video in `#live`, no tablist or button, `preload="none"`, poster present; red-greened with `preload="metadata"` and a stray button |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
