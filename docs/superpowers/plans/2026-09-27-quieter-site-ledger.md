@@ -68,10 +68,10 @@ Not done, on purpose:
 - The deep slop tier reports two pre-existing concept-02 copy findings
   (`marketing-cadence`, `em-dash-density`); frozen review artifact, untouched.
 - `design/assets/images/forms/{flat-exploded,tip-exploded,tips-in-hand}.jpg`
-  are modified in the working tree (1200x900 re-renders of the exploded
-  views, from the untracked `.impeccable/`), not part of this brief and left
-  uncommitted; `.impeccable/`, `Screenshot from 2026-09-26 23-42-08.png` and
-  `webpage.jpg` stay untracked.
+  (1200x900 re-renders of the exploded views, from the untracked
+  `.impeccable/`) were held back from the two passes above and committed on
+  the user's word afterwards; `.impeccable/`, `Screenshot from 2026-09-26
+  23-42-08.png` and `webpage.jpg` stay untracked.
 - The `Code` and `Hardware guide` pending buttons in the hero were not
   discussed and stay.
 - The phone screenshot's 980px layout is the browser's, not the page's: the
