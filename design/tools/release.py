@@ -88,7 +88,10 @@ def main() -> None:
             if server is not None:
                 server.terminate()
 
-    run(["git", "add", "design", "index.html"])
+    # Tracked files only: a plain `git add design` swept a 21 MB source
+    # clip a user had dropped into design/assets/video/ into a stamp commit
+    # (a874f06, 2026-09-27). New assets are committed by hand before a release.
+    run(["git", "add", "-u", "design", "index.html"])
     staged = subprocess.run(
         ["git", "diff", "--cached", "--quiet"], cwd=ROOT
     ).returncode
@@ -108,7 +111,7 @@ def main() -> None:
     ).stdout.strip()
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
     run([sys.executable, os.path.join("design", "tools", "publish.py")])
-    run(["git", "add", "design", "index.html"])
+    run(["git", "add", "-u", "design", "index.html"])
     run(["git", "commit", "-m", f"chore(design): stamp {head}\n\n{TRAILER}"])
     run(["git", "push", "origin", "main"])
     print(f"release: pushed {head} (+stamp)")
