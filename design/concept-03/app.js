@@ -1774,19 +1774,19 @@ watchReconVisibility();
 setReconPlayback(reconWanted);
 
 /* ------------------------------------------------------------------ *
- * DAT / 03 -- shear clip selector
+ * Clip selector (DAT / 03 shear, and the live clip at the end)
  *
  * Source and poster are swapped together and the element reloaded; swapping
  * only the source leaves the previous clip's poster behind, which reads as
  * the wrong clip until playback starts. browser_check asserts both move.
  * ------------------------------------------------------------------ */
 
-function initShearViewer() {
-  const tabs = [...document.querySelectorAll(".shear-tabs button")];
-  const video = document.querySelector("#shear-video");
-  const source = document.querySelector("#shear-source");
-  const label = document.querySelector("#shear-clip-label");
-  const note = document.querySelector("#shear-clip-note");
+function initClipSelector(prefix, describe) {
+  const tabs = [...document.querySelectorAll(`.${prefix}-tabs button`)];
+  const video = document.querySelector(`#${prefix}-video`);
+  const source = document.querySelector(`#${prefix}-source`);
+  const label = document.querySelector(`#${prefix}-clip-label`);
+  const note = document.querySelector(`#${prefix}-clip-note`);
   if (!tabs.length || !video || !source) return;
 
   function select(tab) {
@@ -1810,10 +1810,7 @@ function initShearViewer() {
     if (wasPlaying) video.play().catch(() => {});
     label.textContent = `${tab.dataset.label.toUpperCase()} / ${tab.dataset.duration.toUpperCase()}`;
     note.textContent = tab.dataset.note;
-    video.setAttribute(
-      "aria-label",
-      `Marker-free shear field for ${tab.dataset.label}: ${tab.dataset.note}`
-    );
+    video.setAttribute("aria-label", describe(tab.dataset));
   }
 
   tabs.forEach((tab) => {
@@ -1834,4 +1831,5 @@ function initShearViewer() {
   });
 }
 
-initShearViewer();
+initClipSelector("shear", (clip) => `Marker-free shear field for ${clip.label}: ${clip.note}`);
+initClipSelector("live", (clip) => `Live GlowTact feed on a tablet, ${clip.label.toLowerCase()}: ${clip.note}`);

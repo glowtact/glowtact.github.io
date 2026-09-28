@@ -423,7 +423,8 @@ main {
    2026-09-27; the bands carry their own head room instead. */
 .mechanism,
 .forms,
-.results {
+.results,
+.live {
   padding-top: clamp(124px, 15vw, 240px);
 }
 
@@ -2521,7 +2522,8 @@ main {
   align-items: start;
 }
 
-.shear-tabs {
+.shear-tabs,
+.live-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 1px;
@@ -2529,7 +2531,8 @@ main {
   background: var(--optic-ring-soft);
 }
 
-.shear-tabs button {
+.shear-tabs button,
+.live-tabs button {
   flex: 1 1 auto;
   min-height: 44px;
   padding: 12px 18px;
@@ -2543,31 +2546,36 @@ main {
   transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
 }
 
-.shear-tabs button:hover {
+.shear-tabs button:hover,
+.live-tabs button:hover {
   color: var(--readout);
   background: var(--optic-surface-2);
 }
 
-.shear-tabs button[aria-selected="true"] {
+.shear-tabs button[aria-selected="true"],
+.live-tabs button[aria-selected="true"] {
   color: var(--camera-black);
   background: var(--signal-amber);
   font-weight: 600;
 }
 
-.shear-stage {
+.shear-stage,
+.live-stage {
   margin: 0;
   background: var(--optic-surface-1);
   border: 1px solid var(--optic-ring-soft);
 }
 
-.shear-stage video {
+.shear-stage video,
+.live-stage video {
   display: block;
   width: 100%;
   height: auto;
   background: var(--camera-black);
 }
 
-.shear-stage figcaption {
+.shear-stage figcaption,
+.live-stage figcaption {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 18px;
@@ -2576,11 +2584,19 @@ main {
   font-size: var(--text-label);
 }
 
-.shear-stage figcaption span:first-child {
+.shear-stage figcaption span:first-child,
+.live-stage figcaption span:first-child {
   color: var(--readout-tertiary);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
   letter-spacing: 0.14em;
+}
+
+/* The live clip closes the page at full content width: the tablet feed is
+   the content, and the two versions (stabilized, as shot) share one stage. */
+.live-layout {
+  display: grid;
+  gap: 1px;
 }
 
 .shear-legend {

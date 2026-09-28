@@ -59,6 +59,21 @@ tiny header; the paper PDF was still the anonymous review build.
 | Hero empty on the phone: the screenshot lays out at about 980px (desktop-site mode or a wide layout viewport) on a 2100px-tall viewport, and `min-height: calc(100svh - 72px)` with a centred copy put the copy 883px below the header | Playwright 980x2100 reproduced it: hero 2028px, copy top 883px | `min-height: min(calc(100svh - 72px), 860px)`; at 1280x900 the value is unchanged (828px) | `check_hero_height` at 980x2100 and 1280x2000: hero at most 900px, copy top at most 360px; red-greened by removing the cap; after: hero 860px, copy top 299px |
 | True phone (412px): three stacked full-width buttons under the summary | 168px of buttons | Paper full width, the two pending items share a row with their `coming soon` on a second line | 412px screenshot |
 
+## Fourth pass: the advisor's live clip
+
+`GlowTact BW fingerprint.MOV`, a 29.9 s handheld phone clip (HEVC 10-bit,
+1280x720, 30 fps, audio): a GlowTact on a desk, a tablet showing the raw feed,
+a fingertip, then a coin pressed through denim. The user asked for it at the
+end of the page in two versions, as shot and per-frame cropped against the
+shake, with the resolution enhanced.
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| Where to put it: a background or side video was the first idea | the signal (the tablet screen) is about a quarter of the frame; dimmed behind text it would be illegible, and a page-wide autoplaying background breaks the site's poster-and-preload-none discipline | a closing `Live` band before the research record, full content width, the shear clip selector reused (`initClipSelector` now serves both) with `Stabilized` default and `As shot` beside it | design mode: codec gate extended to `#live video`; selector moves source and poster; `preload="none"`; red-greened with `preload="metadata"` |
+| Camera shake | tablet-corner template tracking on the source: dx +-16 px (range 79), dy +-22 px (range 69) | vidstab tripod mode locked to frame 1; a second pass gained nothing (3.5 to 3.4 px) and was dropped | after: dx +-3.5 px (range 16), dy +-2 px (range 11) |
+| vidstab's default optimal zoom pushed the sensor off the right edge | about 7% zoom about the centre; the sensor pad sat 45 px from the edge in the reference frame | `optzoom=0`, `zoom=0`, `crop=black`, then a fixed 1168x657 window at (96, 63) chosen from the measured border maxima (left 20, right 13, top 34, bottom 0 px) so no frame shows a border; lanczos to 1280x720, `unsharp=5:5:0.5` | zero fully black edge columns across sampled frames; both versions 16:9 so the stage does not jump |
+| "Enhance resolution" | no super-resolution model on the machine (no torch, no `dnn_superres`) | a 1.1x lanczos resample with light sharpening, stated as such in `design/tools/live_clip.py`; the source stays in `materials/video/` with the manifest rewritten | `ffprobe` h264 yuv420p, 897 frames each; 5.7 MB and 6.7 MB, loaded only on play |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
@@ -77,3 +92,6 @@ Not done, on purpose:
 - The phone screenshot's 980px layout is the browser's, not the page's: the
   live page carries the viewport meta and lays out one column at 412px. The
   hero cap makes desktop-site mode tolerable; it does not switch it off.
+- The live clip keeps the tablet's own UI chrome and the full 30 s; a trim or
+  a true super-resolution pass (Real-ESRGAN, not installed) is the user's
+  call.

@@ -41,7 +41,7 @@ materials/                        451 files, 467 MiB
 ├── captures/                     321 files, 105 MiB
 │   ├── 3d-recon-pad/              tactile/diff/enhanced frames + cropped/ + index.csv
 │   └── sensitive-pad/             same structure, sensitivity experiments
-├── video/                         48 files,  51 MiB
+├── video/                         49 files,  71 MiB
 │   ├── mms_gt.mp4                 M&M contact clip (source of the site's video)
 │   ├── gt_mms.mp4                 a different, shorter cut of the same subject
 │   ├── Glowtact.prproj            Premiere project
@@ -100,6 +100,7 @@ the mesh PNGs and the video are byte-for-byte copies.
 | `design/assets/images/hero-teaser.jpg` | `materials/figures/teaser.png` |
 | `design/assets/images/fingerprints/press-1..5.jpg` | `~/tactile_data/glowtact/analysis/fingerprints/cropped/` tactile frames 000001, 000002, 000003, 000004, 000008 (the paper's three plus the lightest and hardest press of the same placement) |
 | `design/assets/video/shear/*.mp4`, `design/assets/images/shear/*-poster.jpg` | `~/Desktop/glowtact_materials/shear_field/videos/original/` re-encoded H.264 CRF 20; posters cut at each object's `peak_frame` in `shear_field/params.json` (the colour-tuned set was retired 2026-09-27) |
+| `design/assets/video/live/live-as-shot.mp4`, `live-stabilized.mp4`, posters in `design/assets/images/live/` | `materials/video/GlowTact-BW-fingerprint.MOV` (handheld phone clip, HEVC 10-bit 1280x720, 29.9 s, the advisor's live demo) via `design/tools/live_clip.py`: as shot with the audio stripped; stabilized with vidstab tripod mode locked to frame 1, a fixed 1168x657 window inside every frame's border, lanczos to 1280x720, light unsharp |
 | `design/assets/video/recon/*.mp4`, `design/assets/images/reconstruction/*` | `~/Desktop/glowtact_materials/gallery/gallery/<object>/` turntable GIFs and tactile frames, the paper's reconstruction parameters; `*-object.jpg` are the object photographs cropped from `materials/figures/3d_recon.png` (top row) and, for the Oreo, `slides/3d_recon.pptx` media image25 |
 | `design/assets/images/reconstruction-overview.jpg` | `materials/figures/3d_recon.png` |
 | `design/assets/images/contact-geometry.jpg` | `materials/figures/glowtact_h.png` |

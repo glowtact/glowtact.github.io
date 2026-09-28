@@ -1492,7 +1492,7 @@ def check_results_region(browser) -> None:
     #    check cannot tell a shippable file from one Safari and every hardware
     #    decoder will refuse. The criterion has to be the profile itself.
     videos = page.eval_on_selector_all(
-        "#results video source, #results video[src]",
+        "#results video source, #results video[src], #live video source",
         "els => els.map(el => el.getAttribute('src'))",
     )
     assert videos, "no videos found in #results; the check would pass vacuously"
@@ -1532,6 +1532,24 @@ def check_results_region(browser) -> None:
     assert before["poster"] != after["poster"], (
         "shear selector changed the source but not the poster; the previous "
         "clip's still would show until playback starts"
+    )
+
+    # The live clip at the end (2026-09-27) uses the same selector: two
+    # versions of one 30 s handheld clip, nothing loaded until played.
+    live_before = page.evaluate(
+        """() => ({src: document.querySelector('#live-source').getAttribute('src'),
+                  poster: document.querySelector('#live-video').getAttribute('poster'),
+                  preload: document.querySelector('#live-video').preload})"""
+    )
+    page.click("#live-tab-1")
+    page.wait_for_timeout(250)
+    live_after = page.evaluate(
+        """() => ({src: document.querySelector('#live-source').getAttribute('src'),
+                  poster: document.querySelector('#live-video').getAttribute('poster')})"""
+    )
+    assert live_before["preload"] == "none", f"live clip must not preload: {live_before}"
+    assert live_before["src"] != live_after["src"] and live_before["poster"] != live_after["poster"], (
+        f"live selector must move source and poster together: {live_before} -> {live_after}"
     )
 
     # 6. Sensitivity is a passive-placement demonstration: two clips, both
