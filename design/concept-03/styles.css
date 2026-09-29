@@ -1766,6 +1766,29 @@ main {
   font-size: var(--text-fine);
 }
 
+.research-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 20px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+}
+
+.research-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--readout);
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 var(--signal-amber);
+}
+
+.research-links a:hover {
+  color: var(--signal-amber-bright);
+}
+
 .research-heading sup {
   /* On the scale: 0.7em made 8.4px and 9.8px, two sizes the census rejects. */
   font-size: var(--text-fine);

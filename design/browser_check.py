@@ -1273,6 +1273,8 @@ def check_hero_actions(browser) -> None:
     info = page.evaluate(
         """() => ({
             paper: [...document.querySelectorAll('.hero-actions a')].map(a => a.getAttribute('href')),
+            nav: [...document.querySelectorAll('.instrument-header nav a')].map(a => a.getAttribute('href')).slice(-1),
+            record: [...document.querySelectorAll('.research-links a')].map(a => a.getAttribute('href')),
             pending: [...document.querySelectorAll('.hero-actions .button--pending')]
               .map(el => [el.tagName, el.hasAttribute('href'), el.getAttribute('aria-disabled')]),
             heights: [...document.querySelectorAll('.hero-actions .button')]
@@ -1282,8 +1284,14 @@ def check_hero_actions(browser) -> None:
             title: document.title,
         })"""
     )
-    assert info["paper"] == ["../../GlowTact.pdf"], (
-        f"the hero must carry exactly the paper link: {info['paper']}"
+    # The paper is on arXiv since 2026-09-28: Paper in the hero and the header
+    # goes to the abstract, and the research record links arXiv and the local PDF.
+    arxiv = "https://arxiv.org/abs/2609.32471"
+    assert info["paper"] == [arxiv] and info["nav"] == [arxiv], (
+        f"the hero and header must carry exactly the arXiv paper link: {info['paper']} {info['nav']}"
+    )
+    assert info["record"] == [arxiv, "../../GlowTact.pdf"], (
+        f"the research record must link arXiv then the PDF: {info['record']}"
     )
     assert info["pending"] == [["SPAN", False, "true"], ["SPAN", False, "true"]], info["pending"]
     assert info["heights"] and min(info["heights"]) >= 44, info["heights"]

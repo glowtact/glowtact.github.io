@@ -88,6 +88,12 @@ either end to go.
 | Idle seconds at both ends | bright fraction of the hand zone: baseline 0.24, up from 1.0 s, back at 28.0 s; screen contact from 1.7 s to 27.8 s | trimmed to 0.9 to 28.1 s (27.2 s) | frame count in `ffprobe` |
 | The as-shot version and its selector | user: the stabilized one only | as-shot clip and poster removed, the page shows one figure, `initClipSelector` serves shear alone again | design mode: one video in `#live`, no tablist or button, `preload="none"`, poster present; red-greened with `preload="metadata"` and a stray button |
 
+## Sixth pass: the arXiv link
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| The paper was linked only as the local PDF | arXiv abs 2609.32471 confirmed by its page metadata: same title, seven authors, 2026-09-26 | `Paper` in the header and the hero goes to the arXiv abstract; the research record gains an `arXiv:2609.32471` link and a `PDF` link to the local copy; BibTeX carries `journal = {arXiv preprint arXiv:2609.32471}` | design mode asserts both `Paper` links point at the arXiv abstract and the record links at arXiv and the PDF |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
