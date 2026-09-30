@@ -1774,43 +1774,26 @@ watchReconVisibility();
 setReconPlayback(reconWanted);
 
 /* ------------------------------------------------------------------ *
- * Clip selector (DAT / 03 shear)
+ * Shear clip tabs (DAT / 03)
  *
- * Source and poster are swapped together and the element reloaded; swapping
- * only the source leaves the previous clip's poster behind, which reads as
- * the wrong clip until playback starts. browser_check asserts both move.
+ * On a laptop the three clips sit side by side and the tabs are hidden by
+ * CSS; on a phone the tabs show one figure at a time. A clip that leaves
+ * view is paused so nothing plays unseen.
  * ------------------------------------------------------------------ */
 
-function initClipSelector(prefix, describe) {
-  const tabs = [...document.querySelectorAll(`.${prefix}-tabs button`)];
-  const video = document.querySelector(`#${prefix}-video`);
-  const source = document.querySelector(`#${prefix}-source`);
-  const label = document.querySelector(`#${prefix}-clip-label`);
-  const note = document.querySelector(`#${prefix}-clip-note`);
-  if (!tabs.length || !video || !source) return;
+function initShearTabs() {
+  const tabs = [...document.querySelectorAll(".shear-tabs button")];
+  const clips = tabs.map((tab) => document.getElementById(tab.getAttribute("aria-controls")));
+  if (!tabs.length || clips.some((clip) => !clip)) return;
 
   function select(tab) {
-    tabs.forEach((other) => {
+    tabs.forEach((other, index) => {
       const active = other === tab;
       other.setAttribute("aria-selected", String(active));
       other.tabIndex = active ? 0 : -1;
+      clips[index].classList.toggle("is-active", active);
+      if (!active) clips[index].querySelector("video")?.pause();
     });
-    const clip = tab.dataset.clip;
-    const wasPlaying = !video.paused && !video.ended;
-    // Derive the directory from the markup rather than hardcoding `../`.
-    // publish.py rewrites the page's relative references so the root page
-    // resolves from the repository root, but it cannot rewrite a path this
-    // script builds at runtime -- hardcoding `../assets/` made every clip
-    // except the first 404 on the published site while working locally.
-    const videoDir = source.getAttribute("src").replace(/[^/]+$/, "");
-    const posterDir = video.getAttribute("poster").replace(/[^/]+$/, "");
-    source.src = `${videoDir}${clip}.mp4`;
-    video.poster = `${posterDir}${clip}-poster.jpg`;
-    video.load();
-    if (wasPlaying) video.play().catch(() => {});
-    label.textContent = `${tab.dataset.label.toUpperCase()} / ${tab.dataset.duration.toUpperCase()}`;
-    note.textContent = tab.dataset.note;
-    video.setAttribute("aria-label", describe(tab.dataset));
   }
 
   tabs.forEach((tab) => {
@@ -1831,4 +1814,4 @@ function initClipSelector(prefix, describe) {
   });
 }
 
-initClipSelector("shear", (clip) => `Marker-free shear field for ${clip.label}: ${clip.note}`);
+initShearTabs();

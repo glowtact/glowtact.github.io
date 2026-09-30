@@ -2533,12 +2533,20 @@ main {
   display: grid;
   gap: clamp(28px, 3vw, 48px);
   grid-template-columns: minmax(0, 1fr);
-  max-width: 880px;
   align-items: start;
 }
 
+/* Three clips side by side on a laptop; the tabs only exist for the phone,
+   where they show one clip at a time (2026-09-30). */
+.shear-clips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--optic-ring-soft);
+}
+
 .shear-tabs {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   gap: 1px;
   margin-bottom: 1px;
@@ -2595,12 +2603,28 @@ main {
   font-size: var(--text-label);
 }
 
-.shear-stage figcaption span:first-child,
+.shear-clip-label,
 .live-stage figcaption span:first-child {
   color: var(--readout-tertiary);
   font-family: var(--font-mono);
   font-size: var(--text-fine);
   letter-spacing: 0.14em;
+}
+
+.shear-stage figcaption {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 4px 14px;
+  align-items: center;
+}
+
+.shear-object {
+  grid-row: 1 / 3;
+  width: 64px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  box-shadow: inset 0 0 0 1px var(--optic-ring);
 }
 
 /* The live clip closes the page at full content width: the tablet feed is
@@ -2621,6 +2645,18 @@ main {
 @media (max-width: 900px) {
   .shear-layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shear-tabs {
+    display: flex;
+  }
+
+  .shear-clips {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shear-stage:not(.is-active) {
+    display: none;
   }
 }
 

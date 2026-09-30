@@ -756,33 +756,62 @@
             <div class="shear-viewer" data-reveal>
               <div class="shear-tabs" role="tablist" aria-label="Shear tracking clips">
               <button type="button" role="tab" id="shear-tab-0"
-                      aria-controls="shear-stage" aria-selected="true"
-                      tabindex="0"
-                      data-clip="1_fingertip" data-label="Fingertip" data-note="A fingertip pressed and dragged across the pad"
-                      data-duration="6.1 s">Fingertip</button>
+                      aria-controls="shear-clip-0" aria-selected="true"
+                      tabindex="0">Fingertip</button>
               <button type="button" role="tab" id="shear-tab-1"
-                      aria-controls="shear-stage" aria-selected="false"
-                      tabindex="-1"
-                      data-clip="2_coin" data-label="Coin" data-note="A coin edge loaded and slid"
-                      data-duration="8.9 s">Coin</button>
+                      aria-controls="shear-clip-1" aria-selected="false"
+                      tabindex="-1">Coin cell</button>
               <button type="button" role="tab" id="shear-tab-2"
-                      aria-controls="shear-stage" aria-selected="false"
-                      tabindex="-1"
-                      data-clip="4_phillips_head_screw_M5" data-label="M5 Phillips head" data-note="A cross recess under tangential load"
-                      data-duration="13.6 s">M5 Phillips head</button>
+                      aria-controls="shear-clip-2" aria-selected="false"
+                      tabindex="-1">M5 Phillips head</button>
               </div>
-              <figure class="shear-stage" id="shear-stage">
-                <video id="shear-video" controls loop muted playsinline preload="metadata"
-                       poster="../assets/images/shear/1_fingertip-poster.jpg"
-                       aria-label="Marker-free shear field overlaid on the GlowTact tactile image">
-                  <source id="shear-source" src="../assets/video/shear/1_fingertip.mp4" type="video/mp4">
-                  Your browser does not support embedded video.
-                </video>
-                <figcaption>
-                  <span id="shear-clip-label">FINGERTIP / 6.1 S</span>
-                  <span id="shear-clip-note">A fingertip pressed and dragged across the pad</span>
-                </figcaption>
-              </figure>
+              <div class="shear-clips">
+                <figure class="shear-stage is-active" id="shear-clip-0" role="tabpanel" aria-labelledby="shear-tab-0">
+                  <video controls loop muted playsinline preload="none"
+                         poster="../assets/images/shear/1_fingertip-poster.jpg"
+                         aria-label="Marker-free shear field for a fingertip pressed and dragged across the pad">
+                    <source src="../assets/video/shear/1_fingertip.mp4" type="video/mp4">
+                    Your browser does not support embedded video.
+                  </video>
+                  <figcaption>
+                    <img class="shear-object" loading="lazy" decoding="async"
+                         src="../assets/images/shear/1_fingertip-object.jpg"
+                         alt="A fingertip on the GlowTact pad">
+                    <span class="shear-clip-label">FINGERTIP / 6.1 S</span>
+                    <span class="shear-clip-note">Pressed and dragged across the pad</span>
+                  </figcaption>
+                </figure>
+                <figure class="shear-stage" id="shear-clip-1" role="tabpanel" aria-labelledby="shear-tab-1">
+                  <video controls loop muted playsinline preload="none"
+                         poster="../assets/images/shear/2_coin-poster.jpg"
+                         aria-label="Marker-free shear field for a coin cell's edge loaded and slid">
+                    <source src="../assets/video/shear/2_coin.mp4" type="video/mp4">
+                    Your browser does not support embedded video.
+                  </video>
+                  <figcaption>
+                    <img class="shear-object" loading="lazy" decoding="async"
+                         src="../assets/images/shear/2_coin-object.jpg"
+                         alt="A CR2025 coin cell">
+                    <span class="shear-clip-label">COIN CELL / 8.9 S</span>
+                    <span class="shear-clip-note">The cell's edge loaded and slid</span>
+                  </figcaption>
+                </figure>
+                <figure class="shear-stage" id="shear-clip-2" role="tabpanel" aria-labelledby="shear-tab-2">
+                  <video controls loop muted playsinline preload="none"
+                         poster="../assets/images/shear/4_phillips_head_screw_M5-poster.jpg"
+                         aria-label="Marker-free shear field for an M5 Phillips head under tangential load">
+                    <source src="../assets/video/shear/4_phillips_head_screw_M5.mp4" type="video/mp4">
+                    Your browser does not support embedded video.
+                  </video>
+                  <figcaption>
+                    <img class="shear-object" loading="lazy" decoding="async"
+                         src="../assets/images/shear/4_phillips_head_screw_M5-object.jpg"
+                         alt="An M5 Phillips-head screw, head up">
+                    <span class="shear-clip-label">M5 PHILLIPS HEAD / 13.6 S</span>
+                    <span class="shear-clip-note">A cross recess under tangential load</span>
+                  </figcaption>
+                </figure>
+              </div>
               <p class="shear-legend">
                 Readouts per frame: slide, twist, spread, slip; the red outline is the contact.
               </p>

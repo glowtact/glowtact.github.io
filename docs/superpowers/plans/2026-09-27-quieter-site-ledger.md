@@ -108,6 +108,13 @@ either end to go.
 | The body cards showed one figure each: two exploded views and a photograph | user: every body needs an exploded view and a picture of the sensor | each card carries the sensor first and the exploded view second; the flat and fingertip renders supplied by the user (cropped to 4:3 around the sensor, white ground scaled to the plate tone), the humanoid exploded view from the 2026-09-26 drawing; the humanoid keeps the gloved-hand photograph until its render arrives | design mode: three cards, two figures each, the second an exploded view, stacked on a laptop; red-greened by removing a figure |
 | Phone card layout was one square figure beside the words | `150px` column | the two figures share a row at 4:3, the words span the row below | 412 px screenshot |
 
+## Ninth pass: shear clips side by side on a laptop
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| One shear stage with tabs on every width | user: keep the phone layout, put the three clips side by side on a laptop, show each object | three figures in a row at full content width (tabs hidden by CSS); on a phone the tabs toggle `is-active` on one figure and pause the others; every figure carries a 64 px photograph of its object beside the label | design mode: three visible clips on one row, tabs hidden, object files in order, `preload="none"`; on a phone one visible clip and tab 3 shows the third; red-greened three ways |
+| No photographs of the shear objects in the archive | `shear_field/` holds tactile frames only | fingertip cut from the live clip at 3.0 s; the coin object identified as the CR2025 coin cell of the light-object set (the contact in the clip is a 2.5 mm edge) and labelled `Coin cell`; the M5 Phillips head from the Fig. 8 source | the user can swap the coin cell photograph if the clip used a coin |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays

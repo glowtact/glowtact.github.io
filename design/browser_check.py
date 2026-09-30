@@ -1525,22 +1525,26 @@ def check_results_region(browser) -> None:
         )
         assert pix_fmt == "yuv420p", f"{src}: pix_fmt {pix_fmt} is not yuv420p"
 
-    # 4. The shear selector must move source AND poster together.
-    before = page.evaluate(
-        """() => ({src: document.querySelector('#shear-source').getAttribute('src'),
-                  poster: document.querySelector('#shear-video').getAttribute('poster')})"""
+    # 4. The shear clips (2026-09-30): three side by side on a laptop with the
+    #    tabs hidden, each with a photograph of its object and nothing loaded
+    #    until played; the phone half of this check is below, with the cards.
+    shear = page.evaluate(
+        """() => {
+            const clips = [...document.querySelectorAll('.shear-clips .shear-stage')];
+            const tops = clips.map(c => Math.round(c.getBoundingClientRect().top));
+            return {clips: clips.length,
+                    visible: clips.filter(c => c.getBoundingClientRect().width > 0).length,
+                    sameRow: new Set(tops).size === 1,
+                    objects: clips.map(c => ((c.querySelector('img.shear-object') || {}).getAttribute?.('src') || '').split('/').pop()),
+                    tabsHidden: getComputedStyle(document.querySelector('.shear-tabs')).display === 'none',
+                    preload: clips.map(c => c.querySelector('video').preload)};
+        }"""
     )
-    page.click("#shear-tab-2")
-    page.wait_for_timeout(250)
-    after = page.evaluate(
-        """() => ({src: document.querySelector('#shear-source').getAttribute('src'),
-                  poster: document.querySelector('#shear-video').getAttribute('poster')})"""
-    )
-    assert before["src"] != after["src"], "shear selector did not change the source"
-    assert before["poster"] != after["poster"], (
-        "shear selector changed the source but not the poster; the previous "
-        "clip's still would show until playback starts"
-    )
+    assert shear["clips"] == 3 and shear["visible"] == 3 and shear["sameRow"] and shear["tabsHidden"], shear
+    assert shear["objects"] == [
+        "1_fingertip-object.jpg", "2_coin-object.jpg", "4_phillips_head_screw_M5-object.jpg",
+    ], shear
+    assert set(shear["preload"]) == {"none"}, shear
 
     # The live clip at the end (2026-09-28): one locked-view clip, no
     # selector (the as-shot version was dropped), nothing loaded until played.
@@ -1625,6 +1629,12 @@ def check_results_region(browser) -> None:
     # with the card, stay square, and neither they nor the caption box reach
     # past the card's edge (a fixed-track caption grows wider than its card).
     assert all(c["square"] and c["overflow"] <= 0 for c in cards), cards
+    # On a phone the shear tabs show one clip at a time.
+    shown = "() => [...document.querySelectorAll('.shear-clips .shear-stage')].map(c => c.getBoundingClientRect().width > 0)"
+    assert phone.evaluate(shown) == [True, False, False], phone.evaluate(shown)
+    phone.click("#shear-tab-2")
+    phone.wait_for_timeout(200)
+    assert phone.evaluate(shown) == [False, False, True], phone.evaluate(shown)
     phone.close()
     captions = page.evaluate(
         """() => [...document.querySelectorAll('.recon-card')].map(card => {
