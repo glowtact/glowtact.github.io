@@ -18,8 +18,10 @@ materials/                        451 files, 467 MiB
 │   ├── paper.pdf                 the manuscript
 │   ├── GlowTact-2026-08-14.pdf   a later revision; differs from paper.pdf,
 │   │                             so both are kept
-│   └── GlowTact-2026-09-27.pdf   the authored revision (2026-09-26 build),
-│                                 served as /GlowTact.pdf since 2026-09-27
+│   ├── GlowTact-2026-09-27.pdf   the authored revision (2026-09-26 build),
+│   │                             served as /GlowTact.pdf 2026-09-27 to 09-30
+│   └── GlowTact-2026-09-30.pdf   8 pages, the draft limitations notes gone;
+│                                 served as /GlowTact.pdf since 2026-09-30
 ├── figures/                       15 files,  34 MiB
 │   ├── teaser.png / .pdf          hero figure
 │   ├── fingerprints.png / .pdf    fingerprint pressure series

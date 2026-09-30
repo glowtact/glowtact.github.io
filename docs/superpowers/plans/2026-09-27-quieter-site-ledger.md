@@ -94,6 +94,13 @@ either end to go.
 |---|---|---|---|
 | The paper was linked only as the local PDF | arXiv abs 2609.32471 confirmed by its page metadata: same title, seven authors, 2026-09-26 | `Paper` in the header and the hero goes to the arXiv abstract; the research record gains an `arXiv:2609.32471` link and a `PDF` link to the local copy; BibTeX carries `journal = {arXiv preprint arXiv:2609.32471}` | design mode asserts both `Paper` links point at the arXiv abstract and the record links at arXiv and the PDF |
 
+## Seventh pass: the 2026-09-30 paper build, PDF beside Paper
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| A newer paper build | `pdftotext` diff: pages 1 to 7 identical, the draft `VII. Limitations` notes removed, Table I and the references reflowed, 9 to 8 pages | `/GlowTact.pdf` replaced, copy in `materials/paper/GlowTact-2026-09-30.pdf`, manifest rewritten | `materials_check.py --verify`; `verify.py` local reference |
+| Only the arXiv link in the hero | user: attach both | a `PDF` button (`button--quiet`) beside `Paper`; on a phone the two live links share the first row and the pending pair the second | `check_hero_actions`: hero links are arXiv then the PDF; red-greened by removing the button |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays

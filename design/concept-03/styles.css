@@ -2070,13 +2070,9 @@ main {
   }
 
   .hero-actions {
-    /* Paper on its own row; the two pending items share the next one. */
+    /* Two by two: the two live links on one row, the pending pair below. */
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .hero-actions .button--primary {
-    grid-column: 1 / -1;
   }
 
   .button--pending {

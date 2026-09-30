@@ -1287,8 +1287,8 @@ def check_hero_actions(browser) -> None:
     # The paper is on arXiv since 2026-09-28: Paper in the hero and the header
     # goes to the abstract, and the research record links arXiv and the local PDF.
     arxiv = "https://arxiv.org/abs/2609.32471"
-    assert info["paper"] == [arxiv] and info["nav"] == [arxiv], (
-        f"the hero and header must carry exactly the arXiv paper link: {info['paper']} {info['nav']}"
+    assert info["paper"] == [arxiv, "../../GlowTact.pdf"] and info["nav"] == [arxiv], (
+        f"the hero carries the arXiv link then the PDF, the header the arXiv link: {info['paper']} {info['nav']}"
     )
     assert info["record"] == [arxiv, "../../GlowTact.pdf"], (
         f"the research record must link arXiv then the PDF: {info['record']}"
