@@ -1656,6 +1656,20 @@ def check_results_region(browser) -> None:
         "shearTables": 0,
     }, modules
 
+    # 8b. Every body card shows the sensor and its exploded view (2026-09-30):
+    #     two figures, the exploded view second, on a laptop stacked above the
+    #     words.
+    bodies = page.evaluate(
+        """() => [...document.querySelectorAll('.form-comparison article')].map(card => {
+            const imgs = [...card.querySelectorAll('img.form-photo')];
+            return {figures: imgs.length,
+                    exploded: (imgs[1] || {}).getAttribute?.('src')?.includes('-exploded') || false,
+                    stacked: imgs.length === 2 && imgs[1].getBoundingClientRect().top > imgs[0].getBoundingClientRect().bottom - 1,
+                    words: card.querySelectorAll('h3').length};
+        })"""
+    )
+    assert len(bodies) == 3 and all(b == {"figures": 2, "exploded": True, "stacked": True, "words": 1} for b in bodies), bodies
+
     # 9. "Why simple" closes the mechanism band as a module (2026-09-27): four
     #    wrapped dt/dd pairs on one row, not a band of its own on the forms
     #    ground, and not a bare dl whose grid splits titles from their lines.

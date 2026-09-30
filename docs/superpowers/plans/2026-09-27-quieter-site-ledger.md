@@ -101,6 +101,13 @@ either end to go.
 | A newer paper build | `pdftotext` diff: pages 1 to 7 identical, the draft `VII. Limitations` notes removed, Table I and the references reflowed, 9 to 8 pages | `/GlowTact.pdf` replaced, copy in `materials/paper/GlowTact-2026-09-30.pdf`, manifest rewritten | `materials_check.py --verify`; `verify.py` local reference |
 | Only the arXiv link in the hero | user: attach both | a `PDF` button (`button--quiet`) beside `Paper`; on a phone the two live links share the first row and the pending pair the second | `check_hero_actions`: hero links are arXiv then the PDF; red-greened by removing the button |
 
+## Eighth pass: three bodies, two figures each
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| The body cards showed one figure each: two exploded views and a photograph | user: every body needs an exploded view and a picture of the sensor | each card carries the sensor first and the exploded view second; the flat and fingertip renders supplied by the user (cropped to 4:3 around the sensor, white ground scaled to the plate tone), the humanoid exploded view from the 2026-09-26 drawing; the humanoid keeps the gloved-hand photograph until its render arrives | design mode: three cards, two figures each, the second an exploded view, stacked on a laptop; red-greened by removing a figure |
+| Phone card layout was one square figure beside the words | `150px` column | the two figures share a row at 4:3, the words span the row below | 412 px screenshot |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
@@ -116,6 +123,8 @@ Not done, on purpose:
   23-42-08.png` and `webpage.jpg` stay untracked.
 - The `Code` and `Hardware guide` pending buttons in the hero were not
   discussed and stay.
+- The humanoid card's sensor picture is still the gloved-hand photograph;
+  the user has a render on the way.
 - The phone screenshot's 980px layout is the browser's, not the page's: the
   live page carries the viewport meta and lays out one column at 412px. The
   hero cap makes desktop-site mode tolerable; it does not switch it off.
