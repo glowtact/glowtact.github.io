@@ -5,9 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
       name="description"
-      content="GlowTact: a compact vision-based tactile sensor that turns pressure into a direct optical image. Paper, mechanism, and results."
+      content="GlowTact: a simple, compact vision-based tactile sensor for robot and humanoid fingertips. Single-color light, a nitrile membrane on microtextured gel, and the raw image carries the pressure signal. Paper, mechanism, results."
     >
     <title>GlowTact — Simple and compact vision-based tactile sensing</title>
+    <link rel="canonical" href="https://glowtact.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="GlowTact">
+    <meta property="og:title" content="GlowTact: simple and compact vision-based tactile sensing">
+    <meta property="og:description" content="A pressure-responsive tactile sensor: single-color light, a black nitrile membrane on microtextured gel, and the raw image directly represents the pressure distribution. Gram-scale contact detection; M1 screw threads resolved.">
+    <meta property="og:url" content="https://glowtact.github.io/">
+    <meta property="og:image" content="https://glowtact.github.io/design/assets/images/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="A robot hand with black GlowTact fingertips grasping a screw, with the tactile images inset">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GlowTact: simple and compact vision-based tactile sensing">
+    <meta name="twitter:description" content="Single-color light, a black nitrile membrane on microtextured gel, and the raw image directly represents the pressure distribution. Gram-scale contact detection; M1 screw threads resolved.">
+    <meta name="twitter:image" content="https://glowtact.github.io/design/assets/images/og-image.jpg">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": "GlowTact: Simple and Compact Vision-Based Tactile Sensing with High Sensitivity and Spatial Resolution",
+  "name": "GlowTact: Simple and Compact Vision-Based Tactile Sensing with High Sensitivity and Spatial Resolution",
+  "abstract": "Vision-based tactile sensors (VBTS) provide rich contact information for robotic manipulation, but existing designs can be hard to simplify and adapt to the size and constraints of humanoid fingertips. We introduce GlowTact, a pressure-responsive vision-based tactile sensing mechanism that directly visualizes contact pressure. GlowTact requires only single-color, non-directional illumination, and the raw tactile image directly represents the pressure distribution without explicit geometry reconstruction. This simple sensing principle enables compact, customizable tactile sensors while preserving high sensitivity and rich spatial detail. We demonstrate gram-scale contact detection, accurate normal-force estimation, and reconstruction of fine contact geometry, including M1 screw threads. These results establish GlowTact as a practical new sensing technology for compact humanoid fingertips, combining a durable nitrile membrane and simple optical design with sensitive and information-rich tactile perception.",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Yuxiang Ma",
+      "url": "https://yuxiang-ma.github.io/",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Massachusetts Institute of Technology"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Megha Tippur",
+      "url": "https://www.csail.mit.edu/person/megha-tippur",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Massachusetts Institute of Technology"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Pengfei Ye",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Massachusetts Institute of Technology"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Sandra Q. Liu",
+      "url": "https://scholar.google.com/citations?user=6NX22usAAAAJ",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Massachusetts Institute of Technology"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Haonan Chen",
+      "url": "https://haonan16.github.io/",
+      "affiliation": [
+        {
+          "@type": "Organization",
+          "name": "Massachusetts Institute of Technology"
+        },
+        {
+          "@type": "Organization",
+          "name": "Harvard University"
+        }
+      ]
+    },
+    {
+      "@type": "Person",
+      "name": "Francis Richard Cottrell",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Massachusetts Institute of Technology"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Edward Adelson",
+      "url": "https://www.csail.mit.edu/person/ted-adelson",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Massachusetts Institute of Technology"
+      }
+    }
+  ],
+  "datePublished": "2026-09-26",
+  "identifier": "arXiv:2609.32471",
+  "sameAs": "https://arxiv.org/abs/2609.32471",
+  "url": "https://glowtact.github.io/",
+  "image": "https://glowtact.github.io/design/assets/images/og-image.jpg",
+  "encoding": {
+    "@type": "MediaObject",
+    "contentUrl": "https://glowtact.github.io/GlowTact.pdf",
+    "encodingFormat": "application/pdf"
+  },
+  "keywords": [
+    "vision-based tactile sensor",
+    "tactile sensing",
+    "robot fingertip",
+    "humanoid fingertip",
+    "contact pressure",
+    "optical coupling",
+    "nitrile membrane"
+  ]
+}
+    </script>
     <link rel="stylesheet" href="./styles.css">
     <script src="./app.js" defer></script>
   </head>
@@ -858,8 +969,9 @@
             Sensitivity and Spatial Resolution
           </p>
           <p class="research-authors">
-            Yuxiang Ma<sup>*</sup>, Megha Tippur<sup>*</sup>, Pengfei Ye, Sandra Q. Liu,
-            Haonan Chen, Francis Richard Cottrell, Edward Adelson
+            <a href="https://yuxiang-ma.github.io/" target="_blank" rel="noopener">Yuxiang Ma</a><sup>*</sup>, <a href="https://www.csail.mit.edu/person/megha-tippur" target="_blank" rel="noopener">Megha Tippur</a><sup>*</sup>,
+            Pengfei Ye, <a href="https://scholar.google.com/citations?user=6NX22usAAAAJ" target="_blank" rel="noopener">Sandra Q. Liu</a>, <a href="https://haonan16.github.io/" target="_blank" rel="noopener">Haonan Chen</a>,
+            Francis Richard Cottrell, <a href="https://www.csail.mit.edu/person/ted-adelson" target="_blank" rel="noopener">Edward Adelson</a>
           </p>
           <p class="research-affiliations">
             Massachusetts Institute of Technology and Harvard University.
@@ -868,6 +980,17 @@
           <p class="research-links">
             <a href="https://arxiv.org/abs/2609.32471" target="_blank" rel="noopener">arXiv:2609.32471</a>
             <a href="../../GlowTact.pdf" target="_blank" rel="noopener">PDF</a>
+          </p>
+          <p class="research-abstract">
+            Vision-based tactile sensors provide rich contact information for robotic
+            manipulation, but existing designs can be hard to simplify and adapt to the
+            size and constraints of humanoid fingertips. GlowTact is a pressure-responsive
+            vision-based tactile sensing mechanism that directly visualizes contact
+            pressure: it requires only single-color, non-directional illumination, and the
+            raw tactile image directly represents the pressure distribution without
+            explicit geometry reconstruction. The paper demonstrates gram-scale contact
+            detection, accurate normal-force estimation, and reconstruction of fine contact
+            geometry, including M1 screw threads.
           </p>
         </div>
         <div class="research-meta" data-reveal>

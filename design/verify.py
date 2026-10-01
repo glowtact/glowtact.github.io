@@ -1,5 +1,6 @@
 from html.parser import HTMLParser
 from pathlib import Path
+import json
 import re
 import subprocess
 import sys
@@ -69,6 +70,34 @@ def audit(route: Path) -> list[str]:
         target = (route.parent / ref).resolve()
         if not target.exists():
             errors.append(f"missing local reference: {ref}")
+    errors.extend(indexing(route, text))
+    return errors
+
+
+def indexing(route: Path, text: str) -> list[str]:
+    """Search engines see one page: the published root. concept-03 is its
+    source (and its own route), so it declares the root canonical and the
+    article's structured data; the review hub and the other concepts are
+    noindex. Added for Search Console on 2026-10-01."""
+    errors: list[str] = []
+    public = route.name == "index.html" and route.parent.name in ("concept-03", ROOT.parent.name)
+    if public:
+        if 'rel="canonical" href="https://glowtact.github.io/"' not in text:
+            errors.append("missing canonical link to the published root")
+        if 'property="og:image"' not in text or 'name="twitter:card"' not in text:
+            errors.append("missing Open Graph or Twitter card tags")
+        start = text.find('<script type="application/ld+json">')
+        end = text.find("</script>", start)
+        try:
+            data = json.loads(text[start + len('<script type="application/ld+json">'):end]) if start >= 0 else None
+        except json.JSONDecodeError:
+            data = None
+        if not data or data.get("@type") != "ScholarlyArticle" or len(data.get("author", [])) != 7:
+            errors.append("structured data must be a ScholarlyArticle with the seven authors")
+        if not (ROOT / "assets" / "images" / "og-image.jpg").exists():
+            errors.append("og-image.jpg missing under design/assets/images")
+    elif 'name="robots" content="noindex"' not in text:
+        errors.append("review page must be noindex")
     return errors
 
 
@@ -137,6 +166,12 @@ css_text = "\n".join(
 )
 if "@media (prefers-reduced-motion: reduce)" not in css_text:
     failures.append("styles: missing reduced-motion handling")
+
+for name, needle in (("robots.txt", "Sitemap: https://glowtact.github.io/sitemap.xml"),
+                     ("sitemap.xml", "<loc>https://glowtact.github.io/</loc>")):
+    path = ROOT.parent / name
+    if not path.exists() or needle not in path.read_text(encoding="utf-8"):
+        failures.append(f"{name}: missing or without {needle!r}")
 for path in sorted(ROOT.rglob("*.css")):
     for issue in stylesheet_syntax(path):
         failures.append(f"{path.relative_to(ROOT)}: {issue}")

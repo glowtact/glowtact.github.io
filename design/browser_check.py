@@ -1738,9 +1738,19 @@ def check_results_region(browser) -> None:
         """() => ({
             authors: (document.querySelector('.research-authors') || {}).textContent || '',
             bibtex: (document.querySelector('.research-meta code') || {}).textContent || '',
+            links: [...document.querySelectorAll('.research-authors a')].map(a => a.getAttribute('href')),
         })"""
     )
     assert "Adelson" in record["authors"] and "Anonymous" not in record["bibtex"], record
+    # Author pages verified on 2026-10-01; persci.mit.edu was left out (expired
+    # certificate) and the CSAIL page for Sandra Liu redirects to a login.
+    assert record["links"] == [
+        "https://yuxiang-ma.github.io/",
+        "https://www.csail.mit.edu/person/megha-tippur",
+        "https://scholar.google.com/citations?user=6NX22usAAAAJ",
+        "https://haonan16.github.io/",
+        "https://www.csail.mit.edu/person/ted-adelson",
+    ], record["links"]
 
     page.close()
 

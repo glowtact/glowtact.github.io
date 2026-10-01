@@ -1760,6 +1760,23 @@ main {
   line-height: 1.6;
 }
 
+/* Author names are inline links; the vertical padding and negative margin
+   give each a 44px target without changing the line spacing. */
+.research-authors a {
+  display: inline-block;
+  padding-block: 12px;
+  margin-block: -12px;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--optic-ring);
+  text-underline-offset: 3px;
+}
+
+.research-authors a:hover {
+  color: var(--readout);
+  text-decoration-color: var(--signal-amber);
+}
+
 .research-affiliations {
   margin-top: 6px;
   color: var(--readout-tertiary);
@@ -1788,6 +1805,14 @@ main {
 
 .research-links a:hover {
   color: var(--signal-amber-bright);
+}
+
+.research-abstract {
+  max-width: 580px;
+  margin: 22px 0 0;
+  color: var(--readout-secondary);
+  font-size: var(--text-label);
+  line-height: 1.6;
 }
 
 .research-heading sup {

@@ -115,6 +115,19 @@ either end to go.
 | One shear stage with tabs on every width | user: keep the phone layout, put the three clips side by side on a laptop, show each object | three figures in a row at full content width (tabs hidden by CSS); on a phone the tabs toggle `is-active` on one figure and pause the others; every figure carries a 64 px photograph of its object beside the label | design mode: three visible clips on one row, tabs hidden, object files in order, `preload="none"`; on a phone one visible clip and tab 3 shows the third; red-greened three ways |
 | No photographs of the shear objects in the archive | `shear_field/` holds tactile frames only | fingertip cut from the live clip at 3.0 s; the coin object identified as the CR2025 coin cell of the light-object set (the contact in the clip is a 2.5 mm edge) and labelled `Coin cell`; the M5 Phillips head from the Fig. 8 source | the user can swap the coin cell photograph if the clip used a coin |
 
+## Tenth pass: indexing
+
+For Search Console. The verification file went up first; this pass makes the
+one public page legible to a crawler.
+
+| Found | Measured | Fixed | Verified |
+|---|---|---|---|
+| Four indexable copies of the page: the root, `design/concept-03/`, the review hub and the two other concepts | all 200, no canonical, no robots meta | `rel="canonical"` to the root on concept-03 (so the root and its route both declare it); `noindex` on the review hub and concept-01/02; `robots.txt` allows everything and names the sitemap; `sitemap.xml` lists the root and the PDF | `verify.py` `indexing()`: canonical, Open Graph, JSON-LD with seven authors, og-image on disk, noindex on review pages, robots and sitemap present; red-greened three ways |
+| No structured data, no link preview | zero `ld+json`, `og:` or `canonical` tags on the live page | `ScholarlyArticle` JSON-LD (title, abstract, seven authors with affiliations and verified pages, arXiv id, PDF); Open Graph and Twitter card with a 1200x630 crop of the teaser; meta description rewritten with the search terms | `verify.py`; `curl` after release |
+| 588 visible words, no abstract on the page | user agreed to the trade-off | four sentences of the abstract under the research links | design mode text census |
+| Author names were plain text | user: link each author | five names linked (Ma, Tippur, Liu, Chen, Adelson), 44px targets via padding and negative margin; Pengfei Ye and Francis Richard Cottrell have no page the search could verify; persci.mit.edu skipped for an expired certificate, Sandra Liu's CSAIL page for a login wall | design mode asserts the five hrefs; phone touch-target census |
+| PDF metadata | `pdfinfo`: `/Title` and `/Author` empty, no XMP | left as is at the user's word | |
+
 Not done, on purpose:
 
 - `concept-02` still references `fingerprint-pressure.jpg`, so the file stays
