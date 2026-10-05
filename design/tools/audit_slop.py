@@ -482,11 +482,17 @@ def in_scope(design: Design, path: Path) -> bool:
     return rel.startswith(prefix)
 
 
-def project_ships_fonts() -> bool:
-    for css in DESIGN_DIR.rglob("*.css"):
-        if "@font-face" in css.read_text(encoding="utf-8", errors="ignore"):
-            return True
-    for html in DESIGN_DIR.rglob("*.html"):
+def page_ships_fonts(css_path: Path) -> bool:
+    """Whether the page this stylesheet belongs to ships a webfont.
+
+    Scoped to the stylesheet and the HTML beside it: one page loading a
+    webfont does not fix another page whose stack names only OS faces.
+    A project-wide test let concept-04's Geist link clear concept-03's
+    font-not-shipped finding (2026-10-05).
+    """
+    if "@font-face" in css_path.read_text(encoding="utf-8", errors="ignore"):
+        return True
+    for html in css_path.parent.glob("*.html"):
         if re.search(r"fonts\.(googleapis|bunny)|rel=\"preload\"[^>]*as=\"font\"",
                      html.read_text(encoding="utf-8", errors="ignore")):
             return True
@@ -498,7 +504,7 @@ def project_ships_fonts() -> bool:
 def css_rules(path: Path, text: str, design: Design, deep: bool) -> list[Finding]:
     out: list[Finding] = []
     blocks = parse_css(text)
-    ships_fonts = project_ships_fonts()
+    ships_fonts = page_ships_fonts(path)
     scoped = in_scope(design, path)
 
     def add(rule, tier, line, selector, message, fix=""):
