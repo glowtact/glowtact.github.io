@@ -36,6 +36,7 @@ python3 design/browser_check.py                                # all three
 
 # Regenerate the published root from concept-03 (link-checks; refuses to write a broken page).
 python3 design/tools/publish.py
+python3 design/tools/publish.py --source design/concept-04 --target v2/index.html   # the light /v2/ variant
 
 # Full release: stamp -> publish -> verify -> browser_check (all) -> commit -> stamp commit -> push origin main.
 python3 design/tools/release.py "type(scope): subject" [--body file] [--skip-checks]
@@ -54,7 +55,8 @@ concept-03's contact model in page scope and `design/shots.py` takes mechanism s
 
 - `design/` is the review build: `design/index.html` is a hub comparing three concepts; `concept-01/`
   (Optical Coupling), `concept-02/` (Contact Atlas) and `concept-03/` (Signal Chamber) each hold
-  `index.html` + `styles.css` + `app.js`. Concept-03 is the chosen direction and is the only one actively developed.
+  `index.html` + `styles.css` + `app.js`. Concept-03 is the chosen direction and is published at the root;
+  `concept-04/` is the same page in a light figure-page register, published at `/v2/` (see DESIGN.md).
 - The repository-root `index.html` is **generated** by `design/tools/publish.py` from
   `design/concept-03/index.html`: it prepends a DO-NOT-EDIT banner and applies the textual `REWRITES` list so
   `./styles.css` → `./design/concept-03/styles.css`, `../assets/` → `./design/assets/`, etc. Nothing else is

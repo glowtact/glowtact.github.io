@@ -257,6 +257,34 @@ Each of these is a detector rule; the id is in brackets.
   computed styles know what a `clamp()` resolved to. The h1 is exempt from the 1.15× step: on a
   phone it is already sized by the viewport, and forcing a step there would shrink the h2]
 
+## Light register: /v2/ (concept-04)
+
+`design/concept-04/` is the published page's content in a light
+figure-page register, served at `https://glowtact.github.io/v2/` by
+`publish.py --source design/concept-04 --target v2/index.html`. The root
+stays concept-03. Added 2026-10-05 at the author's request: "the website
+feels crowded … improve the layout, color, especially the text."
+
+- Same markup, script and numbers as concept-03 (every `data-metric`,
+  the model, the clips); every page-level check in `browser_check.py`
+  runs on both routes.
+- Paper ground `#ffffff`, band `#f6f6f3`, ink `#171717`, secondary
+  `#3d4044` / `#5f6368`, hairlines `rgba(23,23,23,.07-.12)`. Amber is
+  `#e9a000` as a fill and `#8a5a00` as text (AA on paper). The mechanism
+  band is `#111111` and re-declares concept-03's dark tokens, so the
+  instrument is unchanged.
+- Geist and Geist Mono from Google Fonts (shipped, so `font-not-shipped`
+  does not apply; the detector now tests this per page). Mono for numbers,
+  units and code only.
+- Sentence case, no tracking, no eyebrows or `DAT` codes; captions in the
+  reading face. Type steps 12 / 14 / 16 / 22 px plus the h2 and h1 clamps.
+- The paper header (title, seven authors, affiliations, actions) leads the
+  hero beside the teaser, as on a paper's project page.
+- `noindex`, canonical to the root: one indexed page.
+
+The `## Don't` list applies here too, except that this register has no
+tracked caps.
+
 ## Review build (frozen)
 
 The review hub and concepts 01/02 keep the original light brief. Recorded so

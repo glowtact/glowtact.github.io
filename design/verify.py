@@ -12,6 +12,7 @@ ROUTES = [
     ROOT / "concept-01" / "index.html",
     ROOT / "concept-02" / "index.html",
     ROOT / "concept-03" / "index.html",
+    ROOT / "concept-04" / "index.html",
 ]
 DISCLOSURE = (
     "Conceptual visualization. Geometry and optical paths are schematic and "

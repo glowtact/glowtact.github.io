@@ -16,6 +16,7 @@ PAGES = [
     "concept-01/index.html",
     "concept-02/index.html",
     "concept-03/index.html",
+    "concept-04/index.html",
 ]
 
 short = subprocess.run(

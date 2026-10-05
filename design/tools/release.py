@@ -73,6 +73,8 @@ def main() -> None:
 
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
     run([sys.executable, os.path.join("design", "tools", "publish.py")])
+    run([sys.executable, os.path.join("design", "tools", "publish.py"),
+         "--source", "design/concept-04", "--target", "v2/index.html"])
 
     if not args.skip_checks:
         run([sys.executable, os.path.join("design", "verify.py")])
@@ -91,7 +93,7 @@ def main() -> None:
     # Tracked files only: a plain `git add design` swept a 21 MB source
     # clip a user had dropped into design/assets/video/ into a stamp commit
     # (a874f06, 2026-09-27). New assets are committed by hand before a release.
-    run(["git", "add", "-u", "design", "index.html"])
+    run(["git", "add", "-u", "design", "index.html", "v2"])
     staged = subprocess.run(
         ["git", "diff", "--cached", "--quiet"], cwd=ROOT
     ).returncode
@@ -111,7 +113,9 @@ def main() -> None:
     ).stdout.strip()
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
     run([sys.executable, os.path.join("design", "tools", "publish.py")])
-    run(["git", "add", "-u", "design", "index.html"])
+    run([sys.executable, os.path.join("design", "tools", "publish.py"),
+         "--source", "design/concept-04", "--target", "v2/index.html"])
+    run(["git", "add", "-u", "design", "index.html", "v2"])
     run(["git", "commit", "-m", f"chore(design): stamp {head}\n\n{TRAILER}"])
     run(["git", "push", "origin", "main"])
     print(f"release: pushed {head} (+stamp)")

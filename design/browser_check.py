@@ -20,7 +20,11 @@ ROUTES = {
     "optical": "/concept-01/",
     "atlas": "/concept-02/",
     "signal": "/concept-03/",
+    "figure": "/concept-04/",
 }
+# The published page and its light /v2/ variant embed the same demo and
+# results; every page-level check below runs on both.
+SIGNAL_ROUTES = ("/concept-03/", "/concept-04/")
 VIEWPORTS = {
     "desktop": {"width": 1440, "height": 1000},
     "mobile": {"width": 390, "height": 844},
@@ -403,7 +407,7 @@ def contact_thirds(page: Page) -> set[int]:
 DEFAULT_PROBE = "round"
 
 
-def check_probe_footprints(browser) -> None:
+def check_probe_footprints(browser, route: str) -> None:
     """The picker was removed on 2026-09-27: the demo loads the round probe,
     nothing on the page can change it, and the camera footprint is the
     unclipped disc."""
@@ -411,7 +415,7 @@ def check_probe_footprints(browser) -> None:
     page = context.new_page()
     block_media(page)
     issues = collect_runtime_issues(page)
-    navigate(page, "/concept-03/")
+    navigate(page, route)
 
     picker = page.locator(
         ".probe-control, .probe-options, [data-probe]:not(.camera-contact)"
@@ -440,14 +444,14 @@ def check_probe_footprints(browser) -> None:
     context.close()
 
 
-def check_signal_interactions(browser) -> None:
+def check_signal_interactions(browser, route: str) -> None:
     context = browser.new_context(
         viewport=VIEWPORTS["desktop"], device_scale_factor=2
     )
     page = context.new_page()
     block_media(page)
     issues = collect_runtime_issues(page)
-    navigate(page, "/concept-03/")
+    navigate(page, route)
 
     for selector in (
         ".macro-camera-lens",
@@ -978,7 +982,7 @@ def check_signal_interactions(browser) -> None:
     context.close()
 
 
-def check_micro_toggle_phone(browser) -> None:
+def check_micro_toggle_phone(browser, route: str) -> None:
     """Below 900px the camera view is a third microscope tab. Selecting it
     shows the camera stage and hides both microscope panels; switching back
     must not disturb the model readout; keyboard wrap includes the tab only
@@ -986,7 +990,7 @@ def check_micro_toggle_phone(browser) -> None:
     context = browser.new_context(viewport={"width": 375, "height": 812})
     page = context.new_page()
     block_media(page)
-    navigate(page, "/concept-03/")
+    navigate(page, route)
     page.locator("#signal-pressure").fill("60")
     page.wait_for_timeout(300)
     readout_before = page.locator("#contact-fraction").inner_text()
@@ -1072,6 +1076,7 @@ MAX_DISTINCT_FONT_SIZES = {
     # 6 since the own-sensor pass: 12/14/16 tokens, the form-card floor, and
     # the two heading clamps (measured at 375, 768, 1280 and 1920).
     "signal": 6,
+    "figure": 6,
 }
 
 CONTRAST_JS = r"""
@@ -1194,7 +1199,7 @@ def check_design_system(browser) -> None:
                 # the BibTeX <code> once ran to 583px in a 375px viewport and
                 # the page-level overflow number never saw it. Published page
                 # only: the review hub's comparison table scrolls by design.
-                poking = [] if route_name != "signal" else page.evaluate(
+                poking = [] if route_name not in {"signal", "figure"} else page.evaluate(
                     """() => [...document.querySelectorAll('body *')]
                         .filter(el => el.getBoundingClientRect().right > innerWidth + 1
                                       && getComputedStyle(el).display !== 'none'
@@ -1264,12 +1269,12 @@ def check_type_hierarchy(browser) -> None:
             page.close()
 
 
-def check_hero_actions(browser) -> None:
+def check_hero_actions(browser, route: str) -> None:
     """One live paper link, two pending actions that are not links, and none
     of the review-build chrome (concept badge, status strip) on the page."""
     page = browser.new_page(viewport=AUDIT_VIEWPORTS["phone"])
     block_media(page)
-    navigate(page, "/concept-03/")
+    navigate(page, route)
     info = page.evaluate(
         """() => ({
             paper: [...document.querySelectorAll('.hero-actions a')].map(a => a.getAttribute('href')),
@@ -1308,13 +1313,13 @@ def check_hero_actions(browser) -> None:
 PAGE_BUDGET_SCREENS = {"phone": 13.4, "laptop": 12.6}
 
 
-def check_page_budget(browser) -> None:
+def check_page_budget(browser, route: str) -> None:
     """The page fits its screen budget on a phone and a laptop."""
     for vp_name, limit in PAGE_BUDGET_SCREENS.items():
         vp = AUDIT_VIEWPORTS[vp_name]
         page = browser.new_page(viewport=vp)
         block_media(page)
-        navigate(page, "/concept-03/")
+        navigate(page, route)
         activate_reveals(page)
         page.wait_for_timeout(300)
         screens = page.evaluate("document.documentElement.scrollHeight") / vp["height"]
@@ -1325,11 +1330,11 @@ def check_page_budget(browser) -> None:
         page.close()
 
 
-def check_media_scaling(browser) -> None:
+def check_media_scaling(browser, route: str) -> None:
     """The mechanism animation must stay proportioned and crisp everywhere."""
     for vp_name, viewport in AUDIT_VIEWPORTS.items():
         page = browser.new_page(viewport=viewport, device_scale_factor=2)
-        navigate(page, ROUTES["signal"])
+        navigate(page, route)
         page.wait_for_timeout(300)
 
         box = page.locator("#micro-svg").bounding_box()
@@ -1358,7 +1363,7 @@ def check_media_scaling(browser) -> None:
         page.close()
 
 
-def check_coupling_readability(browser) -> None:
+def check_coupling_readability(browser, route: str) -> None:
     """The two views that state a coupled percentage must look like it.
 
     Both drifted from their own readouts: the 3D field rendered 90.9% amber
@@ -1368,7 +1373,7 @@ def check_coupling_readability(browser) -> None:
     """
     page = browser.new_page(viewport={"width": 1440, "height": 1000},
                             device_scale_factor=2)
-    navigate(page, ROUTES["signal"])
+    navigate(page, route)
 
     page.locator("#micro-tab-3d").click()
     page.wait_for_timeout(400)
@@ -1455,7 +1460,7 @@ def check_coupling_readability(browser) -> None:
     page.close()
 
 
-def check_hero_height(browser) -> None:
+def check_hero_height(browser, route: str) -> None:
     """A phone in desktop mode lays the page out at about 980px on a viewport
     over 2000px tall; 100svh stretched the hero to 2028px and floated the copy
     880px below the header (2026-09-27). The hero is capped."""
@@ -1463,7 +1468,7 @@ def check_hero_height(browser) -> None:
         context = browser.new_context(viewport={"width": width, "height": height})
         page = context.new_page()
         block_media(page)
-        navigate(page, "/concept-03/")
+        navigate(page, route)
         hero = page.evaluate(
             """() => ({
                 hero: Math.round(document.querySelector('.signal-hero').getBoundingClientRect().height),
@@ -1477,7 +1482,7 @@ def check_hero_height(browser) -> None:
             )
 
 
-def check_results_region(browser) -> None:
+def check_results_region(browser, route: str) -> None:
     """Freeze the defect classes the results region introduced.
 
     Each assertion targets a failure that actually occurred while building it,
@@ -1486,7 +1491,7 @@ def check_results_region(browser) -> None:
     clip selector that swaps the source but leaves the previous poster.
     """
     page = browser.new_page(viewport=VIEWPORTS["desktop"])
-    navigate(page, "/concept-03/")
+    navigate(page, route)
 
     results = json.loads(
         (DESIGN_ROOT / "data" / "results.json").read_text(encoding="utf-8")
@@ -1594,7 +1599,7 @@ def check_results_region(browser) -> None:
     #    ran 3573px there).
     phone = browser.new_page(viewport={"width": 375, "height": 812})
     block_media(phone)
-    navigate(phone, "/concept-03/")
+    navigate(phone, route)
     cols = phone.evaluate(
         "getComputedStyle(document.querySelector('.recon-gallery')).gridTemplateColumns.split(' ').length"
     )
@@ -1768,23 +1773,32 @@ def main() -> int:
         if MODE in {"all", "behavior"}:
             check_optical_interactions(browser)
             check_atlas_interactions(browser)
-            check_signal_interactions(browser)
-            check_micro_toggle_phone(browser)
-            check_probe_footprints(browser)
+            for route in SIGNAL_ROUTES:
+                check_signal_interactions(browser, route)
+            for route in SIGNAL_ROUTES:
+                check_micro_toggle_phone(browser, route)
+            for route in SIGNAL_ROUTES:
+                check_probe_footprints(browser, route)
             check_keyboard_focus(browser)
             check_reduced_motion(browser)
         if MODE in {"all", "design"}:
             check_design_system(browser)
-            check_media_scaling(browser)
-            check_hero_height(browser)
-            check_coupling_readability(browser)
-            check_results_region(browser)
+            for route in SIGNAL_ROUTES:
+                check_media_scaling(browser, route)
+            for route in SIGNAL_ROUTES:
+                check_hero_height(browser, route)
+            for route in SIGNAL_ROUTES:
+                check_coupling_readability(browser, route)
+            for route in SIGNAL_ROUTES:
+                check_results_region(browser, route)
             check_type_hierarchy(browser)
-            check_hero_actions(browser)
-            check_page_budget(browser)
+            for route in SIGNAL_ROUTES:
+                check_hero_actions(browser, route)
+            for route in SIGNAL_ROUTES:
+                check_page_budget(browser, route)
         browser.close()
     if MODE in {"all", "visual"}:
-        print(f"PASS: 4 routes × 2 viewports; screenshots: {OUTPUT}")
+        print(f"PASS: {len(ROUTES)} routes × 2 viewports; screenshots: {OUTPUT}")
     if MODE in {"all", "behavior"}:
         print("PASS: interactions, phone view toggle, keyboard focus, reduced motion, console, network")
     if MODE in {"all", "design"}:

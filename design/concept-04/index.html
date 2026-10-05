@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
     <meta
       name="description"
       content="GlowTact: a simple, compact vision-based tactile sensor for robot and humanoid fingertips. Single-color light, a nitrile membrane on microtextured gel, and the raw image carries the pressure signal. Paper, mechanism, results."
@@ -119,6 +120,9 @@
   ]
 }
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
     <link rel="stylesheet" href="./styles.css">
     <script src="./app.js" defer></script>
   </head>
@@ -128,8 +132,7 @@
     <header class="instrument-header">
       <a class="instrument-brand" href="#main" aria-label="GlowTact">
         <span class="status-lamp" aria-hidden="true"></span>
-        <strong>GLOWTACT</strong>
-        <span>OPTICAL TACTILE SENSOR</span>
+        <strong>GlowTact</strong>
       </a>
       <nav aria-label="Sections">
         <a href="#mechanism">Mechanism</a>
@@ -140,60 +143,62 @@
 
     <main id="main">
       <section class="signal-hero" aria-labelledby="signal-title">
-        <div class="hero-copy" data-reveal>
-          <h1 id="signal-title">Contact,<br>made visible.</h1>
-          <p class="hero-summary">
-            GlowTact turns pressure-induced optical coupling into a direct,
-            high-contrast tactile image using a microtextured clear gel,
-            a black membrane, and single-color illumination.
+        <div class="hero-copy">
+          <h1 id="signal-title">GlowTact</h1>
+          <p class="paper-title">
+            Simple and Compact Vision-Based Tactile Sensing with High
+            Sensitivity and Spatial Resolution
+          </p>
+          <p class="research-authors">
+            <a href="https://yuxiang-ma.github.io/" target="_blank" rel="noopener">Yuxiang Ma</a><sup>*</sup>, <a href="https://www.csail.mit.edu/person/megha-tippur" target="_blank" rel="noopener">Megha Tippur</a><sup>*</sup>,
+            Pengfei Ye, <a href="https://scholar.google.com/citations?user=6NX22usAAAAJ" target="_blank" rel="noopener">Sandra Q. Liu</a>, <a href="https://haonan16.github.io/" target="_blank" rel="noopener">Haonan Chen</a>,
+            Francis Richard Cottrell, <a href="https://www.csail.mit.edu/person/ted-adelson" target="_blank" rel="noopener">Edward Adelson</a>
+          </p>
+          <p class="research-affiliations">
+            Massachusetts Institute of Technology and Harvard University.
+            <sup>*</sup>Equal contribution.
           </p>
           <div class="hero-actions">
-            <a class="button button--primary" href="https://arxiv.org/abs/2609.32471" target="_blank" rel="noopener">
-              Paper
-              <span aria-hidden="true">↗</span>
-            </a>
+            <a class="button button--primary" href="https://arxiv.org/abs/2609.32471" target="_blank" rel="noopener">Paper</a>
             <a class="button button--quiet" href="../../GlowTact.pdf" target="_blank" rel="noopener">PDF</a>
             <span class="button button--pending" aria-disabled="true">
-              Code <small>coming soon</small>
+              Code <small>soon</small>
             </span>
             <span class="button button--pending" aria-disabled="true">
-              Hardware guide <small>coming soon</small>
+              Hardware guide <small>soon</small>
             </span>
           </div>
         </div>
 
-        <figure class="hero-figure" data-reveal>
-          <div class="hero-figure__frame">
-            <img
-              src="../assets/images/hero-teaser.jpg"
-              alt="Paper teaser showing robotic hands using black GlowTact fingertips to contact screws, with corresponding tactile camera images"
-            >
-            <span class="figure-corner figure-corner--top" aria-hidden="true"></span>
-            <span class="figure-corner figure-corner--bottom" aria-hidden="true"></span>
-          </div>
+        <figure class="hero-figure">
+          <img
+            src="../assets/images/hero-teaser.jpg"
+            width="2148"
+            height="1994"
+            alt="Paper teaser showing robotic hands using black GlowTact fingertips to contact screws, with corresponding tactile camera images"
+          >
+          <figcaption>
+            <span class="fig-no">Fig. 1</span>
+            Contact turns dark in the raw tactile image: GlowTact fingertips grasping a screw.
+          </figcaption>
         </figure>
       </section>
 
       <section class="mechanism" id="mechanism" aria-labelledby="mechanism-title">
-        <header class="section-header" data-reveal>
+        <header class="section-header">
           <div>
-            <h2 id="mechanism-title">How contact<br>becomes signal.</h2>
+            <h2 id="mechanism-title">How contact becomes signal</h2>
           </div>
           <p>
-            One pressure control drives the deformation, the air-gap closure, and the camera response.
+            Drag to press. The air gap closes, the membrane couples to the gel,
+            and the camera sees the contact darken.
           </p>
         </header>
 
-        <div class="mechanism-shell" data-reveal>
+        <div class="mechanism-shell">
           <header class="mechanism-toolbar">
-            <div class="toolbar-identity">
-              <span class="status-lamp" aria-hidden="true"></span>
-              <div>
-                <strong>COUPLING MONITOR</strong>
-              </div>
-            </div>
             <div class="toolbar-status">
-              <span>INTERFACE STATE</span>
+              <span>Interface state</span>
               <output id="toolbar-state">Local coupling</output>
             </div>
           </header>
@@ -204,7 +209,7 @@
                 <div>
                   <h3 id="macro-title">Membrane–gel interface</h3>
                 </div>
-                <span class="view-badge">SCHEMATIC</span>
+                <span class="view-badge">Schematic</span>
               </header>
 
               <div class="macro-stage">
@@ -469,7 +474,7 @@
               </div>
 
               <footer class="microscope-readout">
-                <span class="micro-window-label">COUPLED AREA IN ~100 µm</span>
+                <span class="micro-window-label">Coupled area in ~100 µm</span>
                 <output id="contact-fraction">24%</output>
     </footer>
             </article>
@@ -479,7 +484,7 @@
                 <div>
                   <h3 id="output-title">Camera response</h3>
                 </div>
-                <span class="view-badge">SIMULATED</span>
+                <span class="view-badge">Simulated</span>
               </header>
               <div class="camera-stage" aria-hidden="true">
                 <span class="camera-vignette"></span>
@@ -492,7 +497,7 @@
                 <span class="camera-reticle camera-reticle--y"></span>
               </div>
               <footer class="camera-readout">
-                <span>LOCAL INTENSITY</span>
+                <span>Local intensity</span>
                 <output id="camera-intensity">No signal</output>
               </footer>
             </article>
@@ -500,7 +505,6 @@
 
           <div class="mechanism-console">
             <div class="sequence-control">
-              <span>SEQUENCE</span>
               <button id="play-sequence" type="button" aria-pressed="false">
                 <span class="play-icon" aria-hidden="true"></span>
                 <span id="play-label">Run once</span>
@@ -509,7 +513,7 @@
 
             <div class="pressure-control">
               <label for="signal-pressure">
-                <span>INDENTATION</span>
+                <span>Indentation</span>
                 <output id="pressure-percent" for="signal-pressure">0%</output>
               </label>
               <input
@@ -524,21 +528,17 @@
 
             <ol class="state-rail" aria-label="Coupling states">
               <li data-state="gap" class="is-active" aria-current="step">
-                <span>00</span>
                 <strong>Air gap</strong>
               </li>
               <li data-state="local">
-                <span>01</span>
                 <strong>Local coupling</strong>
               </li>
               <li data-state="expanded">
-                <span>02</span>
                 <strong>Expanded coupling</strong>
               </li>
             </ol>
 
             <div class="state-explanation" aria-live="polite">
-              <span id="state-index">STATE 00</span>
               <p id="state-copy">
                 An air gap still separates membrane and gel; the camera sees no
                 contact signal.
@@ -551,9 +551,9 @@
           </p>
         </div>
 
-        <div class="principles" data-reveal>
+        <div class="principles">
           <header class="module-header">
-            <h3 id="principles-title">Why simple.</h3>
+            <h3 id="principles-title">Why simple</h3>
           </header>
           <dl class="principles-list">
             <div>
@@ -577,16 +577,16 @@
       </section>
 
       <section class="forms" aria-labelledby="forms-title">
-        <header class="section-header" data-reveal>
+        <header class="section-header">
           <div>
-            <h2 id="forms-title">One principle.<br>Three bodies.</h2>
+            <h2 id="forms-title">One principle, three bodies</h2>
           </div>
           <p>
             The same pressure-induced coupling drives all three.
           </p>
         </header>
 
-        <div class="form-comparison" data-reveal>
+        <div class="form-comparison">
           <article>
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../assets/images/forms/flat-product.jpg"
@@ -627,22 +627,21 @@
       </section>
 
       <section class="results" id="results" aria-labelledby="results-title">
-        <header class="section-header results-header" data-reveal>
+        <header class="section-header results-header">
           <div>
-            <h2 id="results-title">What GlowTact measures.</h2>
+            <h2 id="results-title">What GlowTact measures</h2>
           </div>
         </header>
 
         <ol class="results-index" aria-label="Results index">
-          <li><a href="#sensitivity"><span>DAT / 01</span> Light touch</a></li>
-          <li><a href="#reconstruction"><span>DAT / 02</span> Geometry</a></li>
-          <li><a href="#shear"><span>DAT / 03</span> Shear</a></li>
+          <li><a href="#sensitivity">Light touch</a></li>
+          <li><a href="#reconstruction">Geometry</a></li>
+          <li><a href="#shear">Shear</a></li>
         </ol>
 
         <article class="result-module" id="sensitivity" aria-labelledby="sensitivity-title">
-          <header class="module-header" data-reveal>
-            <h3 id="sensitivity-title">It sees two millinewtons.</h3>
-            <p class="signal-label"><span>DAT / 01</span> Light touch</p>
+          <header class="module-header">
+            <h3 id="sensitivity-title">It sees two millinewtons</h3>
             <p class="module-claim">
               An M&amp;M at <strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g
               (<span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw at
@@ -652,7 +651,7 @@
             </p>
           </header>
 
-          <div class="passive-pair" data-reveal>
+          <div class="passive-pair">
             <figure class="evidence-figure evidence-figure--video">
               <video controls muted playsinline preload="none"
                      poster="../assets/images/mms-contact-poster.jpg"
@@ -661,7 +660,7 @@
                 Your browser does not support embedded video.
               </video>
               <figcaption>
-                <span>M&amp;M / 9.8 mN</span>
+                <span>M&amp;M, 9.8 mN.</span>
                 Resting under its own weight; tactile frame inset.
               </figcaption>
             </figure>
@@ -673,7 +672,7 @@
                 Your browser does not support embedded video.
               </video>
               <figcaption>
-                <span>M2×6 SCREW / 1.96 mN</span>
+                <span>M2×6 screw, 1.96 mN.</span>
                 The lightest object in the set.
               </figcaption>
             </figure>
@@ -686,7 +685,7 @@
                 Your browser does not support embedded video.
               </video>
               <figcaption>
-                <span>FINGERPRINT / 0.25 TO 3.0 N</span>
+                <span>Fingerprint, 0.25 to 3.0 N.</span>
                 Pressed harder in five steps; ridges legible throughout.
               </figcaption>
             </figure>
@@ -705,9 +704,8 @@
             id="reconstruction"
             aria-labelledby="reconstruction-title"
           >
-          <header class="module-header" data-reveal>
-            <h3 id="reconstruction-title">One dark image, turned in three dimensions.</h3>
-            <p class="signal-label"><span>DAT / 02</span> Geometry</p>
+          <header class="module-header">
+            <h3 id="reconstruction-title">One dark image, turned in three dimensions</h3>
             <p class="module-claim">
               Relief from a single frame&#8217;s darkening resolves M1 threads at
               <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong>&nbsp;mm pitch.
@@ -722,7 +720,7 @@
           </div>
 
           <div class="recon-gallery">
-            <figure class="recon-card" data-reveal>
+            <figure class="recon-card">
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -753,7 +751,7 @@
               </figcaption>
             </figure>
 
-            <figure class="recon-card" data-reveal>
+            <figure class="recon-card">
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -784,7 +782,7 @@
               </figcaption>
             </figure>
 
-            <figure class="recon-card" data-reveal>
+            <figure class="recon-card">
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -815,7 +813,7 @@
               </figcaption>
             </figure>
 
-            <figure class="recon-card" data-reveal>
+            <figure class="recon-card">
               <div class="recon-stage">
                 <video
                   class="recon-spin"
@@ -854,9 +852,8 @@
         </article>
 
         <article class="result-module" id="shear" aria-labelledby="shear-title">
-          <header class="module-header" data-reveal>
-            <h3 id="shear-title">It reads the sideways pull.</h3>
-            <p class="signal-label"><span>DAT / 03</span> Shear</p>
+          <header class="module-header">
+            <h3 id="shear-title">It reads the sideways pull</h3>
             <p class="module-claim">
               Marker-free shear from the gel&#8217;s own speckle, usable over
               <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the pad.
@@ -864,7 +861,7 @@
           </header>
 
           <div class="shear-layout">
-            <div class="shear-viewer" data-reveal>
+            <div class="shear-viewer">
               <div class="shear-tabs" role="tablist" aria-label="Shear tracking clips">
               <button type="button" role="tab" id="shear-tab-0"
                       aria-controls="shear-clip-0" aria-selected="true"
@@ -888,7 +885,7 @@
                     <img class="shear-object" loading="lazy" decoding="async"
                          src="../assets/images/shear/1_fingertip-object.jpg"
                          alt="A fingertip on the GlowTact pad">
-                    <span class="shear-clip-label">FINGERTIP / 6.1 S</span>
+                    <span class="shear-clip-label">Fingertip, 6.1 s</span>
                     <span class="shear-clip-note">Pressed and dragged across the pad</span>
                   </figcaption>
                 </figure>
@@ -903,7 +900,7 @@
                     <img class="shear-object" loading="lazy" decoding="async"
                          src="../assets/images/shear/2_coin-object.jpg"
                          alt="A CR2025 coin cell">
-                    <span class="shear-clip-label">COIN CELL / 8.9 S</span>
+                    <span class="shear-clip-label">Coin cell, 8.9 s</span>
                     <span class="shear-clip-note">The cell's edge loaded and slid</span>
                   </figcaption>
                 </figure>
@@ -918,7 +915,7 @@
                     <img class="shear-object" loading="lazy" decoding="async"
                          src="../assets/images/shear/4_phillips_head_screw_M5-object.jpg"
                          alt="An M5 Phillips-head screw, head up">
-                    <span class="shear-clip-label">M5 PHILLIPS HEAD / 13.6 S</span>
+                    <span class="shear-clip-label">M5 Phillips head, 13.6 s</span>
                     <span class="shear-clip-note">A cross recess under tangential load</span>
                   </figcaption>
                 </figure>
@@ -936,16 +933,16 @@
       </section>
 
       <section class="live" id="live" aria-labelledby="live-title">
-        <header class="section-header" data-reveal>
+        <header class="section-header">
           <div>
-            <h2 id="live-title">Straight from the camera.</h2>
+            <h2 id="live-title">Straight from the camera</h2>
           </div>
           <p>
             The raw feed on a tablet, no processing: a fingertip, then a coin through denim.
           </p>
         </header>
 
-        <div class="live-layout" data-reveal>
+        <div class="live-layout">
           <figure class="live-stage" id="live-stage">
             <video id="live-video" controls loop muted playsinline preload="none"
                    poster="../assets/images/live/live-stabilized-poster.jpg"
@@ -954,7 +951,7 @@
               Your browser does not support embedded video.
             </video>
             <figcaption>
-              <span>LOCKED VIEW / 27 S</span>
+              <span>Locked view, 27 s.</span>
               <span>The handheld camera is registered to the tablet frame by frame.</span>
             </figcaption>
           </figure>
@@ -962,21 +959,8 @@
       </section>
 
       <section class="research-console" id="research" aria-labelledby="research-title">
-        <div class="research-heading" data-reveal>
-          <h2 id="research-title">GlowTact</h2>
-          <p>
-            Simple and Compact Vision-Based Tactile Sensing with High
-            Sensitivity and Spatial Resolution
-          </p>
-          <p class="research-authors">
-            <a href="https://yuxiang-ma.github.io/" target="_blank" rel="noopener">Yuxiang Ma</a><sup>*</sup>, <a href="https://www.csail.mit.edu/person/megha-tippur" target="_blank" rel="noopener">Megha Tippur</a><sup>*</sup>,
-            Pengfei Ye, <a href="https://scholar.google.com/citations?user=6NX22usAAAAJ" target="_blank" rel="noopener">Sandra Q. Liu</a>, <a href="https://haonan16.github.io/" target="_blank" rel="noopener">Haonan Chen</a>,
-            Francis Richard Cottrell, <a href="https://www.csail.mit.edu/person/ted-adelson" target="_blank" rel="noopener">Edward Adelson</a>
-          </p>
-          <p class="research-affiliations">
-            Massachusetts Institute of Technology and Harvard University.
-            <sup>*</sup>Equal contribution.
-          </p>
+        <div class="research-heading">
+          <h2 id="research-title">Paper and citation</h2>
           <p class="research-links">
             <a href="https://arxiv.org/abs/2609.32471" target="_blank" rel="noopener">arXiv:2609.32471</a>
             <a href="../../GlowTact.pdf" target="_blank" rel="noopener">PDF</a>
@@ -993,7 +977,7 @@
             geometry, including M1 screw threads.
           </p>
         </div>
-        <div class="research-meta" data-reveal>
+        <div class="research-meta">
           <pre><code>@article{ma2026glowtact,
   title   = {GlowTact: Simple and Compact Vision-Based
              Tactile Sensing with High Sensitivity and Spatial Resolution},
@@ -1007,7 +991,7 @@
     </main>
 
     <footer class="instrument-footer">
-      <p><span class="status-lamp" aria-hidden="true"></span> GLOWTACT</p>
+      <p>GlowTact</p>
       <span class="build-stamp" aria-hidden="true">2026-10-05 · 33a48cc</span>
     </footer>
   </body>

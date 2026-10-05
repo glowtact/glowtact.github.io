@@ -18,6 +18,7 @@ Run after `stamp.py` so the published page carries the same build stamp:
 """
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import sys
@@ -26,31 +27,37 @@ from html.parser import HTMLParser
 ROOT = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 )
-SOURCE = os.path.join("design", "concept-03", "index.html")
-TARGET = "index.html"
-SOURCE_DIR = os.path.dirname(SOURCE).replace(os.sep, "/")
+# The default publishes concept-03 to the root. The light variant goes to a
+# subsite with:  publish.py --source design/concept-04 --target v2/index.html
+DEFAULT_SOURCE_DIR = "design/concept-03"
+DEFAULT_TARGET = "index.html"
 
-BANNER = (
-    "<!--\n"
-    "  GENERATED FILE - DO NOT EDIT.\n"
-    f"  Produced from {SOURCE_DIR}/index.html by design/tools/publish.py.\n"
-    "  Edit the concept, then re-run the tool (or design/tools/release.py).\n"
-    "-->"
-)
 
-# Applied in order. The concept's own stylesheet and script are referenced
-# where they live; `../assets/` and `../` are re-pointed at `design/`.
-REWRITES = [
-    ('href="./styles.css"', f'href="./{SOURCE_DIR}/styles.css"'),
-    ('src="./app.js"', f'src="./{SOURCE_DIR}/app.js"'),
-    ('"../assets/', '"./design/assets/'),
-    ('href="../concept-02/"', 'href="./design/concept-02/"'),
-    # The local PDF lives at the repository root (public URL
-    # https://glowtact.github.io/GlowTact.pdf); the Paper links go to arXiv
-    # 2609.32471 and the research record links this copy.
-    ('href="../../GlowTact.pdf"', 'href="./GlowTact.pdf"'),
-    ('href="../"', 'href="./"'),
-]
+def banner(source_dir: str) -> str:
+    return (
+        "<!--\n"
+        "  GENERATED FILE - DO NOT EDIT.\n"
+        f"  Produced from {source_dir}/index.html by design/tools/publish.py.\n"
+        "  Edit the concept, then re-run the tool (or design/tools/release.py).\n"
+        "-->"
+    )
+
+
+def rewrites(source_dir: str, prefix: str) -> list[tuple[str, str]]:
+    """Applied in order. The concept's own stylesheet and script are referenced
+    where they live; `../assets/` and `../` are re-pointed at `design/`.
+    `prefix` leads from the target's directory to the repository root."""
+    return [
+        ('href="./styles.css"', f'href="{prefix}{source_dir}/styles.css"'),
+        ('src="./app.js"', f'src="{prefix}{source_dir}/app.js"'),
+        ('"../assets/', f'"{prefix}design/assets/'),
+        ('href="../concept-02/"', f'href="{prefix}design/concept-02/"'),
+        # The local PDF lives at the repository root (public URL
+        # https://glowtact.github.io/GlowTact.pdf); the Paper links go to arXiv
+        # 2609.32471 and the research record links this copy.
+        ('href="../../GlowTact.pdf"', f'href="{prefix}GlowTact.pdf"'),
+        ('href="../"', f'href="{prefix}"'),
+    ]
 
 
 class RefCollector(HTMLParser):
@@ -73,7 +80,7 @@ class RefCollector(HTMLParser):
             self.refs.append(value.split("?", 1)[0].split("#", 1)[0])
 
 
-def check_runtime_paths() -> list[str]:
+def check_runtime_paths(source_dir: str) -> list[str]:
     """Reject asset paths built at runtime by the concept's script.
 
     The rewrites below are textual, so they can only fix references that
@@ -83,9 +90,9 @@ def check_runtime_paths() -> list[str]:
     locally, where the concept route is the one being served, and shows up
     only on the published site, only after an interaction.
     """
-    script = os.path.join(ROOT, SOURCE_DIR, "app.js")
+    script = os.path.join(ROOT, source_dir, "app.js")
     if not os.path.exists(script):
-        return [f"cannot audit runtime paths: {SOURCE_DIR}/app.js is missing"]
+        return [f"cannot audit runtime paths: {source_dir}/app.js is missing"]
     text = open(script, encoding="utf-8").read()
     # Strip comments first: prose about this very rule would otherwise match.
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
@@ -98,50 +105,71 @@ def check_runtime_paths() -> list[str]:
     ]
 
 
-def check(html: str) -> list[str]:
-    errors = []
-    if "../" in html:
-        for match in set(re.findall(r'["\'](\.\./[^"\']*)', html)):
-            errors.append(f"unrewritten parent reference: {match}")
+def check(html: str, target: str) -> list[str]:
+    """Resolve every local reference from the target's own directory.
 
+    A reference left in its concept-relative form either escapes the site or
+    lands on a missing file, so this also catches an unrewritten `../`.
+    """
+    errors = []
+    target_dir = os.path.dirname(target)
     collector = RefCollector()
     collector.feed(html)
     for ref in collector.refs:
-        relative = ref.lstrip("./")
-        if ref.endswith("/"):
-            relative = f"{relative}index.html"
-        # The root page links to itself; it is about to be written.
-        if relative == TARGET:
+        relative = os.path.normpath(os.path.join(target_dir, ref))
+        if ref.endswith("/") or ref in {".", ".."}:
+            relative = os.path.join(relative, "index.html")
+        # A page may link to itself; it is about to be written.
+        if os.path.normpath(relative) == os.path.normpath(target):
             continue
-        if not os.path.exists(os.path.join(ROOT, relative.replace("/", os.sep))):
+        if relative.startswith(".."):
+            errors.append(f"reference escapes the site: {ref}")
+        elif not os.path.exists(os.path.join(ROOT, relative)):
             errors.append(f"broken reference: {ref}")
     return errors
 
 
-def main() -> None:
-    source = os.path.join(ROOT, SOURCE)
+def publish(source_dir: str, target: str) -> None:
+    source_dir = source_dir.strip("/").replace(os.sep, "/")
+    target = target.replace(os.sep, "/")
+    depth = target.count("/")
+    prefix = "../" * depth if depth else "./"
+
+    source = os.path.join(ROOT, source_dir, "index.html")
     html = open(source, encoding="utf-8").read()
 
-    for old, new in REWRITES:
+    for old, new in rewrites(source_dir, prefix):
         html = html.replace(old, new)
-    html = html.replace("<!doctype html>", f"<!doctype html>\n{BANNER}", 1)
+    html = html.replace("<!doctype html>", f"<!doctype html>\n{banner(source_dir)}", 1)
 
-    errors = check(html) + check_runtime_paths()
+    errors = check(html, target) + check_runtime_paths(source_dir)
     if errors:
         for error in errors:
             print(f"publish: {error}", file=sys.stderr)
-        raise SystemExit("publish aborted: generated root would be broken")
+        raise SystemExit(f"publish aborted: generated {target} would be broken")
 
-    target = os.path.join(ROOT, TARGET)
+    path = os.path.join(ROOT, target)
     previous = ""
-    if os.path.exists(target):
-        previous = open(target, encoding="utf-8").read()
+    if os.path.exists(path):
+        previous = open(path, encoding="utf-8").read()
     if previous == html:
-        print(f"{TARGET}: unchanged")
+        print(f"{target}: unchanged")
         return
 
-    open(target, "w", encoding="utf-8").write(html)
-    print(f"{TARGET}: published from {SOURCE_DIR}/index.html")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(html)
+    print(f"{target}: published from {source_dir}/index.html")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Publish a concept to a site path.")
+    parser.add_argument("--source", default=DEFAULT_SOURCE_DIR,
+                        help="concept directory (default: %(default)s)")
+    parser.add_argument("--target", default=DEFAULT_TARGET,
+                        help="output path from the repository root (default: %(default)s)")
+    args = parser.parse_args()
+    publish(args.source, args.target)
 
 
 if __name__ == "__main__":

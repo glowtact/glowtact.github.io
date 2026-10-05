@@ -19,7 +19,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "design" / "data" / "results.json"
-ROUTES = [ROOT / "design" / "concept-03" / "index.html"]
+ROUTES = [
+    ROOT / "design" / "concept-03" / "index.html",
+    ROOT / "design" / "concept-04" / "index.html",
+]
 NUMERIC = re.compile(r"-?\d+(?:\.\d+)?")
 
 
