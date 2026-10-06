@@ -179,7 +179,7 @@
           >
           <figcaption>
             <span class="fig-no">Fig. 1</span>
-            Contact turns dark in the raw tactile image: GlowTact fingertips grasping a screw.
+            GlowTact fingertips grasping a screw. Where they touch it, the raw tactile image turns dark.
           </figcaption>
         </figure>
       </section>
@@ -187,11 +187,11 @@
       <section class="mechanism" id="mechanism" aria-labelledby="mechanism-title">
         <header class="section-header">
           <div>
-            <h2 id="mechanism-title">How contact becomes signal</h2>
+            <h2 id="mechanism-title">How it works</h2>
           </div>
           <p>
-            Move the slider to press. The air gap closes, the membrane couples
-            to the gel, and the camera sees the contact darken.
+            Move the slider to press. As the air gap closes, the membrane couples
+            to the gel and the contact turns dark in the camera image.
           </p>
         </header>
 
@@ -531,30 +531,30 @@
           </div>
 
           <p class="instrument-disclosure" id="instrument-disclosure">
-            Qualitative model of the reported P2500 texture and coupling mechanism. Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.
+            A qualitative model of the P2500 texture and the coupling mechanism reported in the paper. Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.
           </p>
         </div>
 
         <div class="principles">
           <header class="module-header">
-            <h3 id="principles-title">Why simple</h3>
+            <h3 id="principles-title">Why it&#8217;s simple</h3>
           </header>
           <dl class="principles-list">
             <div>
               <dt>Single-color light</dt>
-              <dd>One LED, no RGB channels.</dd>
+              <dd>One LED color, no RGB channels.</dd>
             </div>
             <div>
               <dt>Monochrome camera</dt>
-              <dd>Greyscale sensor; no photometric stereo.</dd>
+              <dd>Greyscale images, no photometric stereo.</dd>
             </div>
             <div>
               <dt>No coatings</dt>
-              <dd>Gel and membrane alone; no markers, no calibration.</dd>
+              <dd>Just the gel and the membrane: no markers, no calibration.</dd>
             </div>
             <div>
               <dt>Durable membrane</dt>
-              <dd>Medical-grade nitrile; resists wear and chemicals.</dd>
+              <dd>Medical-grade nitrile, which resists wear and chemicals.</dd>
             </div>
           </dl>
         </div>
@@ -563,10 +563,10 @@
       <section class="forms" aria-labelledby="forms-title">
         <header class="section-header">
           <div>
-            <h2 id="forms-title">One principle, three bodies</h2>
+            <h2 id="forms-title">Three form factors</h2>
           </div>
           <p>
-            The same pressure-induced coupling drives all three.
+            All three use the same pressure-induced coupling.
           </p>
         </header>
 
@@ -645,8 +645,8 @@
                   An M&amp;M (<strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g,
                   <span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw
                   (<strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g,
-                  <span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN), each resting
-                  under its own weight.
+                  <span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN), set on the
+                  pad with no added load.
                 </dd>
               </div>
               <div>
@@ -670,7 +670,7 @@
               </video>
               <figcaption>
                 <span>M&amp;M, 9.8 mN.</span>
-                Resting under its own weight; tactile frame inset.
+                The inset at lower right is the tactile frame.
               </figcaption>
             </figure>
             <figure class="evidence-figure evidence-figure--video">
@@ -695,13 +695,14 @@
               </video>
               <figcaption>
                 <span>Fingerprint, 0.25 to 3 N nominal.</span>
-                Pressed harder in five steps; ridges legible throughout.
+                Five steps of rising pressure; the ridges stay legible at each one.
               </figcaption>
             </figure>
           </div>
 
           <p class="module-scope">
-            Placement shows what the raw frame can see; the threshold comes from controlled probing.
+            The placed objects show what the raw frame picks up. The threshold comes from
+            controlled probing.
           </p>
         </article>
 
@@ -711,10 +712,10 @@
             aria-labelledby="reconstruction-title"
           >
           <header class="module-header">
-            <h3 id="reconstruction-title">One dark image, turned in three dimensions</h3>
+            <h3 id="reconstruction-title">Fine contact geometry down to M1 threads</h3>
             <p class="module-claim">
-              Relief from a single frame&#8217;s darkening resolves M1 threads at
-              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong>&nbsp;mm pitch.
+              The relief, computed from the darkening, resolves the
+              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong>&nbsp;mm thread pitch.
             </p>
           </header>
 
@@ -853,15 +854,15 @@
           </div>
 
           <p class="module-scope" id="reconstruction-disclosure">
-            Relief recovered from a single tactile frame.
+            Each relief comes from a single tactile frame.
           </p>
         </article>
 
         <article class="result-module" id="shear" aria-labelledby="shear-title">
           <header class="module-header">
-            <h3 id="shear-title">It reads the sideways pull</h3>
+            <h3 id="shear-title">Shear from the gel&#8217;s own speckle</h3>
             <p class="module-claim">
-              Marker-free shear from the gel&#8217;s own speckle, usable over
+              The tracked field is usable over
               <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the pad.
             </p>
           </header>
@@ -907,7 +908,7 @@
                          src="../assets/images/shear/2_coin-object.jpg"
                          alt="A CR2025 coin cell">
                     <span class="shear-clip-label">Coin cell, 8.9 s</span>
-                    <span class="shear-clip-note">The cell's edge loaded and slid</span>
+                    <span class="shear-clip-note">Its edge pressed in, then slid</span>
                   </figcaption>
                 </figure>
                 <figure class="shear-stage" id="shear-clip-2" role="tabpanel" aria-labelledby="shear-tab-2">
@@ -922,18 +923,18 @@
                          src="../assets/images/shear/4_phillips_head_screw_M5-object.jpg"
                          alt="An M5 Phillips-head screw, head up">
                     <span class="shear-clip-label">M5 Phillips head, 13.6 s</span>
-                    <span class="shear-clip-note">A cross recess under tangential load</span>
+                    <span class="shear-clip-note">The cross recess under a sideways load</span>
                   </figcaption>
                 </figure>
               </div>
               <p class="shear-legend">
-                Readouts per frame: slide, twist, spread, slip; the red outline is the contact.
+                Each frame reports slide, twist, spread and slip. The red outline marks the contact.
               </p>
             </div>
           </div>
 
           <p class="module-scope">
-            Marker-free: the field comes from the gel&#8217;s own speckle, with no printed marker layer.
+            No marker layer is printed on the gel.
           </p>
         </article>
       </section>
@@ -944,7 +945,7 @@
             <h2 id="live-title">Straight from the camera</h2>
           </div>
           <p>
-            The raw feed on a tablet, no processing: a fingertip, then a coin through denim.
+            The unprocessed feed, shown on a tablet: a fingertip, then a coin pressed through denim.
           </p>
         </header>
 
@@ -957,8 +958,8 @@
               Your browser does not support embedded video.
             </video>
             <figcaption>
-              <span>Locked view, 27 s.</span>
-              <span>The handheld camera is registered to the tablet frame by frame.</span>
+              <span>Stabilized view, 27 s.</span>
+              <span>We track the tablet in every frame, so the screen holds still.</span>
             </figcaption>
           </figure>
         </div>
@@ -1000,7 +1001,7 @@
 
     <footer class="instrument-footer">
       <p>GlowTact</p>
-      <span class="build-stamp" aria-hidden="true">2026-10-06 · eae3dd4</span>
+      <span class="build-stamp" aria-hidden="true">2026-10-06 · 1bca8ec</span>
     </footer>
   </body>
 </html>
