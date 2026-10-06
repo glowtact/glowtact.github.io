@@ -312,6 +312,15 @@ After the first critique (2026-10-06, 23/36), frozen in
   names wrap instead of truncating, exploded views open full size, and
   BibTeX has a copy action.
 
+Author's edits, 2026-10-06:
+
+- The sensors are named Flat sensor, Omnidirectional fingertip and
+  Humanoid fingertip (the names in `design/CONTENT.md`); "the pad" is gone
+  from the page. The cards carry the photographs and the name only.
+- No disclosure paragraph under the demo. Its panels stay labelled
+  "Schematic" and "Simulated", and `verify.py` checks those labels on
+  this page (`SCIENTIFIC_CONSTRAINTS.md`, Exception).
+
 The `## Don't` list applies here too, except that this register has no
 tracked caps.
 

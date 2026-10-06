@@ -18,6 +18,15 @@ DISCLOSURE = (
     "Conceptual visualization. Geometry and optical paths are schematic and "
     "are not a calibrated mechanical or ray-tracing simulation."
 )
+# /v2/ dropped the disclosure paragraph at the author's request (2026-10-06).
+# Its demo panels carry the labels instead, so the page still says the views
+# are schematic and simulated. Every other concept keeps the full sentence.
+PANEL_LABELS_INSTEAD = {
+    "concept-04": (
+        '<span class="view-badge">Schematic</span>',
+        '<span class="view-badge">Simulated</span>',
+    ),
+}
 PROHIBITED = (
     "revolutionary",
     "pixel-wise pressure",
@@ -61,7 +70,12 @@ def audit(route: Path) -> list[str]:
     if parser.h1_count != 1:
         errors.append(f"expected one h1, found {parser.h1_count}")
     if route.name == "index.html" and route.parent.name.startswith("concept-"):
-        if DISCLOSURE not in text:
+        labels = PANEL_LABELS_INSTEAD.get(route.parent.name)
+        if labels:
+            missing = [label for label in labels if label not in text]
+            if missing:
+                errors.append(f"demo panels must stay labelled schematic and simulated: {missing}")
+        elif DISCLOSURE not in text:
             errors.append("missing conceptual visualization disclosure")
     lowered = text.lower()
     for phrase in PROHIBITED:

@@ -512,7 +512,6 @@
                 min="0"
                 max="100"
                 value="0"
-                aria-describedby="instrument-disclosure"
               >
             </div>
 
@@ -530,9 +529,6 @@
             <output id="toolbar-state" class="visually-hidden" for="signal-pressure">Air gap</output>
           </div>
 
-          <p class="instrument-disclosure" id="instrument-disclosure">
-            A qualitative model of the P2500 texture and the coupling mechanism reported in the paper. Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.
-          </p>
         </div>
 
         <div class="principles">
@@ -574,33 +570,31 @@
           <article>
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../assets/images/forms/flat-product.jpg"
-                 alt="The flat GlowTact pad: a black square sensor with a flex cable and two wires">
+                 alt="The flat sensor: a black square body with a flex cable and two wires">
             <a class="form-zoom" href="../assets/images/forms/flat-exploded.jpg" target="_blank" rel="noopener">
               <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                    src="../assets/images/forms/flat-exploded.jpg"
-                   alt="Exploded view of the flat GlowTact build: nitrile membrane, textured silicone, gel holder, strip LED, acrylic, shell, camera holder and camera">
+                   alt="Exploded view of the flat sensor: nitrile membrane, textured silicone, gel holder, strip LED, acrylic, shell, camera holder and camera">
               <span class="visually-hidden">, full size (opens in a new tab)</span>
               <svg class="form-zoom-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"></path></svg>
             </a>
             <div>
-              <h3>Flat pad</h3>
-              <p>Nitrile membrane over textured silicone; strip LED around the acrylic.</p>
+              <h3>Flat sensor</h3>
             </div>
           </article>
           <article>
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../assets/images/forms/tip-product-scaled.jpg"
-                 alt="The fingertip GlowTact: a black rounded dome on a short housing with a flex cable">
+                 alt="The omnidirectional fingertip: a black rounded dome on a short housing with a flex cable">
             <a class="form-zoom" href="../assets/images/forms/tip-exploded.jpg" target="_blank" rel="noopener">
               <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                    src="../assets/images/forms/tip-exploded.jpg"
-                   alt="Exploded view of the domed fingertip build: nitrile membrane, textured silicone, epoxy skeleton, LED ring, camera and sensor holder">
+                   alt="Exploded view of the omnidirectional fingertip: nitrile membrane, textured silicone, epoxy skeleton, LED ring, camera and sensor holder">
               <span class="visually-hidden">, full size (opens in a new tab)</span>
               <svg class="form-zoom-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"></path></svg>
             </a>
             <div>
-              <h3>Fingertip</h3>
-              <p>Textured silicone over a clear epoxy skeleton with an LED ring.</p>
+              <h3>Omnidirectional fingertip</h3>
             </div>
           </article>
           <article>
@@ -615,8 +609,7 @@
               <svg class="form-zoom-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"></path></svg>
             </a>
             <div>
-              <h3>Humanoid finger</h3>
-              <p>About 17 mm wide with front-facing tactile coverage.</p>
+              <h3>Humanoid fingertip</h3>
             </div>
           </article>
         </div>
@@ -646,7 +639,7 @@
                   <span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw
                   (<strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g,
                   <span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN), set on the
-                  pad with no added load.
+                  flat sensor with no added load.
                 </dd>
               </div>
               <div>
@@ -664,7 +657,7 @@
             <figure class="evidence-figure evidence-figure--video">
               <video controls loop muted playsinline preload="none"
                      poster="../assets/images/mms-contact-poster.jpg"
-                     aria-label="An M and M resting on the GlowTact pad under its own weight, with the tactile image inset">
+                     aria-label="An M and M resting on the flat sensor under its own weight, with the tactile image inset">
                 <source src="../assets/video/mms-contact-720.mp4" type="video/mp4">
                 Your browser does not support embedded video.
               </video>
@@ -676,7 +669,7 @@
             <figure class="evidence-figure evidence-figure--video">
               <video controls loop muted playsinline preload="none"
                      poster="../assets/images/sensitivity/screw-m2-poster.jpg"
-                     aria-label="An M2 screw resting on the GlowTact pad under its own weight, with the tactile image inset">
+                     aria-label="An M2 screw resting on the flat sensor under its own weight, with the tactile image inset">
                 <source src="../assets/video/sensitivity/screw-m2.mp4" type="video/mp4">
                 Your browser does not support embedded video.
               </video>
@@ -863,7 +856,7 @@
             <h3 id="shear-title">Shear from the gel&#8217;s own speckle</h3>
             <p class="module-claim">
               The tracked field is usable over
-              <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the pad.
+              <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the sensing surface.
             </p>
           </header>
 
@@ -884,16 +877,16 @@
                 <figure class="shear-stage is-active" id="shear-clip-0" role="tabpanel" aria-labelledby="shear-tab-0">
                   <video controls loop muted playsinline preload="none"
                          poster="../assets/images/shear/1_fingertip-poster.jpg"
-                         aria-label="Marker-free shear field for a fingertip pressed and dragged across the pad">
+                         aria-label="Marker-free shear field for a fingertip pressed and dragged across the flat sensor">
                     <source src="../assets/video/shear/1_fingertip.mp4" type="video/mp4">
                     Your browser does not support embedded video.
                   </video>
                   <figcaption>
                     <img class="shear-object" loading="lazy" decoding="async"
                          src="../assets/images/shear/1_fingertip-object.jpg"
-                         alt="A fingertip on the GlowTact pad">
+                         alt="A fingertip on the flat sensor">
                     <span class="shear-clip-label">Fingertip, 6.1 s</span>
-                    <span class="shear-clip-note">Pressed and dragged across the pad</span>
+                    <span class="shear-clip-note">Pressed and dragged across the sensor</span>
                   </figcaption>
                 </figure>
                 <figure class="shear-stage" id="shear-clip-1" role="tabpanel" aria-labelledby="shear-tab-1">
@@ -1001,7 +994,7 @@
 
     <footer class="instrument-footer">
       <p>GlowTact</p>
-      <span class="build-stamp" aria-hidden="true">2026-10-06 · 1bca8ec</span>
+      <span class="build-stamp" aria-hidden="true">2026-10-06 · e123503</span>
     </footer>
   </body>
 </html>

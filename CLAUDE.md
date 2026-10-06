@@ -96,7 +96,8 @@ PARAMS.md and run the design-mode check.
 
 `design/SCIENTIFIC_CONSTRAINTS.md` is normative: the mechanism is pressure-induced optical coupling with
 single-colour non-directional light (not RGB photometric stereo); the interactive demo is conceptual and must
-carry the exact disclosure sentence that `verify.py` checks for; passive-object demos are not calibrated
+carry the exact disclosure sentence that `verify.py` checks for (on `/v2/`, by the author's decision of 2026-10-06,
+the "Schematic" and "Simulated" panel labels stand in for it and are what `verify.py` checks there); passive-object demos are not calibrated
 minimum-force measurements; GelSight Mini is a representative baseline, never "cannot detect contact".
 `verify.py` also rejects a `PROHIBITED` phrase list.
 
