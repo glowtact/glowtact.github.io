@@ -265,9 +265,9 @@ figure-page register, served at `https://glowtact.github.io/v2/` by
 stays concept-03. Added 2026-10-05 at the author's request: "the website
 feels crowded … improve the layout, color, especially the text."
 
-- Same markup, script and numbers as concept-03 (every `data-metric`,
-  the model, the clips); every page-level check in `browser_check.py`
-  runs on both routes.
+- Same model and `data-metric` sources as concept-03; every page-level
+  check in `browser_check.py` runs on both routes. The copy, the controls
+  and one clip encode below diverge on purpose.
 - Paper ground `#ffffff`, band `#f6f6f3`, ink `#171717`, secondary
   `#3d4044` / `#5f6368`, hairlines `rgba(23,23,23,.07-.12)`. Amber is
   `#e9a000` as a fill and `#8a5a00` as text (AA on paper). The mechanism
@@ -281,6 +281,36 @@ feels crowded … improve the layout, color, especially the text."
 - The paper header (title, seven authors, affiliations, actions) leads the
   hero beside the teaser, as on a paper's project page.
 - `noindex`, canonical to the root: one indexed page.
+
+After the first critique (2026-10-06, 23/36), frozen in
+`check_figure_round1`:
+
+- Light touch leads with the placement demonstration ("A 0.2 g screw shows
+  under its own weight"), and the controlled threshold sits beside it as a
+  labelled claim. The claims are in mN; 0.12 N shows as 120 mN through
+  `data-metric-scale="1000"`, and `audit_metrics.py` checks the printed
+  unit. The fingerprint caption stays "0.25 to 3 N nominal": "3000 mN"
+  would claim a precision the nominal steps do not have.
+  `SCIENTIFIC_CONSTRAINTS.md`: passive placement is never a force floor.
+- Evidence clips (light touch, shear) play muted while in view, never
+  under reduced motion or Data Saver, and keep `preload="none"`. A pause
+  the reader makes sticks until they play the clip again. The native
+  control bar stays off the frame until hover, focus or touch, because it
+  covered the tactile inset. The M&M clip ships as a 720p re-encode
+  (10.1 MB -> 0.75 MB, CRF 20).
+- The coupling states are buttons that set the slider (0 / 40 / 80 %),
+  carry `aria-current`, wrap rather than spill at any width, and have no
+  dead zone on their dot. The visible state appears once; a hidden live
+  `<output id="toolbar-state">` names it for screen readers. The legend
+  draws ray, gap and coupling as different marks (arrowed line, dashed
+  line, thick seam), not only different colours.
+- No zero-offset coloured glow on the interface or the coupling seam,
+  `filter: drop-shadow` included: in this mechanism coupling is darkening,
+  not emitted light. The LEDs keep their soft light, which is what they
+  are.
+- Phones keep the three-link nav, the shear tabs sit in one row, state
+  names wrap instead of truncating, exploded views open full size, and
+  BibTeX has a copy action.
 
 The `## Don't` list applies here too, except that this register has no
 tracked caps.

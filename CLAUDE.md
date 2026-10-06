@@ -76,6 +76,9 @@ Every scientific number shown on the page is marked `data-metric="dotted.path"` 
 that path in `design/data/results.json` (values transcribed from the paper). Numbers a script reads from the
 page live in `<script type="application/json" id="...">` blocks, which `audit_metrics.py` also walks. Editing a
 number in only one place fails `verify.py`. Add new claims to `results.json` first, then mark them in the markup.
+A number shown in another unit carries `data-metric-scale` (0.12 N shown as 120 mN uses `1000`); the gate
+checks the page against the value times that factor, and checks that the unit printed after every number is the
+data's unit, re-prefixed by the scale (so "0.12 mN" with the scale forgotten fails).
 
 `design/data/snr-curves.json` is digitized from the paper's Fig. 10b by `design/tools/digitize_snr.py`
 (the raw SNR data does not exist; the site says so). It needs `materials/figures/SNR.png`, which is untracked.

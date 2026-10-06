@@ -1538,7 +1538,7 @@ function render(value) {
 
   if (pressureInput) pressureInput.value = String(percent);
   if (pressurePercent) pressurePercent.value = `${percent}%`;
-  if (toolbarState) toolbarState.value = state.title;
+  if (toolbarState && toolbarState.value !== state.title) toolbarState.value = state.title;
   if (stateIndex) stateIndex.textContent = state.index;
   if (stateCopy) stateCopy.textContent = state.copy;
   if (contactFraction) contactFraction.value = `${Math.round(ratio * 100)}%`;
@@ -1553,8 +1553,9 @@ function render(value) {
   stateItems.forEach((item) => {
     const isActive = item.dataset.state === state.key;
     item.classList.toggle("is-active", isActive);
-    if (isActive) item.setAttribute("aria-current", "step");
-    else item.removeAttribute("aria-current");
+    const control = item.querySelector("button") ?? item;
+    if (isActive) control.setAttribute("aria-current", "step");
+    else control.removeAttribute("aria-current");
   });
 
   renderMacro(pressure, contactModel);
@@ -1792,7 +1793,6 @@ function initShearTabs() {
       other.setAttribute("aria-selected", String(active));
       other.tabIndex = active ? 0 : -1;
       clips[index].classList.toggle("is-active", active);
-      if (!active) clips[index].querySelector("video")?.pause();
     });
   }
 
@@ -1815,3 +1815,150 @@ function initShearTabs() {
 }
 
 initShearTabs();
+
+/* ------------------------------------------------------------------ *
+ * State rail: each state is a button that sets the indentation to a
+ * point inside that state's range (model: air gap 0-26 %, local
+ * coupling 27-52 %, expanded 53-100 %), so the chips do what they look
+ * like they do.
+ * ------------------------------------------------------------------ */
+
+stateItems.forEach((item) => {
+  const button = item.querySelector("button[data-pressure]");
+  button?.addEventListener("click", () => {
+    stopPlayback();
+    render(Number(button.dataset.pressure) / 100);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Evidence clips (light touch, shear)
+ *
+ * Short muted loops that read as figures: each plays while it is on
+ * screen and pauses when it leaves, so the evidence shows without a
+ * click and nothing decodes unseen. Reduced motion holds every clip on
+ * its poster. The native control bar covered the tactile inset it was
+ * there to show, so it stays off the frame until hover, focus or touch;
+ * the clip is focusable so a keyboard can still reach the controls.
+ * ------------------------------------------------------------------ */
+
+const evidenceVideos = [...document.querySelectorAll("#sensitivity video, #shear video")];
+const evidenceVisible = new WeakSet();
+// A pause the reader made sticks until they play the clip again; pauses this
+// script makes (leaving view, reduced motion) are tagged so they never count.
+const pausedByReader = new WeakSet();
+const pausedByScript = new WeakSet();
+
+function evidenceMayPlay() {
+  return !reduceMotion.matches && !navigator.connection?.saveData;
+}
+
+function syncEvidenceVideo(video) {
+  if (evidenceMayPlay() && evidenceVisible.has(video) && !pausedByReader.has(video)) {
+    // preload="none" stays in the markup: play() is what fetches the clip.
+    const started = video.play();
+    if (started) started.catch(() => {});
+    return;
+  }
+  if (!video.paused) {
+    pausedByScript.add(video);
+    video.pause();
+  }
+}
+
+function initEvidenceVideos() {
+  evidenceVideos.forEach((video) => {
+    video.controls = false;
+    video.tabIndex = 0;
+    video.dataset.evidence = "in-view";
+    video.addEventListener("pointerenter", () => {
+      video.controls = true;
+    });
+    video.addEventListener("pointerleave", (event) => {
+      // A finger lifting also fires pointerleave; touch keeps the controls it asked for.
+      if (event.pointerType === "mouse" && document.activeElement !== video) {
+        video.controls = false;
+      }
+    });
+    video.addEventListener("focus", () => {
+      video.controls = true;
+    });
+    video.addEventListener("blur", () => {
+      if (!video.matches(":hover")) video.controls = false;
+    });
+    video.addEventListener("pause", () => {
+      // A hidden tab pauses media too; that is not the reader's choice.
+      if (pausedByScript.delete(video) || document.hidden) return;
+      pausedByReader.add(video);
+    });
+    video.addEventListener("play", () => {
+      pausedByReader.delete(video);
+    });
+  });
+
+  if (!("IntersectionObserver" in window)) {
+    evidenceVideos.forEach((video) => {
+      evidenceVisible.add(video);
+      syncEvidenceVideo(video);
+    });
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
+        // Engines differ on isIntersecting below the threshold; the ratio decides.
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
+          evidenceVisible.add(video);
+        } else {
+          evidenceVisible.delete(video);
+          if (document.activeElement !== video) video.controls = false;
+        }
+        syncEvidenceVideo(video);
+      });
+    },
+    { threshold: 0.35 }
+  );
+
+  evidenceVideos.forEach((video) => observer.observe(video));
+}
+
+reduceMotion.addEventListener("change", () => {
+  evidenceVideos.forEach(syncEvidenceVideo);
+});
+
+initEvidenceVideos();
+
+/* ------------------------------------------------------------------ *
+ * Copy BibTeX. Without clipboard access (an insecure origin, or a
+ * denied permission) the entry is selected instead, ready to copy.
+ * ------------------------------------------------------------------ */
+
+document.querySelectorAll("[data-copy-target]").forEach((button) => {
+  const label = button.textContent;
+  let resetTimer = 0;
+  button.addEventListener("click", async () => {
+    const source = document.getElementById(button.dataset.copyTarget);
+    if (!source) return;
+    const status = document.getElementById(button.dataset.copyStatus);
+    try {
+      await navigator.clipboard.writeText(source.textContent ?? "");
+      button.textContent = "Copied";
+      if (status) status.textContent = "BibTeX copied.";
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      button.textContent = "Selected; copy it now";
+      if (status) status.textContent = "BibTeX selected; copy it now.";
+    }
+    clearTimeout(resetTimer);
+    resetTimer = window.setTimeout(() => {
+      button.textContent = label;
+      if (status) status.textContent = "";
+    }, 2000);
+  });
+});

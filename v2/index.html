@@ -195,19 +195,12 @@
             <h2 id="mechanism-title">How contact becomes signal</h2>
           </div>
           <p>
-            Drag to press. The air gap closes, the membrane couples to the gel,
-            and the camera sees the contact darken.
+            Move the slider to press. The air gap closes, the membrane couples
+            to the gel, and the camera sees the contact darken.
           </p>
         </header>
 
         <div class="mechanism-shell">
-          <header class="mechanism-toolbar">
-            <div class="toolbar-status">
-              <span>Interface state</span>
-              <output id="toolbar-state">Local coupling</output>
-            </div>
-          </header>
-
           <div class="mechanism-grid">
             <article class="instrument-view macro-view" aria-labelledby="macro-title">
               <header class="view-header">
@@ -529,16 +522,17 @@
             </div>
 
             <ol class="state-rail" aria-label="Coupling states">
-              <li data-state="gap" class="is-active" aria-current="step">
-                <strong>Air gap</strong>
+              <li data-state="gap" class="is-active">
+                <button type="button" data-pressure="0" aria-current="step"><strong>Air gap</strong></button>
               </li>
               <li data-state="local">
-                <strong>Local coupling</strong>
+                <button type="button" data-pressure="40"><strong>Local coupling</strong></button>
               </li>
               <li data-state="expanded">
-                <strong>Expanded coupling</strong>
+                <button type="button" data-pressure="80"><strong>Expanded coupling</strong></button>
               </li>
             </ol>
+            <output id="toolbar-state" class="visually-hidden" for="signal-pressure">Air gap</output>
           </div>
 
           <p class="instrument-disclosure" id="instrument-disclosure">
@@ -586,9 +580,13 @@
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../design/assets/images/forms/flat-product.jpg"
                  alt="The flat GlowTact pad: a black square sensor with a flex cable and two wires">
-            <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
-                 src="../design/assets/images/forms/flat-exploded.jpg"
-                 alt="Exploded view of the flat GlowTact build: nitrile membrane, textured silicone, gel holder, strip LED, acrylic, shell, camera holder and camera">
+            <a class="form-zoom" href="../design/assets/images/forms/flat-exploded.jpg" target="_blank" rel="noopener">
+              <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
+                   src="../design/assets/images/forms/flat-exploded.jpg"
+                   alt="Exploded view of the flat GlowTact build: nitrile membrane, textured silicone, gel holder, strip LED, acrylic, shell, camera holder and camera">
+              <span class="visually-hidden">, full size (opens in a new tab)</span>
+              <svg class="form-zoom-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"></path></svg>
+            </a>
             <div>
               <h3>Flat pad</h3>
               <p>Nitrile membrane over textured silicone; strip LED around the acrylic.</p>
@@ -598,9 +596,13 @@
             <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
                  src="../design/assets/images/forms/tip-product-scaled.jpg"
                  alt="The fingertip GlowTact: a black rounded dome on a short housing with a flex cable">
-            <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
-                 src="../design/assets/images/forms/tip-exploded.jpg"
-                 alt="Exploded view of the domed fingertip build: nitrile membrane, textured silicone, epoxy skeleton, LED ring, camera and sensor holder">
+            <a class="form-zoom" href="../design/assets/images/forms/tip-exploded.jpg" target="_blank" rel="noopener">
+              <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
+                   src="../design/assets/images/forms/tip-exploded.jpg"
+                   alt="Exploded view of the domed fingertip build: nitrile membrane, textured silicone, epoxy skeleton, LED ring, camera and sensor holder">
+              <span class="visually-hidden">, full size (opens in a new tab)</span>
+              <svg class="form-zoom-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"></path></svg>
+            </a>
             <div>
               <h3>Fingertip</h3>
               <p>Textured silicone over a clear epoxy skeleton with an LED ring.</p>
@@ -610,9 +612,13 @@
             <img class="form-photo" loading="lazy" decoding="async"
                  src="../design/assets/images/forms/tips-in-hand.jpg"
                  alt="Two humanoid fingertip sensors held in a gloved hand, one with its gel exposed and one covered by the membrane">
-            <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
-                 src="../design/assets/images/forms/humanoid-exploded.jpg"
-                 alt="Exploded view of the humanoid fingertip: nitrile membrane, gel sensor, U-shaped LED strip, finger housing and wide-angle camera">
+            <a class="form-zoom" href="../design/assets/images/forms/humanoid-exploded.jpg" target="_blank" rel="noopener">
+              <img class="form-photo form-photo--plate" loading="lazy" decoding="async"
+                   src="../design/assets/images/forms/humanoid-exploded.jpg"
+                   alt="Exploded view of the humanoid fingertip: nitrile membrane, gel sensor, U-shaped LED strip, finger housing and wide-angle camera">
+              <span class="visually-hidden">, full size (opens in a new tab)</span>
+              <svg class="form-zoom-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"></path></svg>
+            </a>
             <div>
               <h3>Humanoid finger</h3>
               <p>About 17 mm wide with front-facing tactile coverage.</p>
@@ -636,22 +642,35 @@
 
         <article class="result-module" id="sensitivity" aria-labelledby="sensitivity-title">
           <header class="module-header">
-            <h3 id="sensitivity-title">It sees two millinewtons</h3>
-            <p class="module-claim">
-              An M&amp;M at <strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g
-              (<span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw at
-              <strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g
-              (<span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN) both show in the
-              raw frame under their own weight.
-            </p>
+            <h3 id="sensitivity-title">A <span data-metric="sensitivity.passive_m2_mass">0.2</span>&nbsp;g screw shows under its own weight</h3>
+            <dl class="module-claim sensitivity-claims">
+              <div>
+                <dt>Passive contact</dt>
+                <dd>
+                  An M&amp;M (<strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g,
+                  <span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw
+                  (<strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g,
+                  <span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN), each resting
+                  under its own weight.
+                </dd>
+              </div>
+              <div>
+                <dt>Controlled threshold</dt>
+                <dd>
+                  <strong data-metric="sensitivity.min_detectable_force_median_glowtact" data-metric-scale="1000">120</strong>&nbsp;mN
+                  median minimum detectable force at SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>,
+                  across <span data-metric="sensitivity.probe_count">10</span> probes.
+                </dd>
+              </div>
+            </dl>
           </header>
 
           <div class="passive-pair">
             <figure class="evidence-figure evidence-figure--video">
-              <video controls muted playsinline preload="none"
+              <video controls loop muted playsinline preload="none"
                      poster="../design/assets/images/mms-contact-poster.jpg"
                      aria-label="An M and M resting on the GlowTact pad under its own weight, with the tactile image inset">
-                <source src="../design/assets/video/mms-contact.mp4" type="video/mp4">
+                <source src="../design/assets/video/mms-contact-720.mp4" type="video/mp4">
                 Your browser does not support embedded video.
               </video>
               <figcaption>
@@ -660,7 +679,7 @@
               </figcaption>
             </figure>
             <figure class="evidence-figure evidence-figure--video">
-              <video controls muted playsinline preload="none"
+              <video controls loop muted playsinline preload="none"
                      poster="../design/assets/images/sensitivity/screw-m2-poster.jpg"
                      aria-label="An M2 screw resting on the GlowTact pad under its own weight, with the tactile image inset">
                 <source src="../design/assets/video/sensitivity/screw-m2.mp4" type="video/mp4">
@@ -675,22 +694,19 @@
               <video controls muted playsinline preload="none"
                      loop
                      poster="../design/assets/images/fingerprint-progression-poster.jpg"
-                     aria-label="A fingertip pressed progressively harder, from 0.25 N to 3.0 N, showing increasing contact darkness">
+                     aria-label="A fingertip pressed progressively harder, from a nominal 0.25 to 3 N, showing increasing contact darkness">
                 <source src="../design/assets/video/fingerprint-progression.mp4" type="video/mp4">
                 Your browser does not support embedded video.
               </video>
               <figcaption>
-                <span>Fingerprint, 0.25 to 3.0 N.</span>
+                <span>Fingerprint, 0.25 to 3 N nominal.</span>
                 Pressed harder in five steps; ridges legible throughout.
               </figcaption>
             </figure>
           </div>
 
           <p class="module-scope">
-            Controlled threshold test:
-            <span data-metric="sensitivity.min_detectable_force_median_glowtact">0.12</span>&nbsp;N median
-            minimum detectable force at SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>
-            across <span data-metric="sensitivity.probe_count">10</span> probes.
+            Placement shows what the raw frame can see; the threshold comes from controlled probing.
           </p>
         </article>
 
@@ -866,7 +882,7 @@
                       tabindex="-1">Coin cell</button>
               <button type="button" role="tab" id="shear-tab-2"
                       aria-controls="shear-clip-2" aria-selected="false"
-                      tabindex="-1">M5 Phillips head</button>
+                      tabindex="-1">M5 Phillips</button>
               </div>
               <div class="shear-clips">
                 <figure class="shear-stage is-active" id="shear-clip-0" role="tabpanel" aria-labelledby="shear-tab-0">
@@ -973,7 +989,7 @@
           </p>
         </div>
         <div class="research-meta">
-          <pre><code>@article{ma2026glowtact,
+          <pre><code id="bibtex-code">@article{ma2026glowtact,
   title   = {GlowTact: Simple and Compact Vision-Based
              Tactile Sensing with High Sensitivity and Spatial Resolution},
   author  = {Ma, Yuxiang and Tippur, Megha and Ye, Pengfei and Liu, Sandra Q.
@@ -981,13 +997,15 @@
   journal = {arXiv preprint arXiv:2609.32471},
   year    = {2026}
 }</code></pre>
+          <button class="copy-bibtex" type="button" data-copy-target="bibtex-code" data-copy-status="copy-status">Copy BibTeX</button>
+          <span class="visually-hidden" id="copy-status" role="status"></span>
         </div>
       </section>
     </main>
 
     <footer class="instrument-footer">
       <p>GlowTact</p>
-      <span class="build-stamp" aria-hidden="true">2026-10-05 · 33a48cc</span>
+      <span class="build-stamp" aria-hidden="true">2026-10-06 · eae3dd4</span>
     </footer>
   </body>
 </html>

@@ -8,6 +8,7 @@ import re
 import sys
 
 from playwright.sync_api import (
+    Error as PlaywrightError,
     Page,
     TimeoutError as PlaywrightTimeoutError,
     sync_playwright,
@@ -1801,6 +1802,374 @@ def check_gap_label(browser, route: str = "/concept-04/") -> None:
             raise AssertionError(f"{route}@{vp_name}: the state sentence was removed from /v2/")
 
 
+PLAY_PROBE = r"""
+(() => {
+  window.__plays = [];
+  const nativePlay = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function (...args) {
+    window.__plays.push((this.querySelector('source') || {}).getAttribute?.('src') || this.currentSrc);
+    return nativePlay.apply(this, args);
+  };
+})();
+"""
+
+EVIDENCE_CLIPS = ("mms-contact-720", "screw-m2", "fingerprint-progression")
+SHEAR_CLIPS = ("1_fingertip", "2_coin", "4_phillips_head_screw_M5")
+
+GLOW_JS = r"""() => {
+    const chromatic = (color) => {
+        const [r, g, b, a = 1] = color.match(/[\d.]+/g).map(Number);
+        return a > 0 && Math.max(r, g, b) - Math.min(r, g, b) > 40;
+    };
+    const shadowGlow = (value) => value && value !== 'none' &&
+        value.split(/,(?![^(]*\))/).some(part => {
+            if (/inset/.test(part)) return false;
+            const color = part.match(/rgba?\([^)]*\)/);
+            if (!color) return false;
+            const [x, y, blur] = part.replace(color[0], '').trim().split(/\s+/).map(parseFloat);
+            return x === 0 && y === 0 && blur > 0 && chromatic(color[0]);
+        });
+    const filterGlow = (value) => value && value !== 'none' &&
+        [...value.matchAll(/drop-shadow\((rgba?\([^)]*\))\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px\)/g)]
+            .some(m => +m[2] === 0 && +m[3] === 0 && +m[4] > 0 && chromatic(m[1]));
+    const out = [];
+    for (const el of document.querySelectorAll('body *')) {
+        for (const pseudo of [null, '::before', '::after']) {
+            const s = getComputedStyle(el, pseudo);
+            if (pseudo && s.content === 'none') continue;
+            if (shadowGlow(s.boxShadow) || shadowGlow(s.textShadow) || filterGlow(s.filter)) {
+                const name = typeof el.className === 'string' ? el.className : el.getAttribute('class');
+                out.push((name || el.tagName).slice(0, 40) + (pseudo || ''));
+            }
+        }
+    }
+    return out.slice(0, 6);
+}"""
+
+ABSTRACT_MEASURE_JS = r"""() => {
+    const p = document.querySelector('.research-abstract');
+    const range = document.createRange();
+    range.selectNodeContents(p);
+    const tops = [...range.getClientRects()].map(r => r.top).sort((a, b) => a - b);
+    let lines = tops.length ? 1 : 0;
+    for (let i = 1; i < tops.length; i++) if (tops[i] - tops[i - 1] > 4) lines++;
+    return Math.round(p.textContent.replace(/\s+/g, ' ').trim().length / Math.max(lines, 1));
+}"""
+
+RAIL_FIT_JS = r"""() => [...document.querySelectorAll('.state-rail li')].map(li => {
+    const button = li.querySelector('button');
+    const label = li.querySelector('strong');
+    const style = getComputedStyle(label);
+    return {
+        state: li.dataset.state,
+        fits: !!button && button.getBoundingClientRect().right <= li.getBoundingClientRect().right + 1,
+        cut: label.scrollWidth > label.clientWidth + 1 ||
+            (style.whiteSpace === 'nowrap' && style.textOverflow === 'ellipsis'),
+    };
+})"""
+
+
+def let_media_through(page: Page) -> None:
+    """Like block_media for images and fonts, but clips load: the reader-pause
+    assertion needs a clip that is really playing."""
+
+    def handle(route) -> None:
+        kind = route.request.resource_type
+        if kind == "image":
+            route.fulfill(status=200, content_type="image/gif", body=TRANSPARENT_GIF)
+            return
+        if kind == "font":
+            route.fulfill(status=204, body=b"")
+            return
+        route.continue_()
+
+    page.route("**/*", handle)
+
+
+def check_figure_round1(browser, route: str = "/concept-04/") -> None:
+    """The /v2/ critique fixes of 2026-10-06 and their code review, frozen.
+    Every failure is collected, so one run shows each regression.
+
+    - Light touch leads with the placement demonstration, not a force floor,
+      and the controlled threshold is a claim beside it.
+    - Evidence clips play while in view, never under reduced motion; the
+      native control bar stays off the frame until hover or focus; a clip
+      the reader paused stays paused when it scrolls back into view.
+    - State chips are buttons that move the slider, carry aria-current, and
+      fit their cells at every width; the dot on each chip is not a dead
+      zone; one hidden live status names the state.
+    - The legend encodes ray, gap and coupling by shape, not only colour.
+    - No zero-offset coloured glow, filter drop-shadows included, with the
+      instrument pressed (where the coupling seam is drawn).
+    - Phone: the nav stays, the shear tabs sit in one row, the Camera tab
+      label is centred.
+    - Exploded views open full size and say so; BibTeX copy reports through
+      a status region; the abstract keeps a readable measure.
+    """
+    problems: list[str] = []
+
+    def attempt(label: str, step) -> None:
+        try:
+            step()
+        except (AssertionError, PlaywrightError) as error:
+            problems.append(f"{label}: {str(error).splitlines()[0][:160]}")
+
+    context = browser.new_context(viewport=AUDIT_VIEWPORTS["laptop"])
+    try:
+        context.add_init_script(PLAY_PROBE)
+        page = context.new_page()
+        block_media(page)
+        issues = collect_runtime_issues(page)
+        navigate(page, route)
+
+        def headline() -> None:
+            got = page.evaluate(
+                """() => {
+                    const h3 = document.querySelector('#sensitivity-title');
+                    const head = document.querySelector('#sensitivity .module-header');
+                    return {
+                        title: h3 ? h3.textContent.replace(/\\s+/g, ' ').trim() : '',
+                        threshold: !!(head && head.querySelector(
+                            '[data-metric="sensitivity.min_detectable_force_median_glowtact"]')),
+                    };
+                }"""
+            )
+            if re.search(r"(?i:newton)|\b\d[\d.,]*\s*m?N\b", got["title"]):
+                problems.append(f"sensitivity headline claims a force: {got['title']!r}")
+            if not got["threshold"]:
+                problems.append("controlled threshold is not a claim in the sensitivity header")
+
+        def clip_setup() -> None:
+            clips = page.evaluate(
+                """() => [...document.querySelectorAll('#sensitivity video, #shear video')].map(v => ({
+                    evidence: v.dataset.evidence || '', controls: v.controls, tab: v.tabIndex,
+                    loop: v.loop, preload: v.preload}))"""
+            )
+            want = {"evidence": "in-view", "controls": False, "tab": 0, "loop": True, "preload": "none"}
+            if len(clips) != 6 or any(c != want for c in clips):
+                problems.append(f"evidence clips are not in-view loops with controls off the frame: {clips}")
+            page.locator("#sensitivity .passive-pair").scroll_into_view_if_needed()
+            page.wait_for_timeout(700)
+            played = page.evaluate("window.__plays || []")
+            missing = [name for name in EVIDENCE_CLIPS if not any(name in str(src) for src in played)]
+            if missing:
+                problems.append(f"light-touch clips did not start in view: {missing}")
+            first = page.locator("#sensitivity video").first
+            first.hover()
+            if not first.evaluate("v => v.controls"):
+                problems.append("hovering an evidence clip does not bring its controls back")
+
+        def states() -> None:
+            if page.locator(".mechanism-toolbar").count():
+                problems.append("the mechanism still repeats the interface state in a toolbar")
+            status = page.locator("#toolbar-state")
+            box = status.bounding_box() if status.count() else None
+            if not box or box["width"] > 1 or box["height"] > 1:
+                problems.append(f"the state status is missing or visible: {box}")
+            for state, percent, title in (("gap", "0%", "Air gap"),
+                                          ("expanded", "80%", "Expanded coupling")):
+                page.locator(f'.state-rail li[data-state="{state}"] button').click()
+                page.wait_for_timeout(120)
+                got = page.evaluate(
+                    """() => ({
+                        percent: document.querySelector('#pressure-percent').value,
+                        active: document.querySelector('.state-rail li.is-active')?.dataset.state,
+                        current: [...document.querySelectorAll('.state-rail [aria-current="step"]')]
+                          .map(el => el.tagName + ':' + el.closest('li').dataset.state),
+                        status: document.querySelector('#toolbar-state')?.value,
+                    })"""
+                )
+                want = {"percent": percent, "active": state,
+                        "current": [f"BUTTON:{state}"], "status": title}
+                if got != want:
+                    problems.append(f"state chip {state!r}: {got}, expected {want}")
+            dot = page.evaluate(
+                """() => {
+                    const li = document.querySelector('.state-rail li[data-state="local"]');
+                    const r = li.getBoundingClientRect();
+                    const before = getComputedStyle(li, '::before');
+                    const x = r.left + parseFloat(before.left) + parseFloat(before.width) / 2;
+                    const hit = document.elementFromPoint(x, r.top + r.height / 2);
+                    return !!(hit && hit.closest('button') === li.querySelector('button'));
+                }"""
+            )
+            if not dot:
+                problems.append("clicking a state chip's dot misses its button")
+
+        def legend() -> None:
+            marks = page.evaluate(
+                """() => Object.fromEntries(['ray', 'gap', 'coupling'].map(name => {
+                    const s = getComputedStyle(document.querySelector('.legend-' + name));
+                    return [name, [s.height, s.borderTopStyle, s.borderTopWidth].join(' ')];
+                }))"""
+            )
+            if len(set(marks.values())) < 3:
+                problems.append(f"legend marks differ only by colour: {marks}")
+
+        def glows() -> None:
+            # Runs after the "expanded" chip: the coupling seam is drawn at 80 %.
+            found = page.evaluate(GLOW_JS)
+            if found:
+                problems.append(f"zero-offset coloured glows: {found}")
+
+        def reading() -> None:
+            links = page.evaluate(
+                """() => [...document.querySelectorAll('.form-comparison article')].map(card => {
+                    const img = card.querySelectorAll('img.form-photo')[1];
+                    const link = img && img.closest('a.form-zoom');
+                    return !!(link && link.getAttribute('href') === img.getAttribute('src')
+                              && !link.hasAttribute('aria-label') && img.alt
+                              && /new tab/.test(link.textContent));
+                })"""
+            )
+            if links != [True, True, True]:
+                problems.append(f"exploded views do not open full size with a described link: {links}")
+            button = page.locator('.research-meta button[data-copy-target="bibtex-code"]')
+            if not button.count() or button.get_attribute("aria-live"):
+                problems.append("no Copy BibTeX action, or the button itself is a live region")
+            else:
+                button.click()
+                page.wait_for_timeout(200)
+                said = page.evaluate(
+                    "() => document.getElementById(document.querySelector('[data-copy-status]')"
+                    "?.dataset.copyStatus)?.textContent || ''"
+                )
+                if not said:
+                    problems.append("copying BibTeX announces nothing")
+            measure = page.evaluate(ABSTRACT_MEASURE_JS)
+            if measure > 80:
+                problems.append(f"abstract runs {measure} characters per line (keep it at 80 or under)")
+
+        attempt("headline", headline)
+        attempt("clips", clip_setup)
+        attempt("states", states)
+        attempt("legend", legend)
+        attempt("glows", glows)
+        attempt("reading", reading)
+        if issues:
+            problems.append(f"runtime issues: {'; '.join(issues)}")
+    finally:
+        context.close()
+
+    # A chip at 901-1060 px once overflowed its cell: the button could not
+    # shrink below "Expanded coupling". The checks run on fallback fonts, so
+    # the truncating style itself fails as well as measured overflow.
+    for width in (901, 1024):
+        page = browser.new_page(viewport={"width": width, "height": 900})
+        try:
+            block_media(page)
+            navigate(page, route)
+            rail = page.evaluate(RAIL_FIT_JS)
+            bad = [r["state"] for r in rail if not r["fits"] or r["cut"]]
+            if bad:
+                problems.append(f"@{width}: state chips spill or truncate: {bad}")
+        finally:
+            page.close()
+
+    context = browser.new_context(viewport=AUDIT_VIEWPORTS["laptop"])
+    try:
+        context.add_init_script(PLAY_PROBE)
+        page = context.new_page()
+        let_media_through(page)
+        navigate(page, route)
+
+        def reader_pause() -> None:
+            page.locator("#sensitivity .passive-pair").scroll_into_view_if_needed()
+            page.wait_for_function(
+                "() => { const v = document.querySelector('#sensitivity video');"
+                " return v && !v.paused && v.currentTime > 0.2; }",
+                timeout=8000,
+            )
+            mark = page.evaluate(
+                "() => { document.querySelector('#sensitivity video').pause();"
+                " return window.__plays.length; }"
+            )
+            page.evaluate("window.scrollTo(0, 0)")
+            page.wait_for_timeout(600)
+            page.locator("#sensitivity .passive-pair").scroll_into_view_if_needed()
+            page.wait_for_timeout(900)
+            again = page.evaluate(
+                "m => window.__plays.slice(m).filter(s => String(s).includes('mms-contact-720')).length",
+                mark,
+            )
+            paused = page.evaluate("() => document.querySelector('#sensitivity video').paused")
+            if again or not paused:
+                problems.append("a clip the reader paused starts again when it scrolls back into view")
+
+        attempt("reader pause", reader_pause)
+    finally:
+        context.close()
+
+    calm = browser.new_context(viewport=AUDIT_VIEWPORTS["laptop"], reduced_motion="reduce")
+    try:
+        calm.add_init_script(PLAY_PROBE)
+        page = calm.new_page()
+        block_media(page)
+        navigate(page, route)
+
+        def still() -> None:
+            for selector in ("#sensitivity .passive-pair", "#shear .shear-clips"):
+                page.locator(selector).scroll_into_view_if_needed()
+                page.wait_for_timeout(600)
+            played = page.evaluate("window.__plays || []")
+            moving = [src for src in played
+                      if any(name in str(src) for name in EVIDENCE_CLIPS + SHEAR_CLIPS)]
+            if moving:
+                problems.append(f"evidence clips play under reduced motion: {moving}")
+
+        attempt("reduced motion", still)
+    finally:
+        calm.close()
+
+    # 390 wide: the detector caught a cut-off state name there.
+    phone = browser.new_page(viewport=VIEWPORTS["mobile"])
+    try:
+        block_media(phone)
+        navigate(phone, route)
+
+        def small() -> None:
+            got = phone.evaluate(
+                r"""() => {
+                    const links = [...document.querySelectorAll('.instrument-header nav a')].map(a => {
+                        const r = a.getBoundingClientRect();
+                        return r.width >= 44 && r.height >= 44 && getComputedStyle(a).visibility !== 'hidden';
+                    });
+                    const tabs = [...document.querySelectorAll('.shear-tabs button')];
+                    const shown = tabs.filter(b => b.getBoundingClientRect().width > 0);
+                    const camera = document.querySelector('#micro-tab-camera');
+                    let offset = null;
+                    if (camera) {
+                        const range = document.createRange();
+                        range.selectNodeContents(camera);
+                        const t = range.getBoundingClientRect(), b = camera.getBoundingClientRect();
+                        offset = Math.round(Math.abs((t.top + t.bottom) / 2 - (b.top + b.bottom) / 2));
+                    }
+                    return {
+                        links,
+                        tabs: tabs.length, shown: shown.length,
+                        rows: new Set(shown.map(b => Math.round(b.getBoundingClientRect().top))).size,
+                        cameraOffset: offset,
+                    };
+                }"""
+            )
+            if len(got["links"]) != 3 or not all(got["links"]):
+                problems.append(f"phone nav is missing or under 44px: {got['links']}")
+            if got["tabs"] != 3 or got["shown"] != 3 or got["rows"] != 1:
+                problems.append(f"phone shear tabs are hidden or wrap: {got}")
+            if got["cameraOffset"] is None or got["cameraOffset"] > 2:
+                problems.append(f"phone Camera tab label is off centre by {got['cameraOffset']}px")
+            bad = [r["state"] for r in phone.evaluate(RAIL_FIT_JS) if not r["fits"] or r["cut"]]
+            if bad:
+                problems.append(f"phone state chips spill or truncate: {bad}")
+
+        attempt("phone", small)
+    finally:
+        phone.close()
+
+    if problems:
+        raise AssertionError(f"{route}: " + "; ".join(problems))
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
@@ -1822,6 +2191,7 @@ def main() -> int:
                 check_probe_footprints(browser, route)
             check_keyboard_focus(browser)
             check_reduced_motion(browser)
+            check_figure_round1(browser)
         if MODE in {"all", "design"}:
             check_design_system(browser)
             for route in SIGNAL_ROUTES:
