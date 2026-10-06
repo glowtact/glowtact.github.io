@@ -1760,6 +1760,47 @@ def check_results_region(browser, route: str) -> None:
     page.close()
 
 
+def check_gap_label(browser, route: str = "/concept-04/") -> None:
+    """The /v2/ air-gap label sits in the gap it names (2026-10-06): its
+    centre lies below the membrane's underside and above the median gel
+    surface under it, at rest. It used to float at y 60-75 of 320, inside
+    the black membrane, with the gap at y 142-190."""
+    for vp_name in ("phone", "laptop"):
+        page = browser.new_page(viewport=AUDIT_VIEWPORTS[vp_name])
+        block_media(page)
+        navigate(page, route)
+        page.locator("#signal-pressure").fill("0")
+        page.wait_for_timeout(150)
+        got = page.evaluate(
+            """() => {
+                const svg = document.getElementById('micro-svg');
+                const box = svg.getBoundingClientRect();
+                const k = 520 / box.width;
+                const lab = document.querySelector('.stage-label--gap').getBoundingClientRect();
+                const x0 = (lab.left - box.left) * k, x1 = (lab.right - box.left) * k;
+                const cy = ((lab.top + lab.bottom) / 2 - box.top) * k;
+                const sample = (el) => {
+                    const L = el.getTotalLength(), pts = [];
+                    for (let i = 0; i <= 800; i++) pts.push(el.getPointAtLength(L * i / 800));
+                    return pts.filter(p => p.x >= x0 && p.x <= x1).map(p => p.y);
+                };
+                const membrane = Math.max(...sample(document.getElementById('micro-membrane')));
+                const surface = sample(document.getElementById('micro-surface-line')).sort((a, b) => a - b);
+                return {cy: Math.round(cy), membrane: Math.round(membrane),
+                        surface: Math.round(surface[Math.floor(surface.length / 2)]),
+                        stateCopy: !!document.getElementById('state-copy')};
+            }"""
+        )
+        page.close()
+        if not got["membrane"] < got["cy"] < got["surface"]:
+            raise AssertionError(
+                f"{route}@{vp_name}: air-gap label centre y={got['cy']} is not in the gap "
+                f"(membrane {got['membrane']}, gel surface median {got['surface']})"
+            )
+        if got["stateCopy"]:
+            raise AssertionError(f"{route}@{vp_name}: the state sentence was removed from /v2/")
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
@@ -1792,6 +1833,7 @@ def main() -> int:
             for route in SIGNAL_ROUTES:
                 check_results_region(browser, route)
             check_type_hierarchy(browser)
+            check_gap_label(browser)
             for route in SIGNAL_ROUTES:
                 check_hero_actions(browser, route)
             for route in SIGNAL_ROUTES:
