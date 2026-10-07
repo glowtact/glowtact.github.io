@@ -277,6 +277,13 @@ redirect to the root so old links keep working.
 - No video captions (2026-10-07, author: "good videos should explain
   themselves"): every video's figcaption carries no text (the object and
   tactile thumbnails stay), and the live section shows its heading only.
+- Three cutting rounds (2026-10-07, author: "each section should only have
+  the information we want to deliver"): 343 -> 284 visible words. Results
+  carry the claim and its numbers; the mechanism band states the mechanism
+  once and each "Why it's simple" line adds only what its title does not
+  say; the form-factor section is its heading and the three names; the
+  hero caption keeps the message, not the picture. `PAGE_BUDGET_WORDS` in
+  `browser_check.py` holds the page at 290.
 
 - Same model and `data-metric` sources as concept-03; every page-level
   check in `browser_check.py` runs on both routes. The copy, the controls

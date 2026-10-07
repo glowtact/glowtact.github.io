@@ -1312,6 +1312,19 @@ def check_hero_actions(browser, route: str) -> None:
 # A section that grows past this is a regression; ratchet the number down
 # when something is removed, never up to make a build pass.
 PAGE_BUDGET_SCREENS = {"phone": 13.4, "laptop": 12.6}
+# Visible words in <main> (screen-reader-only text excluded). Three cutting
+# rounds on 2026-10-07 took the published page from 343 to 284 ("each
+# section should only have the information we want to deliver"); the same
+# ratchet rule as the screens applies.
+PAGE_BUDGET_WORDS = {"/concept-04/": 290}
+VISIBLE_WORDS_JS = r"""() => {
+    const m = document.querySelector('main').cloneNode(true);
+    m.querySelectorAll('.visually-hidden, .canvas-fallback').forEach(e => e.remove());
+    document.body.appendChild(m);
+    const n = m.innerText.split(/\s+/).filter(Boolean).length;
+    m.remove();
+    return n;
+}"""
 
 
 def check_page_budget(browser, route: str) -> None:
@@ -1328,6 +1341,13 @@ def check_page_budget(browser, route: str) -> None:
             raise AssertionError(
                 f"signal@{vp_name}: {screens:.1f} screens exceeds the budget of {limit}"
             )
+        words = PAGE_BUDGET_WORDS.get(route)
+        if words is not None and vp_name == "laptop":
+            count = page.evaluate(VISIBLE_WORDS_JS)
+            if count > words:
+                raise AssertionError(
+                    f"{route}: {count} visible words exceeds the budget of {words}"
+                )
         page.close()
 
 
