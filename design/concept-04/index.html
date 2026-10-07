@@ -178,7 +178,7 @@
           >
           <figcaption>
             <span class="fig-no">Fig. 1</span>
-            GlowTact fingertips grasping a screw. Where they touch it, the raw tactile image turns dark.
+            Contact turns dark in the raw tactile image.
           </figcaption>
         </figure>
       </section>
@@ -634,19 +634,18 @@
               <div>
                 <dt>Passive contact</dt>
                 <dd>
-                  An M&amp;M (<strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g,
-                  <span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN) and an M2 screw
-                  (<strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g,
-                  <span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN), set on the
-                  flat sensor with no added load.
+                  M&amp;M, <strong data-metric="sensitivity.passive_mm_mass">1.0</strong>&nbsp;g
+                  (<span data-metric="sensitivity.passive_mm_force">9.8</span>&nbsp;mN);
+                  M2 screw, <strong data-metric="sensitivity.passive_m2_mass">0.2</strong>&nbsp;g
+                  (<span data-metric="sensitivity.passive_m2_force">1.96</span>&nbsp;mN).
                 </dd>
               </div>
               <div>
                 <dt>Controlled threshold</dt>
                 <dd>
                   <strong data-metric="sensitivity.min_detectable_force_median_glowtact" data-metric-scale="1000">120</strong>&nbsp;mN
-                  median minimum detectable force at SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>,
-                  across <span data-metric="sensitivity.probe_count">10</span> probes.
+                  median at SNR&nbsp;=&nbsp;<span data-metric="sensitivity.snr_threshold">3</span>,
+                  <span data-metric="sensitivity.probe_count">10</span> probes.
                 </dd>
               </div>
             </dl>
@@ -689,8 +688,7 @@
           <header class="module-header">
             <h3 id="reconstruction-title">Fine contact geometry down to M1 threads</h3>
             <p class="module-claim">
-              The relief, computed from the darkening, resolves the
-              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong>&nbsp;mm thread pitch.
+              <strong data-metric="reconstruction.finest_thread_pitch">0.25</strong>&nbsp;mm pitch, from a single frame.
             </p>
           </header>
 
@@ -821,8 +819,7 @@
           <header class="module-header">
             <h3 id="shear-title">Shear from the gel&#8217;s own speckle</h3>
             <p class="module-claim">
-              The tracked field is usable over
-              <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the sensing surface.
+              No markers; usable over <strong data-metric="shear.usable_field_lcn_clahe">97.8</strong>&nbsp;% of the surface.
             </p>
           </header>
 
