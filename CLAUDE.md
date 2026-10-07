@@ -34,9 +34,8 @@ GLOWTACT_CHECK_MODE=behavior python3 design/browser_check.py   # interactions, k
 GLOWTACT_CHECK_MODE=design   python3 design/browser_check.py   # contrast, touch targets, type scale, overflow, media, results region, type hierarchy
 python3 design/browser_check.py                                # all three
 
-# Regenerate the published root from concept-03 (link-checks; refuses to write a broken page).
+# Regenerate the published root from concept-04 (link-checks; refuses to write a broken page).
 python3 design/tools/publish.py
-python3 design/tools/publish.py --source design/concept-04 --target v2/index.html   # the light /v2/ variant
 
 # Full release: stamp -> publish -> verify -> browser_check (all) -> commit -> stamp commit -> push origin main.
 python3 design/tools/release.py "type(scope): subject" [--body file] [--skip-checks]
@@ -55,15 +54,16 @@ concept-03's contact model in page scope and `design/shots.py` takes mechanism s
 
 - `design/` is the review build: `design/index.html` is a hub comparing three concepts; `concept-01/`
   (Optical Coupling), `concept-02/` (Contact Atlas) and `concept-03/` (Signal Chamber) each hold
-  `index.html` + `styles.css` + `app.js`. Concept-03 is the chosen direction and is published at the root;
-  `concept-04/` is the same page in a light figure-page register, published at `/v2/` (see DESIGN.md).
+  `index.html` + `styles.css` + `app.js`. `concept-04/` is the same page as concept-03
+  in a light figure-page register; it has been the published root since 2026-10-07 (concept-03 before, now
+  noindex). `/v2/` is a redirect to the root that keeps old links working (see DESIGN.md).
 - The repository-root `index.html` is **generated** by `design/tools/publish.py` from
-  `design/concept-03/index.html`: it prepends a DO-NOT-EDIT banner and applies the textual `REWRITES` list so
-  `./styles.css` → `./design/concept-03/styles.css`, `../assets/` → `./design/assets/`, etc. Nothing else is
+  `design/concept-04/index.html`: it prepends a DO-NOT-EDIT banner and applies the textual `REWRITES` list so
+  `./styles.css` → `./design/concept-04/styles.css`, `../assets/` → `./design/assets/`, etc. Nothing else is
   copied; the root page references CSS/JS/media where they already live under `design/`. **Never edit the root
-  `index.html` — edit concept-03 and re-run `publish.py`.**
+  `index.html` — edit concept-04 and re-run `publish.py`.**
 - Consequences of that design:
-  - Adding a new top-level asset or stylesheet/script to concept-03 requires a new entry in `publish.py`'s `REWRITES`.
+  - Adding a new top-level asset or stylesheet/script to concept-04 requires a new entry in `publish.py`'s `REWRITES`.
   - `app.js` must not build asset paths from `'../assets/'` literals — `publish.py`'s `check_runtime_paths()`
     rejects them, because the rewrite is textual and cannot see JS. Derive asset directories from the markup
     (e.g. an existing `src`) so the same script resolves from both `/design/concept-03/` and `/`.
@@ -96,7 +96,7 @@ PARAMS.md and run the design-mode check.
 
 `design/SCIENTIFIC_CONSTRAINTS.md` is normative: the mechanism is pressure-induced optical coupling with
 single-colour non-directional light (not RGB photometric stereo); the interactive demo is conceptual and must
-carry the exact disclosure sentence that `verify.py` checks for (on `/v2/`, by the author's decision of 2026-10-06,
+carry the exact disclosure sentence that `verify.py` checks for (on concept-04, the published root, by the author's decision of 2026-10-06,
 the "Schematic" and "Simulated" panel labels stand in for it and are what `verify.py` checks there); passive-object demos are not calibrated
 minimum-force measurements; GelSight Mini is a representative baseline, never "cannot detect contact".
 `verify.py` also rejects a `PROHIBITED` phrase list.

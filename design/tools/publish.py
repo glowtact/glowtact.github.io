@@ -6,7 +6,7 @@ under `design/`, so the bare domain used to 404. This writes a root
 rewritten to resolve from the repository root.
 
 Only `index.html` is generated. The concept's CSS and JS are referenced in
-place under `design/concept-03/`, and images/video in place under
+place under the concept's folder (`design/concept-04/`), and images/video in place under
 `design/assets/`, so nothing is duplicated and the published page can never
 drift from the reviewed one.
 
@@ -27,9 +27,9 @@ from html.parser import HTMLParser
 ROOT = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 )
-# The default publishes concept-03 to the root. The light variant goes to a
-# subsite with:  publish.py --source design/concept-04 --target v2/index.html
-DEFAULT_SOURCE_DIR = "design/concept-03"
+# The default publishes concept-04 to the root (since 2026-10-07; concept-03
+# before). Any concept can still go to a subsite with --source and --target.
+DEFAULT_SOURCE_DIR = "design/concept-04"
 DEFAULT_TARGET = "index.html"
 
 

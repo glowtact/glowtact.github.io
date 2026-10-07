@@ -90,12 +90,12 @@ def audit(route: Path) -> list[str]:
 
 
 def indexing(route: Path, text: str) -> list[str]:
-    """Search engines see one page: the published root. concept-03 is its
-    source (and its own route), so it declares the root canonical and the
-    article's structured data; the review hub and the other concepts are
-    noindex. Added for Search Console on 2026-10-01."""
+    """Search engines see one page: the published root. concept-04 is its
+    source since 2026-10-07 (concept-03 before), so it declares the root
+    canonical and the article's structured data; the review hub and the
+    other concepts are noindex. Added for Search Console on 2026-10-01."""
     errors: list[str] = []
-    public = route.name == "index.html" and route.parent.name in ("concept-03", ROOT.parent.name)
+    public = route.name == "index.html" and route.parent.name in ("concept-04", ROOT.parent.name)
     if public:
         if 'rel="canonical" href="https://glowtact.github.io/"' not in text:
             errors.append("missing canonical link to the published root")

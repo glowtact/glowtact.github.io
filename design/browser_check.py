@@ -23,7 +23,7 @@ ROUTES = {
     "signal": "/concept-03/",
     "figure": "/concept-04/",
 }
-# The published page and its light /v2/ variant embed the same demo and
+# concept-03 and concept-04 (the published root since 2026-10-07) embed the same demo and
 # results; every page-level check below runs on both.
 SIGNAL_ROUTES = ("/concept-03/", "/concept-04/")
 VIEWPORTS = {
@@ -1846,15 +1846,22 @@ GLOW_JS = r"""() => {
     return out.slice(0, 6);
 }"""
 
-ABSTRACT_MEASURE_JS = r"""() => {
-    const p = document.querySelector('.research-abstract');
-    const range = document.createRange();
-    range.selectNodeContents(p);
-    const tops = [...range.getClientRects()].map(r => r.top).sort((a, b) => a - b);
-    let lines = tops.length ? 1 : 0;
-    for (let i = 1; i < tops.length; i++) if (tops[i] - tops[i - 1] > 4) lines++;
-    return Math.round(p.textContent.replace(/\s+/g, ' ').trim().length / Math.max(lines, 1));
+CLOSING_PAIR_JS = r"""() => {
+    const live = document.querySelector('#live')?.getBoundingClientRect();
+    const paper = document.querySelector('#research')?.getBoundingClientRect();
+    return {
+        abstract: !!document.querySelector('.research-abstract'),
+        sideBySide: !!live && !!paper && paper.left >= live.right - 1 && Math.abs(paper.top - live.top) < 2,
+        bibtexWraps: (() => {
+            const pre = document.querySelector('#bibtex-code');
+            const range = document.createRange();
+            range.selectNodeContents(pre);
+            const rows = new Set([...range.getClientRects()].map(r => Math.round(r.top))).size;
+            return rows - pre.textContent.split('\n').length;
+        })(),
+    };
 }"""
+
 
 RAIL_FIT_JS = r"""() => [...document.querySelectorAll('.state-rail li')].map(li => {
     const button = li.querySelector('button');
@@ -1904,7 +1911,9 @@ def check_figure_round1(browser, route: str = "/concept-04/") -> None:
     - Phone: the nav stays, the shear tabs sit in one row, the Camera tab
       label is centred.
     - Exploded views open full size and say so; BibTeX copy reports through
-      a status region; the abstract keeps a readable measure.
+      a status region.
+    - Live clip and paper record sit side by side on a laptop; no abstract
+      (author, 2026-10-07).
     """
     problems: list[str] = []
 
@@ -2036,9 +2045,13 @@ def check_figure_round1(browser, route: str = "/concept-04/") -> None:
                 )
                 if not said:
                     problems.append("copying BibTeX announces nothing")
-            measure = page.evaluate(ABSTRACT_MEASURE_JS)
-            if measure > 80:
-                problems.append(f"abstract runs {measure} characters per line (keep it at 80 or under)")
+            closing = page.evaluate(CLOSING_PAIR_JS)
+            if closing["abstract"]:
+                problems.append("the abstract is back on the page; the author removed it")
+            if not closing["sideBySide"]:
+                problems.append("the live clip and the paper record must sit side by side on a laptop")
+            if closing["bibtexWraps"] > 0:
+                problems.append(f"the BibTeX column wraps {closing['bibtexWraps']} hand-broken lines")
 
         attempt("headline", headline)
         attempt("clips", clip_setup)

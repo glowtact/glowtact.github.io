@@ -73,8 +73,6 @@ def main() -> None:
 
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
     run([sys.executable, os.path.join("design", "tools", "publish.py")])
-    run([sys.executable, os.path.join("design", "tools", "publish.py"),
-         "--source", "design/concept-04", "--target", "v2/index.html"])
 
     if not args.skip_checks:
         run([sys.executable, os.path.join("design", "verify.py")])
@@ -113,8 +111,6 @@ def main() -> None:
     ).stdout.strip()
     run([sys.executable, os.path.join("design", "tools", "stamp.py")])
     run([sys.executable, os.path.join("design", "tools", "publish.py")])
-    run([sys.executable, os.path.join("design", "tools", "publish.py"),
-         "--source", "design/concept-04", "--target", "v2/index.html"])
     run(["git", "add", "-u", "design", "index.html", "v2"])
     run(["git", "commit", "-m", f"chore(design): stamp {head}\n\n{TRAILER}"])
     run(["git", "push", "origin", "main"])

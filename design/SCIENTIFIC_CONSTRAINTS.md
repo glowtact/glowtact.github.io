@@ -44,10 +44,10 @@ The mechanism is related to frustrated internal reflection, but:
 Mandatory note:
 > Conceptual visualization. Geometry and optical paths are schematic and are not a calibrated mechanical or ray-tracing simulation.
 
-Exception (author's decision, 2026-10-06): the light `/v2/` page
-(`design/concept-04/`) carries no note; its demo panels are labelled
-"Schematic" and "Simulated" instead, and `verify.py` requires those labels
-there. The published root keeps the note.
+Exception (author's decision, 2026-10-06): the light page
+(`design/concept-04/`, the published root since 2026-10-07) carries no
+note; its demo panels are labelled "Schematic" and "Simulated" instead,
+and `verify.py` requires those labels there. concept-03 keeps the note.
 
 ## Experimental Data
 - use final source data only

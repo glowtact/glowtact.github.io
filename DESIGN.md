@@ -257,13 +257,19 @@ Each of these is a detector rule; the id is in brackets.
   computed styles know what a `clamp()` resolved to. The h1 is exempt from the 1.15× step: on a
   phone it is already sized by the viewport, and forcing a step there would shrink the h2]
 
-## Light register: /v2/ (concept-04)
+## Light register: the published root (concept-04)
 
-`design/concept-04/` is the published page's content in a light
-figure-page register, served at `https://glowtact.github.io/v2/` by
-`publish.py --source design/concept-04 --target v2/index.html`. The root
-stays concept-03. Added 2026-10-05 at the author's request: "the website
-feels crowded … improve the layout, color, especially the text."
+`design/concept-04/` is concept-03's content in a light figure-page
+register. Added 2026-10-05 at /v2/ at the author's request: "the website
+feels crowded … improve the layout, color, especially the text." On
+2026-10-07 the author made it the current version: `publish.py` now
+writes it to the root, concept-03 is noindex, and `v2/index.html` is a
+redirect to the root so old links keep working.
+
+- Closing band (2026-10-07): the live clip and the paper record sit side
+  by side (5fr / 6fr, one column below 900px); the abstract is not shown;
+  the BibTeX is broken by hand at about 55 characters and must not wrap at
+  laptop widths.
 
 - Same model and `data-metric` sources as concept-03; every page-level
   check in `browser_check.py` runs on both routes. The copy, the controls
