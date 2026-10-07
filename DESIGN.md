@@ -274,6 +274,9 @@ redirect to the root so old links keep working.
   the live clip's caption and the sentences after each sensitivity label are
   gone; the labels themselves stay. The sensitivity head's "Passive contact"
   and "Controlled threshold" still keep the two apart.
+- No video captions (2026-10-07, author: "good videos should explain
+  themselves"): every video's figcaption carries no text (the object and
+  tactile thumbnails stay), and the live section shows its heading only.
 
 - Same model and `data-metric` sources as concept-03; every page-level
   check in `browser_check.py` runs on both routes. The copy, the controls

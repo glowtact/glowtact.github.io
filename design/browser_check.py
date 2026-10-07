@@ -1748,6 +1748,18 @@ def check_results_region(browser, route: str) -> None:
         ]
         back = [phrase for phrase in cut if phrase in text]
         assert not back, f"removed captions are back on concept-04: {back}"
+        # 2026-10-07, second cut: "good videos should explain themselves".
+        # No video carries caption text (thumbnails may stay), and the live
+        # section has its heading only.
+        worded = page.evaluate(
+            """() => [...document.querySelectorAll('figure')]
+                .filter(f => f.querySelector('video'))
+                .map(f => (f.querySelector('figcaption') || {}).textContent || '')
+                .map(t => t.trim()).filter(Boolean)"""
+        )
+        assert not worded, f"video captions are back on concept-04: {worded}"
+        intro = page.evaluate("() => document.querySelectorAll('#live .section-header p').length")
+        assert intro == 0, "the live section's intro line is back on concept-04"
         assert "Controlled threshold" in text and "Passive contact" in text, (
             "the sensitivity head must still tell passive contact from the controlled threshold"
         )
