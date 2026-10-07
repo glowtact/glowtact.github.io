@@ -267,8 +267,8 @@ writes it to the root, concept-03 is noindex, and `v2/index.html` is a
 redirect to the root so old links keep working.
 
 - Closing band (2026-10-07): the live clip and the paper record sit side
-  by side (5fr / 6fr, one column below 900px); the abstract is not shown;
-  the BibTeX is broken by hand at about 55 characters and must not wrap at
+  by side (7fr / 3fr so the video reads, one column below 1100px); the abstract is not shown;
+  the BibTeX is broken by hand at 31 characters at most and must not wrap at
   laptop widths.
 - Captions cut (2026-10-07): the three module footnotes, the shear legend,
   the live clip's caption and the sentences after each sensitivity label are

@@ -3458,11 +3458,12 @@ main {
 }
 
 /* The live clip and the paper record share the closing band, side by side
-   (author, 2026-10-07); the abstract is no longer shown. */
+   (author, 2026-10-07); the abstract is no longer shown. The video takes
+   70 % so the feed reads (author: "7:3 so that the videos show better"). */
 .closing-pair {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: 56px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+  gap: 48px;
   align-items: start;
   padding-top: clamp(88px, 9vw, 128px);
 }
@@ -3479,20 +3480,15 @@ main {
   font-size: clamp(32px, 3.4vw, 44px);
 }
 
+/* The BibTeX is broken by hand at 31 characters at most to fit the narrow column. */
 .closing-pair .research-meta pre {
   max-width: 100%;
-  padding: 20px 22px;
+  padding: 18px 20px;
+  font-size: var(--text-fine);
 }
 
-/* The BibTeX is broken by hand at about 55 characters; below 1200px the
-   half-width column needs the fine size to keep those lines whole. */
-@media (max-width: 1200px) {
-  .closing-pair .research-meta pre {
-    font-size: var(--text-fine);
-  }
-}
-
-@media (max-width: 900px) {
+/* Below 1100px the 30 % column is too narrow for the entry: stack. */
+@media (max-width: 1100px) {
   .closing-pair {
     grid-template-columns: minmax(0, 1fr);
     gap: 72px;

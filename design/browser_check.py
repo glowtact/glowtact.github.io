@@ -1881,6 +1881,7 @@ CLOSING_PAIR_JS = r"""() => {
     return {
         abstract: !!document.querySelector('.research-abstract'),
         sideBySide: !!live && !!paper && paper.left >= live.right - 1 && Math.abs(paper.top - live.top) < 2,
+        ratio: live && paper ? live.width / paper.width : 0,
         bibtexWraps: (() => {
             const pre = document.querySelector('#bibtex-code');
             const range = document.createRange();
@@ -2079,6 +2080,9 @@ def check_figure_round1(browser, route: str = "/concept-04/") -> None:
                 problems.append("the abstract is back on the page; the author removed it")
             if not closing["sideBySide"]:
                 problems.append("the live clip and the paper record must sit side by side on a laptop")
+            # 7:3 since 2026-10-07 so the live video reads (gap included).
+            if not 2.0 <= closing["ratio"] <= 2.6:
+                problems.append(f"the live clip should take about 70 % of the closing band, ratio {closing['ratio']:.2f}")
             if closing["bibtexWraps"] > 0:
                 problems.append(f"the BibTeX column wraps {closing['bibtexWraps']} hand-broken lines")
 
