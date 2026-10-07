@@ -270,6 +270,10 @@ redirect to the root so old links keep working.
   by side (5fr / 6fr, one column below 900px); the abstract is not shown;
   the BibTeX is broken by hand at about 55 characters and must not wrap at
   laptop widths.
+- Captions cut (2026-10-07): the three module footnotes, the shear legend,
+  the live clip's caption and the sentences after each sensitivity label are
+  gone; the labels themselves stay. The sensitivity head's "Passive contact"
+  and "Controlled threshold" still keep the two apart.
 
 - Same model and `data-metric` sources as concept-03; every page-level
   check in `browser_check.py` runs on both routes. The copy, the controls

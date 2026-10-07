@@ -1735,8 +1735,25 @@ def check_results_region(browser, route: str) -> None:
         "els => els.map(el => [el.id, !!el.querySelector('.module-scope')])",
     )
     assert len(modules) == 3, f"expected 3 result modules, found {len(modules)}"
-    missing = [name for name, has in modules if not has]
-    assert not missing, f"result modules without a scope footnote: {missing}"
+    if route == "/concept-04/":
+        # The author cut the footnotes and the explanatory captions from the
+        # published page (2026-10-07); the sensitivity head still separates
+        # passive contact from the controlled threshold.
+        kept = [name for name, has in modules if has]
+        assert not kept, f"scope footnotes are back on concept-04: {kept}"
+        text = page.evaluate(r"() => document.querySelector('main').textContent.replace(/\s+/g, ' ')")
+        cut = [
+            "Stabilized view", "We track the tablet", "Each frame reports",
+            "The inset at lower right", "The lightest object", "Five steps of rising",
+        ]
+        back = [phrase for phrase in cut if phrase in text]
+        assert not back, f"removed captions are back on concept-04: {back}"
+        assert "Controlled threshold" in text and "Passive contact" in text, (
+            "the sensitivity head must still tell passive contact from the controlled threshold"
+        )
+    else:
+        missing = [name for name, has in modules if not has]
+        assert not missing, f"result modules without a scope footnote: {missing}"
 
     # The paper was de-anonymised on 2026-09-27: the research record names
     # the authors and the BibTeX key is theirs.
